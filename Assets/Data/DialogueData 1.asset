@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27314b85532662f4997deb3f841988a2, type: 3}
+  m_Name: DialogueData 1
+  m_EditorClassIdentifier: 
+  checkingTalentName: 
+  ckeckingSkillLevel: 0
+  seccuedIndex: 0
+  failedIndex: 0
+  hasChecked: 0
+  dialogue:
+  - speekerIndex: 0
+    nextLine: 0
+    checkingSkillName: 
+    checkingSkillLevel: 0
+    line: "\u5927\u54E5\uFF1F"
+    options: []
+  - speekerIndex: 0
+    nextLine: 0
+    checkingSkillName: 
+    checkingSkillLevel: 0
+    line: "\u8FD9\u624D\u6253\u4E86\u51E0\u884C\u554A\uFF1F"
+    options: []
+  - speekerIndex: 0
+    nextLine: 0
+    checkingSkillName: 
+    checkingSkillLevel: 0
+    line: "\u5C31\u8FD9\u4E2A\u6548\u7387\u7EE9\u6548\u5B8C\u4E0D\u6210\u7684\u554A"
+    options: []
+  - speekerIndex: 0
+    nextLine: 0
+    checkingSkillName: 
+    checkingSkillLevel: 0
+    line: "\u5DEE\u4E0D\u591A\u5C31\u8D76\u7D27\u7EE7\u7EED\u5427"
+    options: []
+  - speekerIndex: 0
+    nextLine: 0
+    checkingSkillName: 
+    checkingSkillLevel: 0
+    line: "\u521A\u4E0A\u73ED\uFF0C\u73CD\u60DC\u673A\u4F1A\u54C8"
+    options: []

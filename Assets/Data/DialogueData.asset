@@ -1,0 +1,96 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27314b85532662f4997deb3f841988a2, type: 3}
+  m_Name: DialogueData
+  m_EditorClassIdentifier: 
+  checkingTalentName: Listen
+  ckeckingSkillLevel: 2
+  seccuedIndex: 1
+  failedIndex: 5
+  hasChecked: 1
+  dialogue:
+  - speekerIndex: 0
+    nextLine: 0
+    checkingSkillName: 
+    checkingSkillLevel: 0
+    line: "\u6709\u4E8B\u5417\uFF1F"
+    options:
+    - line: "\u4F60\u5988"
+      checkingSkillName: Speak
+      checkingSkillLevel: 1
+      effectType: 0
+      failedEffectType: 0
+      succedJumpToLine: 0
+      failedJumpToLine: 4
+      jumpToLine: 0
+      hasChecked: 1
+      strings:
+      - 1
+      failedStrings: []
+    - line: "\u6CA1\u4E8B.."
+      checkingSkillName: 
+      checkingSkillLevel: 0
+      effectType: 0
+      failedEffectType: 0
+      succedJumpToLine: 999
+      failedJumpToLine: 0
+      jumpToLine: 999
+      hasChecked: 0
+      strings: []
+      failedStrings: []
+  - speekerIndex: 0
+    nextLine: 0
+    checkingSkillName: 
+    checkingSkillLevel: 0
+    line: "\u554A\uFF1F"
+    options:
+    - line: "\u4F60\u5988\u8FD8\u597D\u5417\uFF1F"
+      checkingSkillName: Speak
+      checkingSkillLevel: 2
+      effectType: 2
+      failedEffectType: 0
+      succedJumpToLine: 0
+      failedJumpToLine: 4
+      jumpToLine: 0
+      hasChecked: 1
+      strings:
+      - 1
+      failedStrings: []
+    - line: "\u6CA1\u4E8B"
+      checkingSkillName: 
+      checkingSkillLevel: 0
+      effectType: 0
+      failedEffectType: 0
+      succedJumpToLine: 999
+      failedJumpToLine: 0
+      jumpToLine: 999
+      hasChecked: 0
+      strings: []
+      failedStrings: []
+  - speekerIndex: 0
+    nextLine: 999
+    checkingSkillName: 
+    checkingSkillLevel: 0
+    line: "\u5443\u2026\u2026\u8FD8\u597D\u2026\u2026\u591A\u8C22\u5173\u5FC3\uFF1F"
+    options: []
+  - speekerIndex: 0
+    nextLine: 999
+    checkingSkillName: 
+    checkingSkillLevel: 0
+    line: "\u4F60\u6CA1\u75C5\u5427\uFF1F\u5148\u8BF4\u597D\uFF0C\u521A\u6765\u4E0D\u80FD\u8BF7\u5047\u7684"
+    options: []
+  - speekerIndex: 0
+    nextLine: 0
+    checkingSkillName: 
+    checkingSkillLevel: 0
+    line: "\u548B\uFF0C\u5DEE\u4E0D\u591A\u56DE\u53BB\u5E72\u6D3B\u4E86\u5427"
+    options: []

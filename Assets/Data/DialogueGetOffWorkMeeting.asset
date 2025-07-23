@@ -1,0 +1,89 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27314b85532662f4997deb3f841988a2, type: 3}
+  m_Name: DialogueGetOffWorkMeeting
+  m_EditorClassIdentifier: 
+  lineCheckingType: 0
+  checkingName: 
+  ckeckingValue: 0
+  seccuedIndex: 0
+  failedIndex: 0
+  hasChecked: 0
+  dialogue:
+  - speekerIndex: 0
+    nextLine: 0
+    checkingSkillName: 
+    checkingSkillLevel: 0
+    line: "\u5F00\u665A\u4F1A\uFF01"
+    options:
+    - line: "\u597D\u8036\uFF01\u4E0B\u73ED\uFF01"
+      checkingSkillName: 
+      checkingSkillLevel: 0
+      effectType: 0
+      failedEffectType: 0
+      succedJumpToLine: 0
+      failedJumpToLine: 0
+      jumpToLine: 0
+      hasChecked: 0
+      strings: []
+      failedStrings: []
+    - line: "\u6211\u8FD8\u60F3\u7EE7\u7EED\u5E72\u6D3B\uFF0C\u6211\u4E0D\u60F3\u4E0B\u73ED\uFF01"
+      checkingSkillName: 
+      checkingSkillLevel: 0
+      effectType: 0
+      failedEffectType: 0
+      succedJumpToLine: 0
+      failedJumpToLine: 0
+      jumpToLine: 0
+      hasChecked: 0
+      strings: []
+      failedStrings: []
+  - speekerIndex: 0
+    nextLine: 0
+    checkingSkillName: 
+    checkingSkillLevel: 0
+    line: "\u6211\u7B80\u5355\u8BF4\u4E00\u4E0B"
+    options: []
+  - speekerIndex: 0
+    nextLine: 0
+    checkingSkillName: 
+    checkingSkillLevel: 0
+    line: "\u660E\u5929\u7684\u6307\u6807\u662F\u2026\u2026"
+    options:
+    - line: "\u660E\u5929\u7684\u6307\u6807\u662F\uFF1F"
+      checkingSkillName: 
+      checkingSkillLevel: 0
+      effectType: 0
+      failedEffectType: 0
+      succedJumpToLine: 0
+      failedJumpToLine: 0
+      jumpToLine: 0
+      hasChecked: 0
+      strings: []
+      failedStrings: []
+  - speekerIndex: 0
+    nextLine: 0
+    checkingSkillName: 
+    checkingSkillLevel: 0
+    line: "\u8FD8\u6CA1\u5B9E\u73B0\uFF0C\u7B49\u5468\u8A00\u5F04\u5B8C\u518D\u8BF4"
+    options:
+    - line: "\u65E2\u7136\u5982\u6B64\uFF0C\u4E0B\u73ED\uFF01"
+      checkingSkillName: 
+      checkingSkillLevel: 0
+      effectType: 0
+      failedEffectType: 0
+      succedJumpToLine: 0
+      failedJumpToLine: 0
+      jumpToLine: 0
+      hasChecked: 0
+      strings: []
+      failedStrings: []
