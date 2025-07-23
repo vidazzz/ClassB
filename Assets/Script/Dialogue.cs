@@ -58,7 +58,7 @@ public class DialogueData : ScriptableObject {
             return failedIndex;
     }
 
-    public void ClearAllCheck()
+    public void Reset()
     {
         hasChecked = false;
         foreach (var line in dialogue)
@@ -75,11 +75,30 @@ public class DialogueData : ScriptableObject {
 [Serializable]
 public class LineNode
 {
+    [SerializeField]
+    private string line;
+    public string Line{
+        get {
+                if(formatArgNames.Length > 0)
+                {
+                    string[] formatArgs = new string[formatArgNames.Length];
+                    for ( int i = 0 ; i < formatArgNames.Length ; i ++)
+                    {
+                        formatArgs[i] = Hero.Instance.lifeController.statsPairs[formatArgNames[i]].ToString();
+                        Debug.Log(formatArgs[i]);
+                    }
+                    return string.Format(line,formatArgs);
+                }
+                else
+                    return line;
+            }
+        }
+    public string[] formatArgNames;
     public int speekerIndex = 0; //0是本人
     public int nextLine;//非选项跳转时跳转至哪句话，1base，0是按照索引找下一句
     public string checkingSkillName;
     public int checkingSkillLevel;
-    public string line;
+
     public List<DialogueOption> options;
 
     public LineNode(LineNode origin)

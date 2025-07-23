@@ -51,6 +51,9 @@ public class CutSceneController : MonoBehaviour
                 case CoroutineType.Blackout:
                     yield return StartCoroutine(Blackout(task.obj.GetComponent<Blackout>()));
                     break;
+                case CoroutineType.ResetDialuoge:
+                    ResetDialuoge(task.dialogueData);
+                    break;
                 case CoroutineType.Pusse:
                     Pusse();
                     break;
@@ -84,10 +87,14 @@ public class CutSceneController : MonoBehaviour
     {
         yield return StartCoroutine(blackout.FadeInOrOutCoroutine());
     }
-
     void  SetObjActiveFalse(GameObject obj)
     {
         obj.SetActive(false);
+    }
+
+    void  ResetDialuoge(DialogueData dialogueData)
+    {
+        dialogueData.Reset();
     }
     void  SetObjActiveTrue(GameObject obj)
     {

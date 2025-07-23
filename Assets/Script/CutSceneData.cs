@@ -29,6 +29,7 @@ public enum CoroutineType
     SetActiveTrue,
     SetActiveFalse,
     Blackout,
+    ResetDialuoge,
     Pusse,
     Resume,
 }

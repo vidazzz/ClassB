@@ -71,7 +71,7 @@ public class DialogueController : MonoBehaviour
             if(lineNode.speekerIndex != 0)            
                 textMesh = meetingTextMeshList[lineNode.speekerIndex]; //如果存在多人对话，对话框根据speekerIndex选取
             textMesh.transform.parent.gameObject.SetActive(true);
-            textMesh.text = lineNode.line;
+            textMesh.text = lineNode.Line;
             if (lineNode.options.Count > 0) //有选项
             {
                 textMesh.text += "\n";
@@ -152,7 +152,7 @@ public class DialogueController : MonoBehaviour
     {
         foreach(var dialogue in dialogues)
         {
-            dialogue.ClearAllCheck();
+            dialogue.Reset();
         }          
     }
     

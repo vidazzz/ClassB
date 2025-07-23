@@ -20,6 +20,13 @@ MonoBehaviour:
     varList: []
     dialogueData: {fileID: 0}
     destination: {fileID: 0}
+  - objName: 
+    destinationObjName: 
+    obj: {fileID: 0}
+    coroutineType: 7
+    varList: []
+    dialogueData: {fileID: 11400000, guid: f5f2fdc8bdd07634b97285d824eb10bf, type: 2}
+    destination: {fileID: 0}
   - objName: NPC
     destinationObjName: 
     obj: {fileID: 0}
