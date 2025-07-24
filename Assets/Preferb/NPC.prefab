@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 5315199179363316440}
   - component: {fileID: 1214137258827167434}
   - component: {fileID: 2805709288786834572}
-  - component: {fileID: 5115638431139286015}
   m_Layer: 2
   m_Name: Character_PopUp
   m_TagString: Untagged
@@ -107,20 +106,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &5115638431139286015
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 369351248500035377}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9cd73084224573f478d8910b2f3a9488, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  animator: {fileID: 1214137258827167434}
-  popState: 0
 --- !u!1 &1559574560598797036
 GameObject:
   m_ObjectHideFlags: 0
@@ -581,7 +566,6 @@ MonoBehaviour:
   interactionPrompt: "\u4E92\u52A8"
   interactionKey: 101
   fSpeed: 10
-  popUp: {fileID: 5115638431139286015}
   lifeController: {fileID: 0}
   spawnPosition: {x: 0, y: 0, z: 0}
   affinityEffectArgsList:
