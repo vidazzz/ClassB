@@ -72,8 +72,26 @@ public class LifeController : MonoBehaviour
         }
         Hero.Instance.DisplayStatsValue();
     }
-
-    void Try_KPI_SettleAccounts()
+    public void SalarySettleAccounts()
+    {
+        float bonus = 0;
+        if(Random.Range(0f,1f)<(statsPairs["requiredKPI"] - statsPairs["kpi"])/statsPairs["kpi"]) //发奖金的概率
+            bonus = statsPairs["kpi"]*1f;
+        float salary = statsPairs["kpi"] + bonus;
+        AddModifier("money",salary);
+        statsPairs["kpi"] = 0; //清kpi
+        if(character is Hero)
+            PopUp.Instance.ShowPopUp($"Get Salary: {salary} (with {bonus} Bonus)");
+        float newRequiredKPI = statsPairs["kpi"]+ (float)Math.Ceiling(statsPairs["requiredKPI"]*Random.Range(0,0.5f)); //计算新的KPI
+        if(statsPairs["kpi"] >= statsPairs["requiredKPI"])
+        {
+            statsPairs["lastRequiredKPI"] = statsPairs["requiredKPI"]; //数值存档
+            statsPairs["requiredKPI"] = newRequiredKPI; //如果完成了今天的KPI则KPI门槛上调
+            statsPairs["haveFinishWork"] = 1;
+        }  
+        Hero.Instance.DisplayStatsValue();
+    }
+    public void Try_KPI_SettleAccounts()
     {
         float newRequiredKPI = statsPairs["kpi"]+ (float)Math.Ceiling(statsPairs["requiredKPI"]*Random.Range(0,0.5f)); //计算新的KPI
         if(statsPairs["kpi"] >= statsPairs["requiredKPI"])
@@ -86,7 +104,7 @@ public class LifeController : MonoBehaviour
             statsPairs["haveFinishWork"] = 0;
         Hero.Instance.DisplayStatsValue();
     }
-    void TrySalarySettleAccounts()
+    public void TrySalarySettleAccounts()
     {
         if(statsPairs["haveFinishWork"] == 0)
         {
@@ -106,7 +124,7 @@ public class LifeController : MonoBehaviour
         Hero.Instance.DisplayStatsValue();
     }
 
-    void TrySalarySettleAccountsAffterWork()
+    public void TrySalarySettleAccountsAffterWork()
     {
         if(!waitForSettleAccountsAffterWork)
             return;
@@ -146,9 +164,7 @@ public class LifeController : MonoBehaviour
         };
 
         Timer.onHourEnd += SettleAccountsPerHour;
-        Timer.onOffWork += Try_KPI_SettleAccounts;
-        Timer.onOffWork2 += TrySalarySettleAccounts;
-        Timer.onDayEnd += TrySalarySettleAccountsAffterWork;
+        Timer.onDayEnd += SalarySettleAccounts;
     }
 
     void Start()
@@ -158,9 +174,7 @@ public class LifeController : MonoBehaviour
     void OnDestroy()
     {   
         Timer.onHourEnd -= SettleAccountsPerHour;
-        Timer.onOffWork -= Try_KPI_SettleAccounts;
-        Timer.onOffWork2 -= TrySalarySettleAccounts;
-        Timer.onDayEnd -= TrySalarySettleAccountsAffterWork;
+        Timer.onDayEnd -= SalarySettleAccounts;
     }
 
     // Update is called once per frame

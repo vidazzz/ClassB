@@ -155,6 +155,8 @@ public class Timer : MonoBehaviour
         {
             offWorkCoroutineQueueManager.AddCoroutine(CutSceneController.Instance.ExecuteCoroutines(3));
         }
+        else
+            offWorkCoroutineQueueManager.AddCoroutine(EndTheDay());
             
     }
     void AddDayEndCoroution()

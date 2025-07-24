@@ -69,7 +69,7 @@ MonoBehaviour:
     - line: "\u4F46\u662F\u2026\u2026\u6211\u62D2\u7EDD\uFF01\uFF01"
       checkingSkillName: Speak
       checkingSkillLevel: 2
-      effectType: 0
+      effectType: 5
       failedEffectType: 0
       succedJumpToLine: 0
       failedJumpToLine: 12
@@ -205,7 +205,7 @@ MonoBehaviour:
     speekerIndex: 0
     checkingStatsName: 
     checkingValue: 0
-    seccuedIndex: 0
+    seccuedIndex: 999
     failedIndex: 0
     options: []
   - line: "\u6EDA\uFF01"
