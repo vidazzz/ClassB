@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 
 
@@ -48,22 +49,19 @@ public class DiceCheck : MonoBehaviour
         result = dice < talent.level;   
         
        
-        StartCoroutine(DisplayResult(talent.name,result));
+        DisplayResult(talent.name,result);
         return result;
             
     }
 
-    public IEnumerator DisplayResult(string talentName,bool checkResult)
+    public void DisplayResult(string talentName,bool checkResult)
     {
         string result = $"<color=#{ColorUtility.ToHtmlStringRGB(Color.magenta)}>{talentName}</color>: ";
         if(checkResult)
             result += $"<color={"green"}>success";
         else
             result += $"<color={"red"}>failure";
-        checkResultText.text = result;
-        checkResultText.transform.parent.gameObject.SetActive(true);
-        yield return new WaitForSeconds(5); //弹窗时间
-        checkResultText.transform.parent.gameObject.SetActive(false);
+        PopUp.Instance.ShowPopUp(result);
     }
 
     // Start is called before the first frame update

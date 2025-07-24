@@ -35,8 +35,11 @@ public class Timer : MonoBehaviour
     public static timerDelegate onStartWork;
     public static timerDelegate onOffWork;
     public static timerDelegate onNextFrame;
+    [HideInInspector]
     public static bool shouldOffWorkNow;
+    [HideInInspector]
     public static bool hadQuitTypingGame; //用于标记是否退出过打字界面
+    private static GameObject pauseIcon;
 
     public Queue<IEnumerator> dayBeginCoroutineQueue = new();
     
@@ -54,7 +57,8 @@ public class Timer : MonoBehaviour
                 yield return null;
             mm += Time.deltaTime * oneSecondInGame * Hero.Instance.lifeController.TimeMultiplier;
             onNextFrame?.Invoke(); //下一帧
-            yield return StartCoroutine(nextFrameCoroutineQueueManager.ProcessQueue()); //下一帧
+            if(!nextFrameCoroutineQueueManager.IsQueueEmpty)
+                yield return StartCoroutine(nextFrameCoroutineQueueManager.ProcessQueue()); //下一帧
             
             
             if(hh >= 9) //上班时间
@@ -76,7 +80,7 @@ public class Timer : MonoBehaviour
             if(hh == 18 && !isOffWork) //下班时间
             {
                 isOffWork = true;
-                onOffWork.Invoke();
+                onOffWork?.Invoke();
                 yield return StartCoroutine(offWorkCoroutineQueueManager.ProcessQueue());
             }
             if(hh >= 26) //凌晨2点
@@ -112,11 +116,17 @@ public class Timer : MonoBehaviour
 
     public static void Pause()
     {
+        if(hasPaused)
+            return;
         deltaTime = 0;
+        pauseIcon.SetActive(true);
         hasPaused = true;
     }
     public static void Resume()
     {
+        if(!hasPaused)
+            return;
+        pauseIcon.SetActive(false);
         hasPaused = false;
     }
     
@@ -167,6 +177,8 @@ public class Timer : MonoBehaviour
         onOffWork += AddGetOffWorkCoroutine;
         onDayEnd += AddDayEndCoroution;
 
+        pauseIcon = GameObject.Find("PauseIcon");
+        pauseIcon.SetActive(false);
     }
 
     // Start is called before the first frame update

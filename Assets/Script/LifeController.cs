@@ -96,7 +96,7 @@ public class LifeController : MonoBehaviour
 
     public bool Check(string statsName,float value)
     {
-        bool result = value >= statsPairs[statsName];
+        bool result = statsPairs[statsName] >= value;
         return result;
     }
     void Awake()

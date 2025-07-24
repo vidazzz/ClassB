@@ -1,12 +1,15 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
+using Unity.VisualScripting.Antlr3.Runtime.Tree;
 using UnityEngine;
 
 public class TestConsole : MonoBehaviour
 {
     public GameObject testPanel;
     private DialogueController[] dialogueControllers;
+    bool isTestPausing = false;
     public void TestResetDialogue()
     {
         foreach(var dialogueController in dialogueControllers)
@@ -39,6 +42,16 @@ public class TestConsole : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.Q))
         {
             testPanel.SetActive(!testPanel.activeSelf);
+            if(testPanel.activeSelf)
+            {
+                if(!Timer.hasPaused)
+                {
+                    Timer.Pause();
+                    isTestPausing = true;
+                }      
+            }
+            else if(isTestPausing == true)
+                Timer.Resume();
         }
     }
 }

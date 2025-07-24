@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2805709288786834572}
   - component: {fileID: 5115638431139286015}
   m_Layer: 2
-  m_Name: PopUp
+  m_Name: Character_PopUp
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -290,7 +290,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: dialogue
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: aa3b3e61b66f7b940a733af19023b5a6, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: f7e2d46168c3ce343a8ba60204bc2bd4, type: 2}
   m_sharedMaterial: {fileID: 2567464593985851577, guid: aa3b3e61b66f7b940a733af19023b5a6, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
@@ -354,7 +354,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 0
+  m_hasFontAssetChanged: 1
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!1 &6138973421718308106

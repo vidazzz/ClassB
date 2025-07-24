@@ -55,10 +55,10 @@ public class CutSceneController : MonoBehaviour
                     ResetDialuoge(task.dialogueData);
                     break;
                 case CoroutineType.Pusse:
-                    Pusse();
+                    Timer.Pause();
                     break;
                 case CoroutineType.Resume:
-                    Resume();
+                    Timer.Resume();
                     break;
                 // 可以添加更多协程类型...
                 default:
@@ -99,14 +99,6 @@ public class CutSceneController : MonoBehaviour
     void  SetObjActiveTrue(GameObject obj)
     {
         obj.SetActive(true);
-    }
-    public void Pusse()
-    {
-        Timer.Pause();
-    }
-    public void Resume()
-    {
-        Timer.Resume();
     }
     // Start is called before the first frame update
     void Awake()

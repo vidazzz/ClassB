@@ -6,7 +6,6 @@ using UnityEngine;
 public class Character : Interactable
 {
     [SerializeField] protected float fSpeed;
-    [SerializeField] protected PopUp popUp;
     [HideInInspector] public LifeController lifeController;
     [HideInInspector] public Vector3 spawnPosition;
     public Dictionary<string,Talent> talents;
@@ -15,16 +14,17 @@ public class Character : Interactable
     public List<AffinityEffectArgs> affinityEffectArgsList; //好感度效果参数
     public List<AffinityEffect> affinityEffects; 
     public bool IsMoving;
+    protected Animator popUpAnimator;
     public override IEnumerator Interact(Character interactor)
     {
         throw new NotImplementedException();
     }
     public IEnumerator ShowPopUp(string reactionType,float duration)
     {
-        popUp.animator.SetInteger(reactionType,1);
+        popUpAnimator.SetInteger(reactionType,1);
         //Debug.Log(gameObject + " Interacting "+target.gameObject);
         yield return new WaitForSeconds(duration);
-        popUp.animator.SetInteger(reactionType,0);
+        popUpAnimator.SetInteger(reactionType,0);
     }
 
     public void FaceTheTarget(GameObject target)
@@ -112,6 +112,8 @@ public class Character : Interactable
         base.Awake();
         lifeController = GetComponent<LifeController>();
         Debug.Assert(lifeController != null,"lifecontruller 不可为空");
+        popUpAnimator = transform.Find("Character_PopUp").GetComponent<Animator>();
+        Debug.Assert(popUpAnimator != null,"popUpAnimator 不可为空");
         spawnPosition = transform.position;
         talents = new();
         buffs = new();

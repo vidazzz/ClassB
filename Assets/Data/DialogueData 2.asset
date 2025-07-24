@@ -19,23 +19,26 @@ MonoBehaviour:
   failedIndex: 0
   hasChecked: 1
   dialogue:
-  - speekerIndex: 0
+  - line: "\u8BDD\u867D\u5982\u6B64\uFF0C\u5F88\u7A77\u5462"
+    formatArgNames: []
+    speekerIndex: 0
     nextLine: 999
     checkingSkillName: 
     checkingSkillLevel: 0
-    line: "\u8BDD\u867D\u5982\u6B64\uFF0C\u5F88\u7A77\u5462"
     options: []
-  - speekerIndex: 0
+  - line: "\u73B0\u5728\u79BB\u804C\u53EF\u4E0D\u662F\u4EC0\u4E48\u597D\u65F6\u673A\u554A"
+    formatArgNames: []
+    speekerIndex: 0
     nextLine: 0
     checkingSkillName: 
     checkingSkillLevel: 0
-    line: "\u73B0\u5728\u79BB\u804C\u53EF\u4E0D\u662F\u4EC0\u4E48\u597D\u65F6\u673A\u554A"
     options: []
-  - speekerIndex: 0
+  - line: "\u4E0D\u662F\u2026\u2026\u60A8\u54EA\u4F4D\uFF1F"
+    formatArgNames: []
+    speekerIndex: 0
     nextLine: 0
     checkingSkillName: 
     checkingSkillLevel: 0
-    line: "\u4E0D\u662F\u2026\u2026\u60A8\u54EA\u4F4D\uFF1F"
     options:
     - line: "\u4F60\u4EEC\u597D\uFF0C\u6211\u662F\u7EC3\u4E60\u65F6\u957F\u4E24\u5C0F\u65F6\u534A\u7684\u65B0\u5458\u5DE5"
       checkingSkillName: Speak
@@ -45,7 +48,7 @@ MonoBehaviour:
       succedJumpToLine: 5
       failedJumpToLine: 0
       jumpToLine: 0
-      hasChecked: 0
+      hasChecked: 1
       strings:
       - 1
       failedStrings: []
@@ -60,17 +63,26 @@ MonoBehaviour:
       hasChecked: 0
       strings: []
       failedStrings: []
-  - speekerIndex: 0
-    nextLine: 999
-    checkingSkillName: 
-    checkingSkillLevel: 0
-    line: "\u2026\u2026\u6211\u521A\u521A\u8BF4\u5230\u54EA\u4E86\uFF1F"
-    options: []
-  - speekerIndex: 0
+  - line: "\u2026\u2026"
+    formatArgNames: []
+    speekerIndex: 0
     nextLine: 0
     checkingSkillName: 
     checkingSkillLevel: 0
-    line: "zhin\u4F60>_<"
+    options: []
+  - line: "\u2026\u2026\u6211\u521A\u521A\u8BF4\u5230\u54EA\u4E86\uFF1F"
+    formatArgNames: []
+    speekerIndex: 0
+    nextLine: 999
+    checkingSkillName: 
+    checkingSkillLevel: 0
+    options: []
+  - line: "zhin\u4F60>_<"
+    formatArgNames: []
+    speekerIndex: 0
+    nextLine: 0
+    checkingSkillName: 
+    checkingSkillLevel: 0
     options:
     - line: "\u592A\u7F8E>_<"
       checkingSkillName: 

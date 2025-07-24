@@ -5,6 +5,7 @@ using UnityEngine;
 public class CoroutineQueueManager
 {
     private Queue<IEnumerator> coroutineQueue = new();
+    public bool IsQueueEmpty{get {return coroutineQueue.Count == 0;}}
     private bool isProcessing = false;
     public bool isProcessingValue {
         get {return isProcessing;}

@@ -116,7 +116,7 @@ public class NPC : Character
         if(animator != null)
         {
             animator.SetBool("IsMoving",false);
-            popUp.animator.SetInteger("Result",0); //关掉表情气泡
+            popUpAnimator.SetInteger("Result",0); //关掉表情气泡
         }
     }
 
