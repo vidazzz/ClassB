@@ -24,6 +24,15 @@ public enum TalentType{
     mental,
 }
 
+public enum PreesureLevel {
+    none = 0,
+    low,
+    normal,
+    high,
+    varyHigh,
+    overCome,
+}
+
 // Buff基类
 public abstract class Buff
 {

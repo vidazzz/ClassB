@@ -99,12 +99,12 @@ public class Hero : Character
     }
 
 
-    public void DisplayLifeValue()
+    public void DisplayStatsValue()
     {
         LifeValueText.text = "";
         foreach(var statsPair in lifeController.statsPairs)
         {
-            LifeValueText.text += $"{statsPair.Key} : {statsPair.Value} <= {lifeController.deltaStatsPairs[statsPair.Key]}" + "\n";
+            LifeValueText.text += $"{statsPair.Key} : {statsPair.Value}\n";
         }
     }
 
@@ -123,7 +123,7 @@ public class Hero : Character
     new void Start()
     {
         base.Start();
-        DisplayLifeValue(); 
+        DisplayStatsValue(); 
         Timer.onDayBegin += Respawn;
     }
 

@@ -34,6 +34,7 @@ public class Timer : MonoBehaviour
     public static timerDelegate onHourEnd;
     public static timerDelegate onStartWork;
     public static timerDelegate onOffWork;
+    public static timerDelegate onOffWork2;
     public static timerDelegate onNextFrame;
     [HideInInspector]
     public static bool shouldOffWorkNow;
@@ -82,6 +83,7 @@ public class Timer : MonoBehaviour
                 isOffWork = true;
                 onOffWork?.Invoke();
                 yield return StartCoroutine(offWorkCoroutineQueueManager.ProcessQueue());
+                onOffWork2?.Invoke();
             }
             if(hh >= 26) //凌晨2点
             {  
@@ -147,10 +149,13 @@ public class Timer : MonoBehaviour
         if(hadQuitTypingGame)//退出过打字界面才有后面的交互
             dayBeginCoroutineQueueManager.AddCoroutine(CutSceneController.Instance.ExecuteCoroutines(2));
     }
-    void AddGetOffWorkCoroutine()
+    void AddOffWorkCoroutine()
     {
         if(hadQuitTypingGame)//退出过打字界面才有后面的交互
+        {
             offWorkCoroutineQueueManager.AddCoroutine(CutSceneController.Instance.ExecuteCoroutines(3));
+        }
+            
     }
     void AddDayEndCoroution()
     {
@@ -174,7 +179,7 @@ public class Timer : MonoBehaviour
         onTheVaryBegining += OnTheVaryBegining;
         onTheVaryBegining += AddVaryBeginingCoroutine;
         onDayBegin += AddDayBeginCoroutine;
-        onOffWork += AddGetOffWorkCoroutine;
+        onOffWork += AddOffWorkCoroutine;
         onDayEnd += AddDayEndCoroution;
 
         pauseIcon = GameObject.Find("PauseIcon");
@@ -200,7 +205,7 @@ public class Timer : MonoBehaviour
         onTheVaryBegining -= OnTheVaryBegining;
         onTheVaryBegining -= AddVaryBeginingCoroutine;
         onDayBegin -= AddDayBeginCoroutine;
-        onOffWork -= AddGetOffWorkCoroutine;
+        onOffWork -= AddOffWorkCoroutine;
         onDayEnd -= AddDayEndCoroution;
     }
 }

@@ -95,24 +95,22 @@ public class LineNode
         }
     public string[] formatArgNames;
     public int speekerIndex = 0; //0是本人
-    public int nextLine;//非选项跳转时跳转至哪句话，1base，0是按照索引找下一句
-    public string checkingSkillName;
-    public int checkingSkillLevel;
-
+    public int nextLine{
+        get {
+            if(checkingStatsName == "")
+                return seccuedIndex;
+            if(Hero.Instance.lifeController.Check(checkingStatsName,checkingValue))
+                return seccuedIndex;
+            else
+                return failedIndex;
+        }
+    }//非选项跳转时跳转至哪句话，1base，0是按照索引找下一句
+    public string checkingStatsName;
+    public int checkingValue;
+    public int seccuedIndex;
+    public int failedIndex;
     public List<DialogueOption> options;
 
-    public LineNode(LineNode origin)
-    {
-        speekerIndex = origin.speekerIndex;
-        nextLine = origin.nextLine;
-        checkingSkillName = origin.checkingSkillName;
-        line = origin.line;
-        options = new();
-        foreach(DialogueOption option in origin.options)
-        {
-            options.Add(new DialogueOption(option));
-        }
-    }
 }
 
 public enum LineCheckingType
@@ -130,6 +128,7 @@ public enum EffectType
     ModifyAfinity,
     CheckItem,
     OffWork,
+    RollBack,
 }
 
 [Serializable]
@@ -150,22 +149,6 @@ public class DialogueOption //: MonoBehaviour
     public List<string> failedStrings;
     private bool checkResult = true; //如果不检定，默认使用成功结果
 
-    public DialogueOption(DialogueOption origin)
-    {
-        line = origin.line;
-        checkingSkillName = origin.checkingSkillName;
-        checkingSkillLevel = origin.checkingSkillLevel;
-        effectType = origin.effectType;
-        failedEffectType = origin.failedEffectType;
-        succedJumpToLine = origin.succedJumpToLine;
-        failedJumpToLine = origin.failedJumpToLine;
-        jumpToLine = origin.jumpToLine;
-        hasChecked = origin.hasChecked;
-        hasChecked = origin.hasChecked;
-        strings = new(origin.strings);
-        failedStrings = new(origin.failedStrings);
-        checkResult = origin.checkResult;
-    }
     public IEnumerator OptionEffect(DialogueController dialogueController)
     {
         EffectType type;     
@@ -197,6 +180,9 @@ public class DialogueOption //: MonoBehaviour
                 break;
             case EffectType.CheckItem:
                 yield return EffectCheckItem(strings);
+                break;
+            case EffectType.RollBack:
+                RollbackRequiredKPI();
                 break;
             case EffectType.OffWork:
                 Timer.shouldOffWorkNow = true;
@@ -230,6 +216,11 @@ public class DialogueOption //: MonoBehaviour
         Community.affinity.ModifyAffinity(Hero.Instance,target,Convert.ToInt32(strings[0]));
         Community.PrintAffinity();
         yield return null;
+    }
+    public void RollbackRequiredKPI()
+    {
+        Hero.Instance.lifeController.statsPairs["requiredKPI"] = Hero.Instance.lifeController.statsPairs["lastRequiredKPI"];
+        Hero.Instance.DisplayStatsValue();
     }
     public IEnumerator EffectCheckItem(List<string> strings)
     {
