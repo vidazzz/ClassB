@@ -194,7 +194,7 @@ public class TypingGame : MonoBehaviour
                     CheckInput();
                 }
                 if ((int)Hero.Instance.lifeController.PreesureLevel > 2) //如果压力过大就会导致字符跳动
-                    HighlightCorrectCharacter(ReplaceRandomChar(currentSentence,ShuffleIndexArray,(int)Hero.Instance.lifeController.PreesureLevel));
+                    HighlightCorrectCharacter(ReplaceRandomChar(currentSentence,ShuffleIndexArray,(int)Hero.Instance.lifeController.PreesureLevel-2));
                 else
                     HighlightCorrectCharacter(currentSentence);
             }
