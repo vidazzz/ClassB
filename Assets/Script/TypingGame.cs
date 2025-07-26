@@ -26,6 +26,10 @@ public class TypingGame : MonoBehaviour
     public float preesure;
     private float timeLimit = 3;
     private float timeLimitTimer;
+    private float quitTimer = 0;
+    [SerializeField]
+    private float quitTimerThreshold; // 提示退出的时间阈值
+    private bool isQuitTimerRunning;
     private float fishingTime;
     public float fishingTimeThreshold;
     public int fish;
@@ -159,15 +163,17 @@ public class TypingGame : MonoBehaviour
     
     public IEnumerator StartTyping()
     {
-        Debug.Log("StartTyping");
-        Coroutine timelimitTimer = StartCoroutine(TimeLimitTimer());
+        Coroutine timelimitTimerCoroutine = StartCoroutine(TimeLimitTimer());
+        if(!isQuitTimerRunning && !hasDisplayQuit)
+            StartCoroutine(QuitTimer());
         StartNewOne();
         yield return Check(); //持续检查字符直到退出或完成
         if(!isTyping)
             yield break;
         if(doHaveTime) //不是因为倒计时结束而是因为完成句子跳出检查的
         {
-            StopCoroutine(timelimitTimer);
+            StopCoroutine(timelimitTimerCoroutine);
+            quitTimer = 0; //重置退出提示计时器;
             SettleAccount(); //结算
         }     
         yield return StartTyping(); //没有退出则继续下一句
@@ -180,13 +186,9 @@ public class TypingGame : MonoBehaviour
         {
             if(!Timer.hasPaused)
             {
-                if(fish >= fishThreshold)
-                {
-                    if(!hasDisplayQuit)
-                        DisplayQuitGame();
-                    if(Input.GetKeyDown(KeyCode.Escape) && !Timer.hasPaused)
-                        EndGame();       
-                }
+                if(Input.GetKeyDown(KeyCode.Escape) && hasDisplayQuit)
+                    EndGame();       
+                
                 // 检测键盘输入
                 if (Input.anyKeyDown)
                 {
@@ -224,6 +226,25 @@ public class TypingGame : MonoBehaviour
         
         // 显示初始文本（全黑色）
         textMesh.text = displaySentence;
+    }
+    
+    private IEnumerator QuitTimer()
+    {
+        isQuitTimerRunning = true;
+        quitTimer = 0;
+        while(quitTimer < quitTimerThreshold && !hasDisplayQuit)
+        {
+            if(!Timer.hasPaused)
+            {
+                quitTimer += Time.deltaTime;    
+            }
+            yield return null;
+        }
+        if(quitTimer >= quitTimerThreshold)
+        {
+            DisplayQuitGame();
+            isQuitTimerRunning = false;
+        }
     }
     private IEnumerator TimeLimitTimer()
     {

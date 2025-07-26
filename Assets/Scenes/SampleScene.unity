@@ -13630,6 +13630,10 @@ PrefabInstance:
       value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 4023138116355126006, guid: 1c37fb500667bdf42a09031e03ccbd6c, type: 3}
+      propertyPath: quitTimerThreshold
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 4023138116355126006, guid: 1c37fb500667bdf42a09031e03ccbd6c, type: 3}
       propertyPath: fishingTimeThreshold
       value: 5
       objectReference: {fileID: 0}
