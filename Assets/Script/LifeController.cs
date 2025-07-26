@@ -149,7 +149,7 @@ public class LifeController : MonoBehaviour
         {      
             {"preesure",25},
             {"preesureResistance",0}, //压力抗性，概率不会产生压力
-            {"money",99999999},
+            {"money",0},
             {"kpi",10},
             {"kpiBouesPossibility",0},//概率提升收益
             {"kpiBouesMultiplier",1},//概率提升收益
