@@ -153,7 +153,7 @@ public class LifeController : MonoBehaviour
             {"kpi",10},
             {"kpiBouesPossibility",0},//概率提升收益
             {"kpiBouesMultiplier",1},//概率提升收益
-            {"requiredKPI",5},
+            {"requiredKPI",10},
             {"lastRequiredKPI",0},//上一次的kpi指标
             {"kpiMultiplier",1},//加buff时生效的kpi倍率
             {"energy",100},
