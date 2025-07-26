@@ -205,7 +205,7 @@ public class TypingGame : MonoBehaviour
     {
         isTyping = true;
         currentArrows = new();
-        int j = Random.Range(6,10);
+        int j = Random.Range(4,6);
         for(int i = 0 ; i < j ; i++)
         {
             currentArrows.Add(arrows[Random.Range(0,arrows.Length)]);
