@@ -17,7 +17,7 @@ public class StatsPanel : MonoBehaviour
             GameObject go = Instantiate(preferbTestMesh, GetComponent<RectTransform>());
             TextMeshProUGUI textMesh = go.GetComponent<TextMeshProUGUI>();
             textMesh.text = statsName;
-            textMesh.text += " "+Hero.Instance.lifeController.statsPairs[statsName].ToString("F2");
+            textMesh.text += " : " + (int)Hero.Instance.lifeController.statsPairs[statsName];
         }
     }
 
