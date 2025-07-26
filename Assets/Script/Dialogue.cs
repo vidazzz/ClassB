@@ -135,8 +135,8 @@ public enum EffectType
 public class DialogueOption //: MonoBehaviour
 {
     public string line;
-    public string checkingSkillName;
-    public int checkingSkillLevel;
+    public string checkingTalentName;
+    public int checkingTalentLevel;
     public EffectType effectType;
     public EffectType failedEffectType;
     public int succedJumpToLine; //1base，0表示跳转索引顺序的下一句，如果要检定注意不要填0
@@ -153,9 +153,9 @@ public class DialogueOption //: MonoBehaviour
     {
         EffectType type;     
         checkResult = true;//如果不检定，默认使用成功结果
-        if(checkingSkillName != "") //填了checkingSkillName就进行检定
+        if(checkingTalentName != "") //填了checkingSkillName就进行检定
         {
-            checkResult = DiceCheck.Instance.Check(Hero.Instance.GetTalent(checkingSkillName),checkingSkillLevel);
+            checkResult = DiceCheck.Instance.Check(Hero.Instance.GetTalent(checkingTalentName),checkingTalentLevel);
             hasChecked = true;
         }
         if(checkResult) //根据检定结果决定采用的效果和跳转索引

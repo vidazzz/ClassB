@@ -80,8 +80,8 @@ public class DialogueController : MonoBehaviour
                 foreach (var option in lineNode.options)
                 {
                     textMesh.text += "\n" + i + ". " + option.line;
-                    if(option.checkingSkillName != "")
-                        textMesh.text +="\t" + DiceCheck.Instance.PredictionString(option.checkingSkillName,option.checkingSkillLevel);
+                    if(option.checkingTalentName != "")
+                        textMesh.text +="\t" + DiceCheck.Instance.PredictionString(option.checkingTalentName,option.checkingTalentLevel);
                     i++;
                 }
                 isWaitingForInput = true;
