@@ -162,7 +162,7 @@ public class Timer : MonoBehaviour
     void AddDayEndCoroution()
     {
         dayEndCoroutineQueueManager.AddCoroutine(Blackout.Instance.FadeInOrOutCoroutine());
-        dayEndCoroutineQueueManager.AddCoroutine(Blackout.Instance.DisplayText()); //一天结束后的旁白
+        dayEndCoroutineQueueManager.AddCoroutine(Blackout.Instance.DisplayText(Blackout.Instance.narrationSentances)); //一天结束后的旁白
     }
 
     public static void SetOneSecondInGame(int value)

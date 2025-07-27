@@ -49,7 +49,7 @@ public class CutSceneController : MonoBehaviour
                     SetObjActiveFalse(task.obj);
                     break;
                 case CoroutineType.Blackout:
-                    yield return StartCoroutine(Blackout(task.obj.GetComponent<Blackout>()));
+                    yield return StartCoroutine(BlackOutCoroutine(task.varList.ToArray()));
                     break;
                 case CoroutineType.ResetDialuoge:
                     ResetDialuoge(task.dialogueData);
@@ -83,9 +83,10 @@ public class CutSceneController : MonoBehaviour
     {
         yield return StartCoroutine(interactable.Interact(Hero.Instance));
     }
-    IEnumerator  Blackout(Blackout blackout)
+    IEnumerator  BlackOutCoroutine(string[] sentances)
     {
-        yield return StartCoroutine(blackout.FadeInOrOutCoroutine());
+        yield return StartCoroutine(Blackout.Instance.FadeInOrOutCoroutine());
+        yield return StartCoroutine(Blackout.Instance.DisplayText(sentances));
     }
     void  SetObjActiveFalse(GameObject obj)
     {

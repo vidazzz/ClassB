@@ -20,7 +20,7 @@ public class Blackout : MonoBehaviour
     }
     [SerializeField] private float fadeDuration = 1f; // 淡入持续时间
     TextMeshProUGUI textMesh;
-    UnityEngine.UI.Image image;
+    Image image;
     public string[] narrationSentances;
     bool isFading;
 
@@ -90,10 +90,10 @@ public class Blackout : MonoBehaviour
     }
 
     //文本显示
-    public IEnumerator DisplayText()
+    public IEnumerator DisplayText(string[] sentances)
     {
         textMesh.gameObject.SetActive(true);
-        foreach(string s in narrationSentances)
+        foreach(string s in sentances)
         {
             textMesh.text = s;
             do
@@ -106,7 +106,7 @@ public class Blackout : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        image = GetComponent<UnityEngine.UI.Image>();
+        image = GetComponent<Image>();
         textMesh = GetComponentInChildren<TextMeshProUGUI>();
     }
 
