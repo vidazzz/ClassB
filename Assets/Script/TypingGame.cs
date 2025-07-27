@@ -14,7 +14,8 @@ public class TypingGame : MonoBehaviour
     public Color correctColor = Color.green;  // 正确字符的颜色
     public Color normalColor = Color.black;   // 普通字符的颜色
     private string currentSentence;   // 当前句子
-    private int currentIndex = 0;     // 当前字符索引
+    private int CheckingIndex = 0;     // 当前字符索引
+    private int checkedIndex = -1; // 当前已检查的字符索引
     public TextMeshProUGUI textMesh; // 用于颜色修改的TextMeshPro组件
     public TextMeshProUGUI textMeshForQuit;
     public Slider timeLimitSlider;
@@ -24,7 +25,8 @@ public class TypingGame : MonoBehaviour
     private bool doHaveTime = true;
     public int kpi;
     public float preesure;
-    private float timeLimit = 3;
+    [SerializeField]
+    private float timeLimit;
     private float timeLimitTimer;
     private float quitTimer = 0;
     [SerializeField]
@@ -32,9 +34,7 @@ public class TypingGame : MonoBehaviour
     private bool isQuitTimerRunning;
     private float fishingTime;
     public float fishingTimeThreshold;
-    public int fish;
     public int fishThreshold;
-    public Hero hero;
     bool hasDisplayQuit;
 
     
@@ -75,49 +75,7 @@ public class TypingGame : MonoBehaviour
         fishingTimer();       
     }
     
-    void CheckInput()
-    {
-        bool isMarch = false;
-        // 获取当前应该输入的字符
-        switch(currentArrows[currentIndex])
-        {
-            case "↑":
-                if(Input.GetKeyDown(KeyCode.W))
-                    isMarch = true;
-                break;
-            case "↓":
-                if(Input.GetKeyDown(KeyCode.S))
-                    isMarch = true;
-                break;
-            case "←":
-                if(Input.GetKeyDown(KeyCode.A))
-                    isMarch = true;
-                break;
-            case "→":
-                if(Input.GetKeyDown(KeyCode.D))
-                    isMarch = true;
-                break;
-            default:
-                break;
-        }
 
-        // 比较输入字符与目标字符
-        if (isMarch)
-        {
-            // 输入正确，移动到下一个字符
-            currentIndex++;
-            // 更改字符颜色
-            HighlightCorrectCharacter();  
-        }
-        else
-        {
-            Debug.Log(Input.inputString);
-            currentIndex = 0;
-            displaySentence = $"<mspace=60px><color=#{ColorUtility.ToHtmlStringRGB(normalColor)}>{currentSentence}</color>";
-            textMesh.text = displaySentence;
-            // 输入错误重新开始本句子
-        }
-    }
     
     void HighlightCorrectCharacter()
     {
@@ -125,14 +83,14 @@ public class TypingGame : MonoBehaviour
         displaySentence = "";
         // 已输入正确的部分（绿色）
         displaySentence += $"<mspace=60px><color=#{ColorUtility.ToHtmlStringRGB(correctColor)}>";
-        displaySentence += currentSentence[..currentIndex];
+        displaySentence += currentSentence[..CheckingIndex];
         displaySentence += "</color>";
         
         // 未输入的部分（黑色）
-        if (currentIndex < currentSentence.Length)
+        if (CheckingIndex < currentSentence.Length)
         {
             displaySentence += $"<mspace=60px><color=#{ColorUtility.ToHtmlStringRGB(normalColor)}>";
-            displaySentence += currentSentence[currentIndex..];
+            displaySentence += currentSentence[CheckingIndex..];
             displaySentence += "</color>";
         }
         
@@ -146,14 +104,14 @@ public class TypingGame : MonoBehaviour
         displaySentence = "";
         // 已输入正确的部分（绿色）
         displaySentence += $"<mspace=100px><color=#{ColorUtility.ToHtmlStringRGB(correctColor)}>";
-        displaySentence += sentence[..currentIndex];
+        displaySentence += sentence[..CheckingIndex];
         displaySentence += "</color>";
         
         // 未输入的部分（黑色）
-        if (currentIndex < sentence.Length)
+        if (CheckingIndex < sentence.Length)
         {
             displaySentence += $"<mspace=100px><color=#{ColorUtility.ToHtmlStringRGB(normalColor)}>";
-            displaySentence += sentence[currentIndex..];
+            displaySentence += sentence[CheckingIndex..];
             displaySentence += "</color>";
         }
         
@@ -174,35 +132,12 @@ public class TypingGame : MonoBehaviour
         {
             StopCoroutine(timelimitTimerCoroutine);
             quitTimer = 0; //重置退出提示计时器;
+            checkedIndex = -1; //重置字符检查索引
             SettleAccount(); //结算
-        }     
+        }
         yield return StartTyping(); //没有退出则继续下一句
     }
 
-    public IEnumerator Check()
-    {
-        int[] ShuffleIndexArray = Shuffle(currentSentence);
-        while(currentIndex < currentSentence.Length && isTyping && doHaveTime)
-        {
-            if(!Timer.hasPaused)
-            {
-                if(Input.GetKeyDown(KeyCode.Escape) && hasDisplayQuit)
-                    EndGame();       
-                
-                // 检测键盘输入
-                if (Input.anyKeyDown)
-                {
-                    fishingTime = 0;
-                    CheckInput();
-                }
-                if ((int)Hero.Instance.lifeController.PreesureLevel > 2) //如果压力过大就会导致字符跳动
-                    HighlightCorrectCharacter(ReplaceRandomChar(currentSentence,ShuffleIndexArray,(int)Hero.Instance.lifeController.PreesureLevel-2));
-                else
-                    HighlightCorrectCharacter(currentSentence);
-            }
-            yield return null;
-        }
-    }
     public void StartNewOne()
     {
         isTyping = true;
@@ -219,13 +154,84 @@ public class TypingGame : MonoBehaviour
         displaySentence = $"<mspace=100px><color=#{ColorUtility.ToHtmlStringRGB(normalColor)}>{currentSentence}</color>";
         
         // 重置索引
-        currentIndex = 0;
+        CheckingIndex = 0;
         
         // 打开textMesh所在panel
         textMesh.transform.parent.gameObject.SetActive(true);
         
         // 显示初始文本（全黑色）
         textMesh.text = displaySentence;
+    }
+
+    public IEnumerator Check()
+    {
+        int[] ShuffleIndexArray = Shuffle(currentSentence);
+        while(CheckingIndex < currentSentence.Length && isTyping && doHaveTime)
+        {
+            if(!Timer.hasPaused)
+            {
+                if(Input.GetKeyDown(KeyCode.Escape) && hasDisplayQuit)
+                    EndGame();       
+                
+                // 检测键盘输入 
+                if (Input.anyKeyDown)
+                {              
+                    fishingTime = 0;
+                    CheckInput();
+                }
+                if ((int)Hero.Instance.lifeController.PreesureLevel > 2) //如果压力过大就会导致字符跳动
+                    HighlightCorrectCharacter(ReplaceRandomChar(currentSentence,ShuffleIndexArray,(int)Hero.Instance.lifeController.PreesureLevel-2));
+                else
+                    HighlightCorrectCharacter(currentSentence);
+            }
+            yield return null;
+        }
+    }
+
+    void CheckInput()
+    {
+        bool isMarch = false;
+        // 获取当前应该输入的字符
+        switch(currentArrows[CheckingIndex])
+        {
+            case "↑":
+                if(Input.GetKeyDown(KeyCode.W))
+                    isMarch = true;
+                break;
+            case "↓":
+                if(Input.GetKeyDown(KeyCode.S))
+                    isMarch = true;
+                break;
+            case "←":
+                if(Input.GetKeyDown(KeyCode.A))
+                    isMarch = true;
+                break;
+            case "→":
+                if(Input.GetKeyDown(KeyCode.D))
+                    isMarch = true;
+                break;
+            default:
+                break;
+        }
+        if(CheckingIndex > checkedIndex)
+            checkedIndex = CheckingIndex; //如果已检查索引等于当前输入的索引，则增加检查索引
+        // 比较输入字符与目标字符
+        if (isMarch)
+        {
+            // 输入正确，移动到下一个字符
+            CheckingIndex++;
+            // 更改字符颜色
+            HighlightCorrectCharacter();  
+        }
+        else
+        {
+            CheckingIndex = 0;
+            displaySentence = $"<mspace=60px><color=#{ColorUtility.ToHtmlStringRGB(normalColor)}>{currentSentence}</color>";
+            textMesh.text = displaySentence;
+            // 输入错误重新开始本句子
+        }
+
+        Debug.Log($"checkedIndex:{checkedIndex} CheckingIndex:{CheckingIndex}");
     }
     
     private IEnumerator QuitTimer()
@@ -262,6 +268,7 @@ public class TypingGame : MonoBehaviour
             yield return null;
         }
         doHaveTime = false;
+        checkedIndex = -1; //重置字符检查索引
     }
 
     public void EndGame()
@@ -293,11 +300,13 @@ public class TypingGame : MonoBehaviour
         char[] chars = input.ToCharArray();
         for(int i  = 0 ; i < indexCount && i < indexArrey.Length ; i++)
         {
+            if(indexArrey[i] <= checkedIndex ) //如果需要替换的字符已被检查过，则跳过
+                continue; 
             int asciiCode = Random.Range(65, 91);
-            char randomArrow = (char)asciiCode; //arrows[Random.Range(0,arrows.Length-1)].Single();
+            char replaceChar = (char)asciiCode; //arrows[Random.Range(0,arrows.Length-1)].Single();
             // 修改指定位置的字符
             //Debug.Log($"indexArrey[i]:{indexArrey[i]} ,  chars.length{chars.Length}");
-            chars[indexArrey[i]] = randomArrow;
+            chars[indexArrey[i]] = replaceChar;
         }
         
         // 返回新字符串
@@ -326,7 +335,6 @@ public class TypingGame : MonoBehaviour
         if(fishingTime>=fishingTimeThreshold)
         {
             fishingTime = 0;
-            fish ++;
             Hero.Instance.lifeController.AddModifier("preesure",-1); //摸鱼解压 
             if(Hero.Instance.lifeController.KpiMultiplier>1)
                 Hero.Instance.lifeController.AddModifier("kpi", -5); //老板查岗时公然摸鱼扣kpi
