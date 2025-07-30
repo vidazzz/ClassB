@@ -2920,12 +2920,12 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1122625816}
+  - {fileID: 1499397963}
   - {fileID: 1128550796}
   - {fileID: 1186793378}
   - {fileID: 1732944528}
   - {fileID: 1812531861}
   - {fileID: 1387330402}
-  - {fileID: 1499397963}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -3859,6 +3859,7 @@ MonoBehaviour:
   dialogues:
   - {fileID: 11400000, guid: f2798807e91aeef4c95630d97e2f0991, type: 2}
   multiPersonDialogues: []
+  dialogueGraphs: []
   currentLineIndex: 0
   character: {fileID: 0}
 --- !u!61 &827531389
@@ -12269,6 +12270,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 42871176506680659, guid: 866fe664faa34c34f89d9b736a90c9a1, type: 3}
+      propertyPath: dialogueGraphs.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 42871176506680659, guid: 866fe664faa34c34f89d9b736a90c9a1, type: 3}
+      propertyPath: dialogueGraphs.Array.data[0]
+      value: 
+      objectReference: {fileID: 11400000, guid: d2f2e8d1716e9f445970d992cc352be7, type: 2}
     - target: {fileID: 1895567256321352005, guid: 866fe664faa34c34f89d9b736a90c9a1, type: 3}
       propertyPath: ThingsICanDo.Array.data[0].obgList.Array.data[0]
       value: 

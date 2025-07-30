@@ -37,10 +37,10 @@ public class NPC : Character
                 dialogueController.Initialize(dialogueController.multiPersonDialogues[someThingsWorkingOn.multiPersonDialoguesIndex],someThingsWorkingOn.obgList);
                 yield return StartCoroutine(dialogueController.DisplayDialogue());
             }
-            else if(dialogueController?.dialogues.Count > 0)
+            else if(dialogueController?.dialogueGraphs.Count > 0)
             {
-                dialogueController.Initialize(dialogueController.dialogues[dialogueIndex]);
-                yield return StartCoroutine(dialogueController.DisplayDialogue());
+                dialogueController.GraghInitialize(dialogueIndex);
+                yield return StartCoroutine(dialogueController.GraghDisplayDialogue());
             }
             else
                 Debug.LogWarning("No dialogue has been set");
