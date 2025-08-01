@@ -131,17 +131,18 @@ public class Timer : MonoBehaviour
         pauseIcon.SetActive(false);
         hasPaused = false;
     }
-    
-    void OnTheVaryBegining()
-    {   
-        StartCoroutine(CutSceneController.Instance.ExecuteCoroutines(0)); //由于需要这个打字自行运转，不能在timer协程中yield return，所以新开一个协程并行处理
-    }
     void AddNextFrameCoroutines() //装填协程进入队列
     {
         
     }
+    void OnTheVaryBegining()
+    {   
+        StartCoroutine(CutSceneController.Instance.ExecuteCoroutines(0)); //由于需要这个打字自行运转，不能在timer协程中yield return，所以新开一个协程并行处理
+    }
+
     void AddVaryBeginingCoroutine()
     {
+        theVaryBeginingCoroutineQueueManager.AddCoroutine(CutSceneController.Instance.ExecuteCoroutines(4));
     }
     void AddDayBeginCoroutine()
     {
