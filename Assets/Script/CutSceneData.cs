@@ -15,7 +15,7 @@ public class Task{
     public GameObject obj;
     public CoroutineType coroutineType;
     public List<string> varList;
-    public DialogueData dialogueData;
+    public DialogueGraph dialogueGraph;
     [HideInInspector]
     public GameObject destination;
 }

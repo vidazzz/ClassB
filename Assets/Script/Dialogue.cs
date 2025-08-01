@@ -5,7 +5,7 @@ using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 
-
+/*
 [CreateAssetMenu(fileName = "DialogueData", menuName = "Dialogue/Dialogue Data")]
 public class DialogueData : ScriptableObject {
     public LineCheckingType lineCheckingType;
@@ -112,6 +112,7 @@ public class LineNode
     public List<DialogueOption> options;
 
 }
+*/
 
 public enum LineCheckingType
 {
@@ -131,8 +132,9 @@ public enum EffectType
     RollBack,
 }
 
+/*
 [Serializable]
-public class DialogueOption //: MonoBehaviour
+public class DialogueOption
 {
     public string line;
     public string checkingTalentName;
@@ -197,6 +199,7 @@ public class DialogueOption //: MonoBehaviour
         else //如果填0就跳转下一句
             yield return dialogueController.DisplayNextLine();
     }
+    
     public IEnumerator EffectJumpToLine(DialogueController dialogueController,int lineIndex)
     {
         dialogueController.currentLineIndex = lineIndex;
@@ -231,4 +234,5 @@ public class DialogueOption //: MonoBehaviour
         yield return null;
     }
 }
+*/
 

@@ -7,13 +7,12 @@ using UnityEngine;
 
 public class DialogueController : MonoBehaviour
 {
-    public List<DialogueData> dialogues;
-    public List<DialogueData> multiPersonDialogues;
-    public List<DialogueGraph> dialogueGraphs; //对话图
+    //public List<DialogueData> dialogues;
+    //public List<DialogueData> multiPersonDialogues;
+    public DialogueGraph dialogueGraph; //对话图
+    public List<DialogueGraph> multiPersonDialogueGraphs; //多人对话图
     [HideInInspector]
     public DialogueNode currentDialogueNode; //当前对话节点
-    List<LineNode> currentDialogue;
-    public int currentLineIndex;
     int currentOptionIndex;
     [HideInInspector]
     public Character character;
@@ -21,31 +20,27 @@ public class DialogueController : MonoBehaviour
     TextMeshProUGUI dialogueTextMesh; //本人的textmesh
     List<TextMeshProUGUI> meetingTextMeshList; //多人对话参与者的textmesh，[0]是本人
 
-    public void Initialize(DialogueData dialogueData ,List<GameObject> objs = null)
+
+    //老方法，已被GraghDisplayDialogue替代
+    //初始化对话所需变量
+    /*
+    public void Initialize(DialogueData dialogueData, List<GameObject> objs = null)
     {
-        meetingTextMeshList = new(){dialogueTextMesh};
-        if(objs != null)
-            foreach(var obj in objs)
+        meetingTextMeshList = new() { dialogueTextMesh };
+        if (objs != null)
+            foreach (var obj in objs)
             {
                 meetingTextMeshList.Add(obj.GetComponent<DialogueController>().dialogueTextMesh);
                 Debug.Assert(obj != null, "obj不能为null");
-                Debug.Assert(meetingTextMeshList[^1] != null,"TextMesh不能为null");
+                Debug.Assert(meetingTextMeshList[^1] != null, "TextMesh不能为null");
             }
         currentLineIndex = dialogueData.FirstLineIndex <= 0 ? 0 : dialogueData.FirstLineIndex - 1;
         currentDialogue = dialogueData.dialogue;
     }
-    public void GraghInitialize(int GraghIndex, List<GameObject> objs = null)
-    {
-        meetingTextMeshList = new(){dialogueTextMesh};
-        if(objs != null)
-            foreach(var obj in objs)
-            {
-                meetingTextMeshList.Add(obj.GetComponent<DialogueController>().dialogueTextMesh);
-                Debug.Assert(obj != null, "obj不能为null");
-                Debug.Assert(meetingTextMeshList[^1] != null,"TextMesh不能为null");
-            }
-        currentDialogueNode = dialogueGraphs[GraghIndex].StartNode;
-    }
+    
+    //老方法，已被GraghDisplayDialogue替代
+    //显示对话
+    /*
     public IEnumerator DisplayDialogue()
     {
         Timer.Pause();
@@ -137,31 +132,55 @@ public class DialogueController : MonoBehaviour
             EndDialogue(textMesh);
         }
     }
-    public IEnumerator GraghDisplayDialogue()
+
+    //老方法，已被GraghDisplayDialogue替代
+    //显示下一句对话
+    public IEnumerator DisplayNextLine()
+    {
+        if (currentDialogue[currentLineIndex].nextLine == 0)
+            currentLineIndex++; //如果是0就按照索引顺序找下一句
+        else
+            currentLineIndex = currentDialogue[currentLineIndex].nextLine - 1;
+        yield return StartCoroutine(DisplayDialogue());
+    }
+    */
+
+    public IEnumerator GraphDisplayDialogue(DialogueGraph dialogueGraph, List<GameObject> objs = null)
     {
         Timer.Pause();
+        //处理多人对话情况
+        meetingTextMeshList = new() { dialogueTextMesh };
+        if (objs != null)
+            foreach (var obj in objs)
+            {
+                meetingTextMeshList.Add(obj.GetComponent<DialogueController>().dialogueTextMesh);
+                Debug.Assert(obj != null, "obj不能为null");
+                Debug.Assert(meetingTextMeshList[^1] != null, "TextMesh不能为null");
+            }
+
+        currentDialogueNode = dialogueGraph.StartNode;
+
         TextMeshProUGUI textMesh = dialogueTextMesh;//默认发言者是本人
+        //对话循环
         while (currentDialogueNode != null)
         {
             isWaitingForInput = true;
-            //Debug.Log(currentLineIndex);
+
+            /*
             //跳过已经完成检定的选项
-            while (currentDialogue[currentLineIndex].options.Count > 0) //检查该句选项是否已完成，是则更新当前索引并继续检查下一句
+            while (currentDialogueNode.optionNodes.Length > 0) //检查该句选项是否已完成，是则更新当前索引并继续检查下一句
             {
-                //Debug.Log(currentLineIndex);
                 bool didAllOptionsUnChecked = true;
-                foreach (var option in currentDialogue[currentLineIndex].options)
+                for (int i = 0; i < currentDialogueNode.optionNodes.Length; i++)
                 {
-                    //Debug.Log(currentLineIndex);
+                    DialogueOptionNode option = currentDialogueNode.GetOutputPort($"optionNodes {i}").Connection.node as DialogueOptionNode;
                     if (option.hasChecked)
                     {
-                        if (option.jumpToLine == 0) //如果填0是下一句
-                            currentLineIndex++;
-                        else
-                            currentLineIndex = option.jumpToLine - 1;
-                        if (currentLineIndex >= currentDialogue.Count) //容错，检定过的选项一路通向结束，对话直接结束了，按规则填写对话分支不应该进入这个判断
+                        currentDialogueNode = option.nextNode;
+                        if (currentDialogueNode == null) //容错，检定过的选项一路通向结束，对话直接结束了，按规则填写对话分支不应该进入这个判断
                         {
                             EndDialogue(textMesh);
+                            Debug.LogWarning("检定过的选项一路通向结束，当前对话节点为null");
                             yield break;
                         }
                         didAllOptionsUnChecked = false;
@@ -171,8 +190,9 @@ public class DialogueController : MonoBehaviour
                 if (didAllOptionsUnChecked)
                     break;
             }
-            if (currentDialogueNode.speekerIndex != 0)
-                textMesh = meetingTextMeshList[currentDialogueNode.speekerIndex]; //如果存在多人对话，对话框根据speekerIndex选取
+            */
+            Debug.Log("currentDialogueNode.speekerIndex : "+currentDialogueNode.speekerIndex);
+            textMesh = meetingTextMeshList[currentDialogueNode.speekerIndex]; //如果存在多人对话，对话框根据speekerIndex选取
             textMesh.transform.parent.gameObject.SetActive(true);
             textMesh.text = currentDialogueNode.Line;
             if (currentDialogueNode.optionNodes.Length > 0) //有选项
@@ -184,10 +204,13 @@ public class DialogueController : MonoBehaviour
                 {
                     DialogueOptionNode option = currentDialogueNode.GetOutputPort($"optionNodes {i}").Connection.node as DialogueOptionNode;
                     options.Add(option);//存储选项节点
-                    option.hasChecked = false;
+                    //option.hasChecked = false;
                     textMesh.text += "\n" + (i + 1) + ". " + option.line;
                     if (option.checkingTalentName != "")
-                        textMesh.text += "\t" + DiceCheck.Instance.PredictionString(option.checkingTalentName, option.checkingTalentLevel);
+                        if (!option.hasChecked)
+                            textMesh.text += "\t" + DiceCheck.Instance.PredictionString(option.checkingTalentName, option.checkingTalentLevel);
+                        else
+                            textMesh.text += "\t" + (option.checkResult ? "<color=green>已成功</color>" : "<color=red>已失败</color>");
                 }
                 isWaitingForInput = true;
                 while (isWaitingForInput) //等待输入
@@ -219,22 +242,17 @@ public class DialogueController : MonoBehaviour
                     yield return null;
                 }
                 textMesh.transform.parent.gameObject.SetActive(false); //输入后关闭对话框
-                currentDialogueNode = currentDialogueNode.nextNode; //获取下一句
+                currentDialogueNode = currentDialogueNode != null ? currentDialogueNode.NextNode : null; //获取下一句
+            }
+            if (currentDialogueNode != null ? currentDialogueNode.nextGraph : null != null) //如果有对话图,优先进入对话图
+            {
+                yield return StartCoroutine(GraphDisplayDialogue(currentDialogueNode.nextGraph));
             }
             yield return null; //等待一帧，避免过快跳过对话
         }
         Debug.Log(currentDialogueNode);
         //跳出循环，下一句是空，结束对话
         EndDialogue(textMesh);
-    }
-    
-    public IEnumerator DisplayNextLine()
-    {
-        if (currentDialogue[currentLineIndex].nextLine == 0)
-            currentLineIndex++; //如果是0就按照索引顺序找下一句
-        else
-            currentLineIndex = currentDialogue[currentLineIndex].nextLine - 1;
-        yield return StartCoroutine(DisplayDialogue());
     }
 
     void EndDialogue(TextMeshProUGUI textMesh)
@@ -243,15 +261,16 @@ public class DialogueController : MonoBehaviour
         Timer.Resume();
         textMesh.transform.parent.gameObject.SetActive(false);
         textMesh.text = "";
-        currentLineIndex = 0;
     }
 
+    /*
     IEnumerator SelectOption(int currentOptionIndex)
     {
         LineNode lineNode = currentDialogue[currentLineIndex];
         DialogueOption option = lineNode.options[currentOptionIndex];
         yield return StartCoroutine(option.OptionEffect(this));
     }
+    */
     
     IEnumerator GraghSelectOption(int currentOptionIndex)
     {
@@ -261,10 +280,7 @@ public class DialogueController : MonoBehaviour
 
     public void TestClearAllCheck()
     {
-        foreach (var dialogue in dialogues)
-        {
-            dialogue.Reset();
-        }
+        dialogueGraph.Reset();
     }
     
     // Start is called before the first frame update

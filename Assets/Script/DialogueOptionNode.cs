@@ -7,30 +7,39 @@ using XNode;
 public class DialogueOptionNode : Node
 {
 	public string line;
+	[Input] public int nodeIndex; //输入端口，连接上一段的输出端口
+	[Output] public int succeededNode;
+	[Output] public int failedNode;
 	public string checkingTalentName;
 	public int checkingTalentLevel;
 	public EffectType succedEffectType;
 	public List<string> succedArgs;
 	public EffectType failedEffectType;
 	public List<string> failedArgs;
-	[Input] public int nodeIndex; //输入端口，连接上一段的输出端口
-	[Output] public int succeededNode;
-	[Output] public int failedNode;
+
+
+	public DialogueNode BelongedNode
+	{
+		get
+		{
+			return GetInputPort("nodeIndex").Connection?.node as DialogueNode;
+		}
+	}//所属对话节点
 
 	[HideInInspector]
-	public DialogueNode jumpToNode;
+	public DialogueNode nextNode;
+	public DialogueGraph nextGraph; //对话图
 	//[HideInInspector]
 	public bool hasChecked = false;
 
 
-	private bool checkResult = true; //如果不检定，默认使用成功结果
+	public bool checkResult = true; //如果不检定，默认使用成功结果
 
 	public IEnumerator OptionEffect(DialogueController dialogueController)
 	{
 		EffectType type;
 		List<string> args;
-		checkResult = true;//如果不检定，默认使用成功结果
-		if (checkingTalentName != "") //填了checkingSkillName就进行检定
+		if (checkingTalentName != "" && !hasChecked) //填了checkingSkillName且没有检定过就进行检定
 		{
 			checkResult = DiceCheck.Instance.Check(Hero.Instance.GetTalent(checkingTalentName), checkingTalentLevel);
 			hasChecked = true;
@@ -39,38 +48,44 @@ public class DialogueOptionNode : Node
 		{
 			type = succedEffectType;
 			args = succedArgs;
-			jumpToNode = GetOutputPort("succeededNode").Connection.node as DialogueNode;
+			nextNode = GetOutputPort("succeededNode").Connection?.node as DialogueNode;
 		}
 		else
 		{
 			type = failedEffectType;
 			args = failedArgs;
-			jumpToNode = GetOutputPort("failedNode").Connection.node as DialogueNode;
+			nextNode = GetOutputPort("failedNode").Connection?.node as DialogueNode;
 		}
 
 		// 根据配置名称选择要执行的协程
-		switch (type)
+		if (!hasChecked)
 		{
-			case EffectType.ModifyStats:
-				yield return EffectModifyParameter(args);
-				break;
-			case EffectType.ModifyAfinity:
-				yield return EffectModifyAffinity(args, dialogueController.character);
-				break;
-			case EffectType.CheckItem:
-				yield return EffectCheckItem(args);
-				break;
-			case EffectType.RollBack:
-				RollbackRequiredKPI();
-				break;
-			case EffectType.OffWork:
-				Timer.shouldOffWorkNow = true;
-				break;
-			// 可以添加更多协程类型...
-			default:
-				break;
+			switch (type)
+			{
+				case EffectType.ModifyStats:
+					yield return EffectModifyParameter(args);
+					break;
+				case EffectType.ModifyAfinity:
+					yield return EffectModifyAffinity(args, dialogueController.character);
+					break;
+				case EffectType.CheckItem:
+					yield return EffectCheckItem(args);
+					break;
+				case EffectType.RollBack:
+					RollbackRequiredKPI();
+					break;
+				case EffectType.OffWork:
+					Timer.shouldOffWorkNow = true;
+					break;
+				// 可以添加更多协程类型...
+				default:
+					break;
+			}
 		}
-		yield return dialogueController.currentDialogueNode = jumpToNode;
+		if(nextGraph != null) //优先进入对话图
+			yield return dialogueController.GraphDisplayDialogue(nextGraph);
+		else
+			dialogueController.currentDialogueNode = nextNode; //下一句
 	}
 
 	//调整属性

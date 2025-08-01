@@ -18,11 +18,7 @@ public class CutSceneController : MonoBehaviour
         }
     }
     public List<CutSceneData> cutSceneDataList;
-
-    public void AddVaringBeginingCoroutines()
-    {
-        //Timer.theVaryBeginingCoroutineQueueManager.AddCoroutine(ExecuteCoroutines(3));
-    }
+    public List<CutSceneGraph> cutSceneGraphList;
 
     public IEnumerator ExecuteCoroutines(int cutSceneDataIndex)
     {
@@ -34,10 +30,10 @@ public class CutSceneController : MonoBehaviour
             switch (task.coroutineType)
             {
                 case CoroutineType.NPCMoves:
-                    yield return StartCoroutine(NPCMoves(task.obj.GetComponent<NPC>(),task.destination));
+                    yield return StartCoroutine(NPCMoves(task.obj.GetComponent<NPC>(), task.destination));
                     break;
                 case CoroutineType.NPCDialogue:
-                    yield return StartCoroutine(NPCDialogue(task.obj.GetComponent<NPC>(),task.dialogueData));
+                    yield return StartCoroutine(Graph_NPC_Dialogue(task.obj.GetComponent<NPC>(), task.dialogueGraph));
                     break;
                 case CoroutineType.interactWith:
                     yield return StartCoroutine(InterateWith(task.obj.GetComponent<Interactable>()));
@@ -52,7 +48,7 @@ public class CutSceneController : MonoBehaviour
                     yield return StartCoroutine(BlackOutCoroutine(task.varList.ToArray()));
                     break;
                 case CoroutineType.ResetDialuoge:
-                    ResetDialuoge(task.dialogueData);
+                    //ResetDialuoge(task.dialogueGraph);
                     break;
                 case CoroutineType.Pusse:
                     Timer.Pause();
@@ -67,17 +63,64 @@ public class CutSceneController : MonoBehaviour
             }
         }
         Timer.Resume();
-
+    }
+    public IEnumerator GraghExecuteCoroutines(int cutSceneGraphIndex)
+    {
+        CutSceneGraph cutSceneGraph = cutSceneGraphList[cutSceneGraphIndex];
+        Timer.Pause();
+        CutSceneNode node = cutSceneGraph.startNode;
+        // 根据配置名称选择要执行的协程
+        switch (node.coroutineType)
+        {
+            case CoroutineType.NPCMoves:
+                yield return StartCoroutine(NPCMoves(node.obj.GetComponent<NPC>(), node.destination));
+                break;
+            case CoroutineType.NPCDialogue:
+                yield return StartCoroutine(Graph_NPC_Dialogue(node.obj.GetComponent<NPC>(), node.dialogueGraph));
+                break;
+            case CoroutineType.interactWith:
+                yield return StartCoroutine(InterateWith(node.obj.GetComponent<Interactable>()));
+                break;
+            case CoroutineType.SetActiveTrue:
+                SetObjActiveTrue(node.obj);
+                break;
+            case CoroutineType.SetActiveFalse:
+                SetObjActiveFalse(node.obj);
+                break;
+            case CoroutineType.Blackout:
+                yield return StartCoroutine(BlackOutCoroutine(node.args.ToArray()));
+                break;
+            case CoroutineType.Pusse:
+                Timer.Pause();
+                break;
+            case CoroutineType.Resume:
+                Timer.Resume();
+                break;
+            // 可以添加更多协程类型...
+            default:
+                yield return null;
+                break;
+        }
+        Timer.Resume();
     }
     IEnumerator NPCMoves(NPC actor,GameObject destination)
     {
         yield return StartCoroutine(actor.MoveTo(destination));
     }
 
+    //已被Graph_NPC_Dialogue替代
+    //NPC发起对话
+    /*
     IEnumerator  NPCDialogue(NPC actor,DialogueData dialogue)
     {
         actor.dialogueController.Initialize(dialogue);
         yield return StartCoroutine(actor.dialogueController.DisplayDialogue());
+    }
+    */
+
+    IEnumerator  Graph_NPC_Dialogue(NPC actor,DialogueGraph dialogueGraph)
+    {
+        yield return StartCoroutine(actor.dialogueController.GraphDisplayDialogue(dialogueGraph));
     }
     IEnumerator  InterateWith(Interactable interactable)
     {
@@ -93,9 +136,9 @@ public class CutSceneController : MonoBehaviour
         obj.SetActive(false);
     }
 
-    void  ResetDialuoge(DialogueData dialogueData)
+    void  ResetDialuoge(DialogueGraph dialogueGraph)
     {
-        dialogueData.Reset();
+        dialogueGraph.Reset();
     }
     void  SetObjActiveTrue(GameObject obj)
     {

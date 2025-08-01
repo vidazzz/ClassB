@@ -12,16 +12,32 @@ public class Talent
     public int level;
     public void LevelUp()
     {
-        level ++;
+        level++;
     }
-    
+
 }
 
-public enum TalentType{
+public enum TalentType
+{
     none = 0,
     information,
     implement,
     mental,
+}
+
+[Serializable]
+public class SomeThing
+{
+    public SomeThingType type;
+    public List<GameObject> obgList;
+    public int multiPersonDialoguesIndex;
+}
+
+[Serializable]
+public enum SomeThingType{
+    none = 0,
+    use,
+    meeting,
 }
 
 public enum PreesureLevel {

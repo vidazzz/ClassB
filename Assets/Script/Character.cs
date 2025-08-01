@@ -8,7 +8,8 @@ public class Character : Interactable
     [SerializeField] protected float fSpeed;
     [HideInInspector] public LifeController lifeController;
     [HideInInspector] public Vector3 spawnPosition;
-    public Dictionary<string,Talent> talents;
+    public int socialDisdence = 1; //社交距离,单位是一个Astar.node的半径
+    public Dictionary<string, Talent> talents;
     public List<Buff> buffs;
     public List<Skill> skills;
     public List<AffinityEffectArgs> affinityEffectArgsList; //好感度效果参数

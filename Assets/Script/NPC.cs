@@ -11,40 +11,29 @@ public class NPC : Character
     public List<SomeThing> ThingsICanDo;
     public DialogueController dialogueController;
     NPC interlocutor;
-    bool isMeeting;
-    DialogueData currentTopic;
-    [Serializable]
-    public class SomeThing {
-        public SomeThingType type;
-        public List<GameObject> obgList;
-        public int multiPersonDialoguesIndex;
-    }
-    [Serializable]
-    public enum SomeThingType{
-        none = 0,
-        use,
-        meeting,
-    }
+    public bool isMeeting;
+    DialogueGraph currentTopic;
+
+
     public override IEnumerator Interact(Character interactor)
     {
         if(interactor is Hero) //对象是主角
         {
             Timer.Pause();
-            Hero.Instance.canActive = false;
-            int dialogueIndex = 0; //需要控制的时候找地方再赋值
-            if(isMeeting && dialogueController.multiPersonDialogues.Count > 0) //多人对话
+            StopAllCoroutines();
+            //Hero.Instance.canActive = false;
+            if (isMeeting && dialogueController.multiPersonDialogueGraphs.Count > 0) //多人对话
             {
-                dialogueController.Initialize(dialogueController.multiPersonDialogues[someThingsWorkingOn.multiPersonDialoguesIndex],someThingsWorkingOn.obgList);
-                yield return StartCoroutine(dialogueController.DisplayDialogue());
+                yield return StartCoroutine(dialogueController.GraphDisplayDialogue(dialogueController.multiPersonDialogueGraphs[someThingsWorkingOn.multiPersonDialoguesIndex], someThingsWorkingOn.obgList));
             }
-            else if(dialogueController?.dialogueGraphs.Count > 0)
+            else if (dialogueController != null ? dialogueController.dialogueGraph : null != null) //单人对话
             {
-                dialogueController.GraghInitialize(dialogueIndex);
-                yield return StartCoroutine(dialogueController.GraghDisplayDialogue());
+                yield return StartCoroutine(dialogueController.GraphDisplayDialogue(dialogueController.dialogueGraph));
             }
             else
                 Debug.LogWarning("No dialogue has been set");
             yield return null;
+            StartCoroutine(LetsDoSomeThing(someThingsWorkingOn));
             Timer.Resume();
         }
         else //interactor is NPC
@@ -62,7 +51,6 @@ public class NPC : Character
         Interactable target = targetObj.GetComponent<Interactable>();
         //Debug.Log("MoveToObj: "+target);
         List<List<AStar.Node>> listPath = new();
-        target.interactPoint ??= new Vector3[]{Vector3.zero};
         if(target.interactPoint.Length == 0)
             target.interactPoint = new Vector3[]{Vector3.zero};
         foreach (Vector3 point in target.interactPoint)
@@ -83,18 +71,19 @@ public class NPC : Character
         if (path != null)
         {
             //Debug.Log(path.Count);
-            foreach (AStar.Node node in path)
+            for (int i = 0; i < path.Count - socialDisdence; i++)
             {
+                AStar.Node node = path[i];
                 Debug.DrawLine(node.worldPosition, node.parent.worldPosition, Color.red, 99f);
                 Vector3 direction = (node.worldPosition - transform.position).normalized;
-                while( transform.position != node.worldPosition)
+                while (transform.position != node.worldPosition)
                 {
-                    transform.position = Vector3.MoveTowards(transform.position,node.worldPosition,Time.deltaTime*fSpeed);
+                    transform.position = Vector3.MoveTowards(transform.position, node.worldPosition, Time.deltaTime * fSpeed);
                     AnimateMove(direction);
-                    do 
+                    do
                         yield return null;
-                    while(Timer.hasPaused); //timer暂停时禁止移动 
-                }    
+                    while (Timer.hasPaused); //timer暂停时禁止移动 
+                }
             }
             AnimateStopMove();
         }
@@ -139,8 +128,9 @@ public class NPC : Character
         List<AStar.Node> path = astar.FindPath(transform.position, gameObj.transform.position);
         if (path != null)
         {
-            foreach (AStar.Node node in path)
+            for (int i = 0; i < path.Count - socialDisdence; i++)
             {
+                AStar.Node node = path[i];
                 Debug.DrawLine(node.worldPosition, node.parent.worldPosition, Color.red, 99f);
                 Vector3 direction = (node.worldPosition - transform.position).normalized;
                 while( transform.position != node.worldPosition)
@@ -166,7 +156,7 @@ public class NPC : Character
         switch(someThing.type)
         {
             case SomeThingType.meeting:
-                yield return StartCoroutine(TakeMeeting(dialogueController.multiPersonDialogues[someThing.multiPersonDialoguesIndex],someThing.obgList));//参数决定了npc想聊什么，以后有需要再实现传参方式
+                yield return StartCoroutine(TakeMeeting(dialogueController.multiPersonDialogueGraphs[someThing.multiPersonDialoguesIndex],someThing.obgList));//参数决定了npc想聊什么，以后有需要再实现传参方式
                 break;
             case SomeThingType.use:
                 yield return StartCoroutine(UseFacility(someThing.obgList[0]));
@@ -193,9 +183,9 @@ public class NPC : Character
             interactable.occupiedBy = null;
         }
     }
-    public IEnumerator TakeMeeting(DialogueData topic,List<GameObject> interlocutors)
+    public IEnumerator TakeMeeting(DialogueGraph topic,List<GameObject> interlocutors)
     {
-        if(interlocutors.Count == 1) //与另一个你npc对话
+        if(interlocutors.Count == 1) //与另一个npc对话
         {
             NPC npc = interlocutors[0].GetComponent<NPC>();
             if(npc.occupiedBy == this || npc.occupiedBy == null) //npc未被占用

@@ -11,11 +11,8 @@ public class Door : Interactable
         if(interactor is Hero) //对象是主角
         {
             Timer.Pause();
-            Hero.Instance.canActive = false;
-            int dialogueIndex = 0; //需要控制的时候找地方再赋值
-            if(dialogueController.dialogues.Count > 0)
-                dialogueController.Initialize(dialogueController.dialogues[dialogueIndex]);
-            yield return StartCoroutine(dialogueController.DisplayDialogue());
+            if(dialogueController.dialogueGraph != null)
+                yield return StartCoroutine(dialogueController.GraphDisplayDialogue(dialogueController.dialogueGraph));
             Timer.Resume();
         }
         else //interactor is NPC

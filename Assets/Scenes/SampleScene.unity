@@ -3801,9 +3801,9 @@ GameObject:
   m_Component:
   - component: {fileID: 827531386}
   - component: {fileID: 827531387}
-  - component: {fileID: 827531388}
   - component: {fileID: 827531390}
   - component: {fileID: 827531389}
+  - component: {fileID: 827531388}
   m_Layer: 0
   m_Name: Door
   m_TagString: Untagged
@@ -3856,11 +3856,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 644d5db7f9a830b4e803f33e04b8fc34, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dialogues:
-  - {fileID: 11400000, guid: f2798807e91aeef4c95630d97e2f0991, type: 2}
-  multiPersonDialogues: []
-  dialogueGraphs: []
-  currentLineIndex: 0
+  dialogueGraph: {fileID: 11400000, guid: d28d20f45b18b6948987d845b7706e68, type: 2}
+  multiPersonDialogueGraphs: []
+  currentDialogueNode: {fileID: 0}
   character: {fileID: 0}
 --- !u!61 &827531389
 BoxCollider2D:
@@ -9111,6 +9109,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 07dc919348faca847af90adab9175fe4, type: 2}
   - {fileID: 11400000, guid: 7aafde8ebc255d042ad65511d6efe29a, type: 2}
   - {fileID: 11400000, guid: 57101c1485cf64044a8f7d38a4d050e4, type: 2}
+  cutSceneGraphList: []
 --- !u!4 &1633873318
 Transform:
   m_ObjectHideFlags: 0
@@ -9135,6 +9134,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 42871176506680659, guid: 866fe664faa34c34f89d9b736a90c9a1, type: 3}
+      propertyPath: dialogueGraph
+      value: 
+      objectReference: {fileID: 11400000, guid: 4321badb58a6f7648a23ce89fcdca78d, type: 2}
+    - target: {fileID: 42871176506680659, guid: 866fe664faa34c34f89d9b736a90c9a1, type: 3}
       propertyPath: dialogueTextMesh
       value: 
       objectReference: {fileID: 1559347195}
@@ -9154,6 +9157,14 @@ PrefabInstance:
       propertyPath: multiPersonDialogues.Array.data[0]
       value: 
       objectReference: {fileID: 11400000, guid: 0d66d33ab30a75649850ca2e87a6f103, type: 2}
+    - target: {fileID: 42871176506680659, guid: 866fe664faa34c34f89d9b736a90c9a1, type: 3}
+      propertyPath: multiPersonDialogueGraphs.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 42871176506680659, guid: 866fe664faa34c34f89d9b736a90c9a1, type: 3}
+      propertyPath: multiPersonDialogueGraphs.Array.data[0]
+      value: 
+      objectReference: {fileID: 11400000, guid: a1fc53c64e24889468091cdebfdbfe4a, type: 2}
     - target: {fileID: 1895567256321352005, guid: 866fe664faa34c34f89d9b736a90c9a1, type: 3}
       propertyPath: ThingsICanDo.Array.size
       value: 1
@@ -12270,6 +12281,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 42871176506680659, guid: 866fe664faa34c34f89d9b736a90c9a1, type: 3}
+      propertyPath: dialogueGraph
+      value: 
+      objectReference: {fileID: 11400000, guid: 4321badb58a6f7648a23ce89fcdca78d, type: 2}
     - target: {fileID: 42871176506680659, guid: 866fe664faa34c34f89d9b736a90c9a1, type: 3}
       propertyPath: dialogueGraphs.Array.size
       value: 1
