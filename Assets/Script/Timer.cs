@@ -4,10 +4,25 @@ using System.Collections.Generic;
 using System.Data;
 using TMPro;
 using Unity.Mathematics;
+using Unity.VisualScripting;
 using UnityEngine;
 public delegate void timerDelegate();
+public delegate void timerDelegateWithInt(int value);
 public class Timer : MonoBehaviour
 {
+    private static Timer instance;
+    
+    public static Timer Instance
+    {
+        get
+        {
+            if (instance == null)
+            {
+                instance = FindObjectOfType<Timer>();
+            }
+            return instance;
+        }
+    }
     private int dd;
     private int hh;
     private float mm;
@@ -21,21 +36,7 @@ public class Timer : MonoBehaviour
     private static int oneSecondInGame = 4;
     public TextMeshProUGUI displayText;
     public static bool hasPaused;
-    public static CoroutineQueueManager dayBeginCoroutineQueueManager;
-    public static CoroutineQueueManager theVaryBeginingCoroutineQueueManager;
-    public static CoroutineQueueManager dayEndCoroutineQueueManager;
-    public static CoroutineQueueManager nextFrameCoroutineQueueManager;
-    public static CoroutineQueueManager offWorkCoroutineQueueManager;
-    public static timerDelegate onTheVaryBegining;
-    public static timerDelegate onDayBegin;
-    public static timerDelegate onDayEnd;
-    public static timerDelegate onDayEnd2;
 
-    public static timerDelegate onHourEnd;
-    public static timerDelegate onStartWork;
-    public static timerDelegate onOffWork;
-    public static timerDelegate onOffWork2;
-    public static timerDelegate onNextFrame;
     [HideInInspector]
     public static bool shouldOffWorkNow;
     [HideInInspector]
@@ -49,25 +50,31 @@ public class Timer : MonoBehaviour
         //计时使用工作时钟 9-33
         //显示使用正常时钟 0-24
         yield return new WaitForSeconds(0.5f);
-        onTheVaryBegining?.Invoke(); //一切的开始                      
-        yield return StartCoroutine(theVaryBeginingCoroutineQueueManager.ProcessQueue()); //一切的开始
+        EventManager.Instance.TheVaryBegining(); //一切的开始
+        yield return StartCoroutine(CoroutineQueueManager.theVaryBeginingCoroutineQueue.ProcessQueue()); //一切的开始
         while(true)
         {
             deltaTime = 0;
             while (hasPaused)
                 yield return null;
             mm += Time.deltaTime * oneSecondInGame * Hero.Instance.lifeController.TimeMultiplier;
-            onNextFrame?.Invoke(); //下一帧
-            if(!nextFrameCoroutineQueueManager.IsQueueEmpty)
-                yield return StartCoroutine(nextFrameCoroutineQueueManager.ProcessQueue()); //下一帧
-            
+            EventManager.Instance.NextFrame(); //下一帧
+            if (!CoroutineQueueManager.nextFrameCoroutineQueue.IsQueueEmpty)
+                yield return StartCoroutine(CoroutineQueueManager.nextFrameCoroutineQueue.ProcessQueue()); //下一帧
+            if (!CoroutineQueueManager.firstQuitTypingGameCoroutineQueue.IsQueueEmpty)
+                yield return StartCoroutine(CoroutineQueueManager.firstQuitTypingGameCoroutineQueue.ProcessQueue()); //处理第一次退出打字游戏的协程队列
             
             if(hh >= 9) //上班时间
             {
                 if(hasDayEnded) //新的一天开始
                 {
-                    onDayBegin?.Invoke();
-                    yield return StartCoroutine(dayBeginCoroutineQueueManager.ProcessQueue());
+                    EventManager.Instance.DayBegin();
+                    yield return StartCoroutine(CoroutineQueueManager.dayBeginCoroutineQueue.ProcessQueue());
+                    if(hadQuitTypingGame) //如果退出过打字界面
+                    {
+                        EventManager.Instance.DayBegin2();
+                        yield return StartCoroutine(CoroutineQueueManager.dayBeginCoroutineQueue2.ProcessQueue());
+                    }
                     hasDayEnded = false;
                     isOffWork = false;
                 }
@@ -76,14 +83,19 @@ public class Timer : MonoBehaviour
             {
                 hh ++;
                 mm = 0;
-                onHourEnd?.Invoke();
+                EventManager.Instance.HourEnd();
             }
             if(hh == 18 && !isOffWork) //下班时间
             {
                 isOffWork = true;
-                onOffWork?.Invoke();
-                yield return StartCoroutine(offWorkCoroutineQueueManager.ProcessQueue());
-                onOffWork2?.Invoke();
+                EventManager.Instance.OffWork();
+                yield return StartCoroutine(CoroutineQueueManager.offWorkCoroutineQueue.ProcessQueue());
+                if(hadQuitTypingGame) //如果退出过打字界面
+                {
+                    EventManager.Instance.OffWork2();
+                    yield return StartCoroutine(CoroutineQueueManager.offWorkCoroutineQueue2.ProcessQueue());
+                }
+                EventManager.Instance.OffWork2();
             }
             if(hh >= 26) //凌晨2点
             {  
@@ -104,11 +116,14 @@ public class Timer : MonoBehaviour
     public IEnumerator EndTheDay()
     {
         hasDayEnded = true;
-        onDayEnd?.Invoke();
-        onDayEnd2?.Invoke();
+
+        EventManager.Instance.DayEnd();
+        yield return StartCoroutine(CoroutineQueueManager.dayEndCoroutineQueue.ProcessQueue());
+        EventManager.Instance.DayEnd2();
+        yield return StartCoroutine(CoroutineQueueManager.dayEndCoroutineQueue2.ProcessQueue());
+
         hh = 9;
-        dd ++;  
-        yield return StartCoroutine(dayEndCoroutineQueueManager.ProcessQueue());
+        dd ++;
     }
     void DisplayClock()
     {
@@ -131,39 +146,15 @@ public class Timer : MonoBehaviour
         pauseIcon.SetActive(false);
         hasPaused = false;
     }
-    void AddNextFrameCoroutines() //装填协程进入队列
-    {
-        
-    }
-    void OnTheVaryBegining()
-    {   
-        StartCoroutine(CutSceneController.Instance.ExecuteCoroutines(0)); //由于需要这个打字自行运转，不能在timer协程中yield return，所以新开一个协程并行处理
-    }
 
-    void AddVaryBeginingCoroutine()
+    void AddDayN_BeginCoroutine(int invokDay)
     {
-        theVaryBeginingCoroutineQueueManager.AddCoroutine(CutSceneController.Instance.ExecuteCoroutines(4));
-    }
-    void AddDayBeginCoroutine()
-    {
-        dayBeginCoroutineQueueManager.AddCoroutine(Blackout.Instance.FadeInOrOutCoroutine());
-        if(hadQuitTypingGame)//退出过打字界面才有后面的交互
-            dayBeginCoroutineQueueManager.AddCoroutine(CutSceneController.Instance.ExecuteCoroutines(2));
+        if (invokDay != dd || !hadQuitTypingGame)
+            return;
     }
     void AddOffWorkCoroutine()
     {
-        if(hadQuitTypingGame)//退出过打字界面才有后面的交互
-        {
-            offWorkCoroutineQueueManager.AddCoroutine(CutSceneController.Instance.ExecuteCoroutines(3));
-        }
-        else
-            offWorkCoroutineQueueManager.AddCoroutine(EndTheDay());
-            
-    }
-    void AddDayEndCoroution()
-    {
-        dayEndCoroutineQueueManager.AddCoroutine(Blackout.Instance.FadeInOrOutCoroutine());
-        dayEndCoroutineQueueManager.AddCoroutine(Blackout.Instance.DisplayText(Blackout.Instance.narrationSentances)); //一天结束后的旁白
+        CoroutineQueueManager.offWorkCoroutineQueue.AddCoroutine(EndTheDay());        
     }
 
     public static void SetOneSecondInGame(int value)
@@ -174,17 +165,11 @@ public class Timer : MonoBehaviour
 
     void Awake()
     {
-        dayBeginCoroutineQueueManager = new();
-        theVaryBeginingCoroutineQueueManager = new();
-        offWorkCoroutineQueueManager = new();
-        dayEndCoroutineQueueManager = new();
-        nextFrameCoroutineQueueManager = new();
-        onTheVaryBegining += OnTheVaryBegining;
-        onTheVaryBegining += AddVaryBeginingCoroutine;
-        onDayBegin += AddDayBeginCoroutine;
-        onOffWork += AddOffWorkCoroutine;
-        onDayEnd += AddDayEndCoroution;
-
+        CoroutineQueueManager.dayBeginCoroutineQueue = new();
+        CoroutineQueueManager.theVaryBeginingCoroutineQueue = new();
+        CoroutineQueueManager.offWorkCoroutineQueue = new();
+        CoroutineQueueManager.dayEndCoroutineQueue = new();
+        CoroutineQueueManager.nextFrameCoroutineQueue = new();
         pauseIcon = GameObject.Find("PauseIcon");
         pauseIcon.SetActive(false);
     }
@@ -205,10 +190,5 @@ public class Timer : MonoBehaviour
 
     void OnDisable()
     {
-        onTheVaryBegining -= OnTheVaryBegining;
-        onTheVaryBegining -= AddVaryBeginingCoroutine;
-        onDayBegin -= AddDayBeginCoroutine;
-        onOffWork -= AddOffWorkCoroutine;
-        onDayEnd -= AddDayEndCoroution;
     }
 }

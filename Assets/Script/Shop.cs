@@ -80,7 +80,7 @@ public class Shop : MonoBehaviour
 
     void AddShoppingCorroutine()
     {
-        Timer.dayEndCoroutineQueueManager.AddCoroutine(ShoppingCorroutine());
+        CoroutineQueueManager.dayEndCoroutineQueue2.AddCoroutine(ShoppingCorroutine());
     }
 
     IEnumerator ShoppingCorroutine()
@@ -106,12 +106,12 @@ public class Shop : MonoBehaviour
 
         InitializeMenu();
 
-        Timer.onDayEnd2 += AddShoppingCorroutine;
+        EventManager.Instance.onDayEnd2 += AddShoppingCorroutine;
     }
 
     void OnDisable()
     {
-        Timer.onDayEnd2 -= AddShoppingCorroutine;
+        EventManager.Instance.onDayEnd2 -= AddShoppingCorroutine;
     }
 
     // Update is called once per frame

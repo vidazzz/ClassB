@@ -475,7 +475,7 @@ MonoBehaviour:
   m_Name: Dialogue Option
   m_EditorClassIdentifier: 
   graph: {fileID: 11400000}
-  position: {x: 504, y: 328}
+  position: {x: 504, y: 360}
   ports:
     keys:
     - nodeIndex
@@ -909,7 +909,7 @@ MonoBehaviour:
   m_Name: Dialogue Option
   m_EditorClassIdentifier: 
   graph: {fileID: 11400000}
-  position: {x: 504, y: 40}
+  position: {x: 504, y: 56}
   ports:
     keys:
     - nodeIndex

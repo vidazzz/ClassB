@@ -117,19 +117,19 @@ public class Hero : Character
     new void Awake()
     {
         base.Awake();
-
+        EventManager.Instance.onDayBegin += Respawn;
     }
     // Start is called before the first frame update
     new void Start()
     {
         base.Start();
         DisplayStatsValue(); 
-        Timer.onDayBegin += Respawn;
+        
     }
 
     void OnDestroy()
     {
-        Timer.onDayBegin -= Respawn;
+        EventManager.Instance.onDayBegin -= Respawn;
     }
 
     

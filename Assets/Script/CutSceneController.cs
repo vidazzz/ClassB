@@ -20,9 +20,54 @@ public class CutSceneController : MonoBehaviour
     public List<CutSceneData> cutSceneDataList;
     public List<CutSceneGraph> cutSceneGraphList;
 
-    public IEnumerator ExecuteCoroutines(int cutSceneDataIndex)
+    void RegisterEvents()
     {
-        List<Task> cutSceneList = cutSceneDataList[cutSceneDataIndex].cutSceneList;
+        foreach (var cutSceneData in cutSceneDataList)
+        {
+            switch (cutSceneData.invokTime)
+            {
+                case InvokTime.TheVaryBegining:
+                    EventManager.Instance.onTheVaryBegining += () => Timer.Instance.StartCoroutine(ExecuteCoroutines(cutSceneData));
+                    break;
+                case InvokTime.theVaryBeginingQueue:
+                    EventManager.Instance.onTheVaryBegining += () => CoroutineQueueManager.theVaryBeginingCoroutineQueue.AddCoroutine(ExecuteCoroutines(cutSceneData));
+                    break;
+                case InvokTime.DayBeginQueue:
+                    EventManager.Instance.onDayBegin += () => CoroutineQueueManager.dayBeginCoroutineQueue.AddCoroutine(ExecuteCoroutines(cutSceneData));
+                    break;
+                case InvokTime.DayBegin2Queue:
+                    EventManager.Instance.onDayBegin2 += () => CoroutineQueueManager.dayBeginCoroutineQueue2.AddCoroutine(ExecuteCoroutines(cutSceneData));
+                    break;
+                case InvokTime.onDayN_Begin:
+                    EventManager.Instance.onDayN_Begin += (dayNumber) => CoroutineQueueManager.dayBeginCoroutineQueue.AddCoroutine(ExecuteCoroutines(cutSceneData));
+                    break;
+                case InvokTime.HourEndQueue:
+                    EventManager.Instance.onHourEnd += () => CoroutineQueueManager.onHourEndCoroutineQueue.AddCoroutine(ExecuteCoroutines(cutSceneData));
+                    break;
+                case InvokTime.OffWorkQueue:
+                    EventManager.Instance.onOffWork += () => CoroutineQueueManager.offWorkCoroutineQueue.AddCoroutine(ExecuteCoroutines(cutSceneData)); 
+                    break;
+                case InvokTime.OffWork2Queue:
+                    EventManager.Instance.onOffWork2 += () => CoroutineQueueManager.offWorkCoroutineQueue2.AddCoroutine(ExecuteCoroutines(cutSceneData));
+                    break;
+                case InvokTime.DayEndQueue:
+                    EventManager.Instance.onDayEnd += () => CoroutineQueueManager.dayEndCoroutineQueue.AddCoroutine(ExecuteCoroutines(cutSceneData));
+                    break;
+                case InvokTime.DayEnd2Queue:
+                    EventManager.Instance.onDayEnd2 += () => CoroutineQueueManager.dayEndCoroutineQueue.AddCoroutine(ExecuteCoroutines(cutSceneData));
+                    break;
+                case InvokTime.FirstQuitTypingGameQueue:
+                    EventManager.Instance.onFirstQuitTypingGame += () => CoroutineQueueManager.firstQuitTypingGameCoroutineQueue.AddCoroutine(ExecuteCoroutines(cutSceneData));
+                    break;
+                // 可以添加更多触发时机的事件注册...
+                default:
+                    break;
+            }
+        }
+    }
+    public IEnumerator ExecuteCoroutines(CutSceneData cutSceneData)
+    {
+        List<Task> cutSceneList = cutSceneData.cutSceneList;
         Timer.Pause();
         foreach (var task in cutSceneList)
         {
@@ -144,10 +189,11 @@ public class CutSceneController : MonoBehaviour
     {
         obj.SetActive(true);
     }
+
     // Start is called before the first frame update
     void Awake()
     {
-
+        RegisterEvents();
     }
     void Start()
     {
@@ -160,7 +206,6 @@ public class CutSceneController : MonoBehaviour
                 cutScene.destination = GameObject.Find(cutScene.destinationObjName);
             }
         }
-        
     }
 
     void OnDestroy()
@@ -170,6 +215,5 @@ public class CutSceneController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
     }
 }

@@ -64,10 +64,10 @@ public class TypingGame : MonoBehaviour
     }
     void OnDisable()
     {
-        Timer.onOffWork -= EndGame;//订阅广播,以后结算时自动关闭打字界面
-        Timer.onDayEnd -= EndGame; //订阅广播,以后结算时自动关闭打字界面
-        Timer.onOffWork2 -= Hero.Instance.lifeController.TrySalarySettleAccounts;
-        Timer.onDayEnd -= Hero.Instance.lifeController.TrySalarySettleAccountsAffterWork;
+        EventManager.Instance.onOffWork -= EndGame;//订阅广播,以后结算时自动关闭打字界面
+        EventManager.Instance.onDayEnd -= EndGame; //订阅广播,以后结算时自动关闭打字界面
+        EventManager.Instance.onOffWork2 -= Hero.Instance.lifeController.TrySalarySettleAccounts;
+        EventManager.Instance.onDayEnd -= Hero.Instance.lifeController.TrySalarySettleAccountsAffterWork;
     }
 
     void Update()
@@ -279,14 +279,14 @@ public class TypingGame : MonoBehaviour
         if(textMeshForQuit.transform.parent.gameObject.activeSelf)//如果退出提示开着,第一次主动退出
         {
             textMeshForQuit.transform.parent.gameObject.SetActive(false);// 关闭提示退出的panel
-            Timer.nextFrameCoroutineQueueManager.AddCoroutine(CutSceneController.Instance.ExecuteCoroutines(1)); //装填cutscene协程，执行一次ExecuteCoroutines进入演出
-            Timer.onOffWork += EndGame;//订阅广播,以后结算时自动关闭打字界面
-            Timer.onDayEnd += EndGame; //订阅广播,以后结算时自动关闭打字界面
+            EventManager.Instance.FirstQuitTypingGame();//第一次主动退出打字游戏
+            EventManager.Instance.onOffWork += EndGame;//订阅广播,以后结算时自动关闭打字界面
+            EventManager.Instance.onDayEnd += EndGame; //订阅广播,以后结算时自动关闭打字界面
 
-            Timer.onDayEnd -= Hero.Instance.lifeController.SalarySettleAccounts;        //取消之前的结算策略
-            Timer.onOffWork += Hero.Instance.lifeController.Try_KPI_SettleAccounts;     //第一次关闭界面后使用新的结算策略
-            Timer.onOffWork2 += Hero.Instance.lifeController.TrySalarySettleAccounts;   //第一次关闭界面后使用新的结算策略
-            Timer.onDayEnd += Hero.Instance.lifeController.TrySalarySettleAccountsAffterWork;   //第一次关闭界面后使用新的结算策略
+            EventManager.Instance.onDayEnd -= Hero.Instance.lifeController.SalarySettleAccounts;        //取消之前的结算策略
+            EventManager.Instance.onOffWork += Hero.Instance.lifeController.Try_KPI_SettleAccounts;     //第一次关闭界面后使用新的结算策略
+            EventManager.Instance.onOffWork2 += Hero.Instance.lifeController.TrySalarySettleAccounts;   //第一次关闭界面后使用新的结算策略
+            EventManager.Instance.onDayEnd += Hero.Instance.lifeController.TrySalarySettleAccountsAffterWork;   //第一次关闭界面后使用新的结算策略
             Timer.hadQuitTypingGame = true;
             Debug.Log("如果退出提示开着");
         }

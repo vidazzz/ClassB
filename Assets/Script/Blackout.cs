@@ -24,7 +24,7 @@ public class Blackout : MonoBehaviour
     public string[] narrationSentances;
     bool isFading;
 
-    public void FadeInOrOut()
+    public void  FadeInOrOut()
     {
         if(!isFading)
             StartCoroutine(FadeInOrOutCoroutine());
@@ -104,10 +104,17 @@ public class Blackout : MonoBehaviour
     }
 
     // Start is called before the first frame update
+    void Awake()
+    {
+        EventManager.Instance.onDayEnd += () => CoroutineQueueManager.dayEndCoroutineQueue.AddCoroutine(FadeInOrOutCoroutine());
+        EventManager.Instance.onDayEnd += () => CoroutineQueueManager.dayEndCoroutineQueue.AddCoroutine(DisplayText(narrationSentances));
+        EventManager.Instance.onDayBegin += () => CoroutineQueueManager.dayBeginCoroutineQueue.AddCoroutine(FadeInOrOutCoroutine());
+    }
     void Start()
     {
         image = GetComponent<Image>();
         textMesh = GetComponentInChildren<TextMeshProUGUI>();
+       
     }
 
     // Update is called once per frame
