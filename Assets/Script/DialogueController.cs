@@ -191,7 +191,7 @@ public class DialogueController : MonoBehaviour
                     break;
             }
             */
-            Debug.Log("currentDialogueNode.speekerIndex : "+currentDialogueNode.speekerIndex);
+            //Debug.Log("currentDialogueNode.speekerIndex : "+currentDialogueNode.speekerIndex);
             textMesh = meetingTextMeshList[currentDialogueNode.speekerIndex]; //如果存在多人对话，对话框根据speekerIndex选取
             textMesh.transform.parent.gameObject.SetActive(true);
             textMesh.text = currentDialogueNode.Line;

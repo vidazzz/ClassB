@@ -34,4 +34,5 @@ MonoBehaviour:
     varList: []
     dialogueGraph: {fileID: 0}
     destination: {fileID: 0}
-  invokTime: 10
+  invokeTime: 7
+  invokeDay: -1

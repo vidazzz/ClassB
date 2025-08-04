@@ -95,7 +95,6 @@ public class Timer : MonoBehaviour
                     EventManager.Instance.OffWork2();
                     yield return StartCoroutine(CoroutineQueueManager.offWorkCoroutineQueue2.ProcessQueue());
                 }
-                EventManager.Instance.OffWork2();
             }
             if(hh >= 26) //凌晨2点
             {  
@@ -133,8 +132,9 @@ public class Timer : MonoBehaviour
 
     public static void Pause()
     {
-        if(hasPaused)
+        if (hasPaused)
             return;
+        Debug.Log("Pause");
         deltaTime = 0;
         pauseIcon.SetActive(true);
         hasPaused = true;
@@ -143,6 +143,7 @@ public class Timer : MonoBehaviour
     {
         if(!hasPaused)
             return;
+        Debug.Log("Resume");
         pauseIcon.SetActive(false);
         hasPaused = false;
     }

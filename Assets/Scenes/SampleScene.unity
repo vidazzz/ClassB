@@ -9110,6 +9110,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 07dc919348faca847af90adab9175fe4, type: 2}
   - {fileID: 11400000, guid: 7aafde8ebc255d042ad65511d6efe29a, type: 2}
   - {fileID: 11400000, guid: 57101c1485cf64044a8f7d38a4d050e4, type: 2}
+  - {fileID: 11400000, guid: 4d9eb46d24ada084da53f6c1d4522552, type: 2}
   cutSceneGraphList: []
 --- !u!4 &1633873318
 Transform:

@@ -77,7 +77,7 @@ public class CutSceneController : MonoBehaviour
         }
 
         List<Task> cutSceneList = cutSceneData.cutSceneList;
-        Timer.Pause();
+        //Timer.Pause();
         foreach (var task in cutSceneList)
         {
             // 根据配置名称选择要执行的协程
@@ -116,7 +116,7 @@ public class CutSceneController : MonoBehaviour
                     break;
             }
         }
-        Timer.Resume();
+        //Timer.Resume();
     }
     public IEnumerator GraghExecuteCoroutines(int cutSceneGraphIndex)
     {

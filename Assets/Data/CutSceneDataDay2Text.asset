@@ -10,29 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c3db7fdce4600cc4fb278d9860053602, type: 3}
-  m_Name: CutSceneMeeting
+  m_Name: CutSceneDataDay2Text
   m_EditorClassIdentifier: 
   cutSceneList:
-  - objName: NPC
+  - objName: NPC (1)
     destinationObjName: Hero
     obj: {fileID: 0}
-    coroutineType: 1
+    coroutineType: 0
     varList: []
     dialogueGraph: {fileID: 0}
     destination: {fileID: 0}
-  - objName: NPC
-    destinationObjName: 
-    obj: {fileID: 0}
-    coroutineType: 2
-    varList: []
-    dialogueGraph: {fileID: 11400000, guid: 98fe739dc8b9b0b41808b5c58515db0c, type: 2}
-    destination: {fileID: 0}
-  - objName: NPC
-    destinationObjName: WayPoint
-    obj: {fileID: 0}
-    coroutineType: 1
-    varList: []
-    dialogueGraph: {fileID: 0}
-    destination: {fileID: 0}
-  invokeTime: 4
-  invokeDay: -1
+  invokeTime: 3
+  invokeDay: 2
