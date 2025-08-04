@@ -106,12 +106,12 @@ public class Shop : MonoBehaviour
 
         InitializeMenu();
 
-        EventManager.Instance.onDayEnd2 += AddShoppingCorroutine;
+        EventManager.Instance.OnDayEnd2 += AddShoppingCorroutine;
     }
 
     void OnDisable()
     {
-        EventManager.Instance.onDayEnd2 -= AddShoppingCorroutine;
+        EventManager.Instance.OnDayEnd2 -= AddShoppingCorroutine;
     }
 
     // Update is called once per frame

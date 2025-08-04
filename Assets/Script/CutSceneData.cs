@@ -7,7 +7,8 @@ using UnityEngine;
 public class CutSceneData : ScriptableObject
 {
     public List<Task> cutSceneList;
-    public InvokTime invokTime; //触发时机
+    public InvokTime invokeTime; //触发时机
+    public int invokeDay = -1; //第几天触发
 }
 [Serializable]
 public class Task{
@@ -43,7 +44,6 @@ public enum InvokTime
     NextFrame,
     DayBeginQueue,
     DayBegin2Queue,
-    onDayN_Begin,
     HourEndQueue,
     OffWorkQueue,
     OffWork2Queue,

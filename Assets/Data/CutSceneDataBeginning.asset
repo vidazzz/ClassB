@@ -38,3 +38,4 @@ MonoBehaviour:
     varList: []
     dialogueGraph: {fileID: 0}
     destination: {fileID: 0}
+  invokTime: 1

@@ -19,72 +19,66 @@ public class EventManager : MonoBehaviour
         }
     }
 
-    public event Action onTheVaryBegining;
-    public event Action onNextFrame;
-    public event Action onDayBegin;
-    public event Action onDayBegin2;
-    public event Action<int> onDayN_Begin;
-    public event Action onHourEnd;
-    public event Action onOffWork;
-    public event Action onOffWork2;
-    public event Action onDayEnd;
-    public event Action onDayEnd2;
-    public event Action onFirstQuitTypingGame;
+    public event Action OnTheVaryBegining;
+    public event Action OnNextFrame;
+    public event Action<int> OnDayBegin;
+    public event Action<int> OnDayBegin2;
+    public event Action OnHourEnd;
+    public event Action OnOffWork;
+    public event Action OnOffWork2;
+    public event Action OnDayEnd;
+    public event Action OnDayEnd2;
+    public event Action OnFirstQuitTypingGame;
 
     public void TheVaryBegining()
     {
-        onTheVaryBegining?.Invoke();
+        OnTheVaryBegining?.Invoke();
         // Additional logic for the vary beginning can be added here
     }
-    public void DayBegin()
+    public void DayBegin(int invokeDay)
     {
-        onDayBegin?.Invoke();
+        OnDayBegin?.Invoke(invokeDay);
         // Additional logic for day begin can be added here
     }
-    public void DayBegin2()
+    public void DayBegin2(int invokeDay)
     {
-        onDayBegin2?.Invoke();
+        OnDayBegin2?.Invoke(invokeDay);
         // Additional logic for day begin 2 can be added here
     }
 
-    public void DayN_Begin(int dayNumber)
-    {
-        onDayN_Begin?.Invoke(dayNumber);
-        // Additional logic for day N begin can be added here
-    }
     public void HourEnd()
     {
-        onHourEnd?.Invoke();
+        OnHourEnd?.Invoke();
         // Additional logic for hour end can be added here
     }
     public void OffWork()
     {
-        onOffWork?.Invoke();
+        OnOffWork?.Invoke();
         // Additional logic for off work can be added here
     }
     public void OffWork2()
     {
-        onOffWork2?.Invoke();
+        OnOffWork2?.Invoke();
         // Additional logic for off work 2 can be added here
     }
     public void DayEnd()
     {
-        onDayEnd?.Invoke();
+        OnDayEnd?.Invoke();
         // Additional logic for day end can be added here
     }
     public void DayEnd2()
     {
-        onDayEnd2?.Invoke();
+        OnDayEnd2?.Invoke();
         // Additional logic for day end 2 can be added here
     }
     public void NextFrame()
     {
-        onNextFrame?.Invoke();
+        OnNextFrame?.Invoke();
         // Additional logic for next frame can be added here
     }
     public void FirstQuitTypingGame()
     {
-        onFirstQuitTypingGame?.Invoke();
+        OnFirstQuitTypingGame?.Invoke();
         // Additional logic for first quit typing game can be added here
     }
 

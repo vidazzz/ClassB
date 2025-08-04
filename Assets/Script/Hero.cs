@@ -87,7 +87,7 @@ public class Hero : Character
         }
     }
 
-    void Respawn()
+    void Respawn(int invokeDay = -1)
     {
         transform.position = spawnPosition;
     }
@@ -117,7 +117,7 @@ public class Hero : Character
     new void Awake()
     {
         base.Awake();
-        EventManager.Instance.onDayBegin += Respawn;
+        EventManager.Instance.OnDayBegin += Respawn;
     }
     // Start is called before the first frame update
     new void Start()
@@ -129,7 +129,7 @@ public class Hero : Character
 
     void OnDestroy()
     {
-        EventManager.Instance.onDayBegin -= Respawn;
+        EventManager.Instance.OnDayBegin -= Respawn;
     }
 
     

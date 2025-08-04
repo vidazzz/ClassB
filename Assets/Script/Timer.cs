@@ -68,11 +68,11 @@ public class Timer : MonoBehaviour
             {
                 if(hasDayEnded) //新的一天开始
                 {
-                    EventManager.Instance.DayBegin();
+                    EventManager.Instance.DayBegin(dd);
                     yield return StartCoroutine(CoroutineQueueManager.dayBeginCoroutineQueue.ProcessQueue());
                     if(hadQuitTypingGame) //如果退出过打字界面
                     {
-                        EventManager.Instance.DayBegin2();
+                        EventManager.Instance.DayBegin2(dd);
                         yield return StartCoroutine(CoroutineQueueManager.dayBeginCoroutineQueue2.ProcessQueue());
                     }
                     hasDayEnded = false;

@@ -163,8 +163,8 @@ public class LifeController : MonoBehaviour
             {"haveFinishWork",0},//结算时是否完成了当天工作
         };
 
-        EventManager.Instance.onHourEnd += SettleAccountsPerHour;
-        EventManager.Instance.onDayEnd += SalarySettleAccounts;
+        EventManager.Instance.OnHourEnd += SettleAccountsPerHour;
+        EventManager.Instance.OnDayEnd += SalarySettleAccounts;
     }
 
     void Start()
@@ -173,8 +173,8 @@ public class LifeController : MonoBehaviour
     }
     void OnDestroy()
     {   
-        EventManager.Instance.onHourEnd -= SettleAccountsPerHour;
-        EventManager.Instance.onDayEnd -= SalarySettleAccounts;
+        EventManager.Instance.OnHourEnd -= SettleAccountsPerHour;
+        EventManager.Instance.OnDayEnd -= SalarySettleAccounts;
     }
 
     // Update is called once per frame

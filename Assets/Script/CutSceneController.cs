@@ -24,40 +24,37 @@ public class CutSceneController : MonoBehaviour
     {
         foreach (var cutSceneData in cutSceneDataList)
         {
-            switch (cutSceneData.invokTime)
+            switch (cutSceneData.invokeTime)
             {
                 case InvokTime.TheVaryBegining:
-                    EventManager.Instance.onTheVaryBegining += () => Timer.Instance.StartCoroutine(ExecuteCoroutines(cutSceneData));
+                    EventManager.Instance.OnTheVaryBegining += () => Timer.Instance.StartCoroutine(ExecuteCoroutines(cutSceneData));
                     break;
                 case InvokTime.theVaryBeginingQueue:
-                    EventManager.Instance.onTheVaryBegining += () => CoroutineQueueManager.theVaryBeginingCoroutineQueue.AddCoroutine(ExecuteCoroutines(cutSceneData));
+                    EventManager.Instance.OnTheVaryBegining += () => CoroutineQueueManager.theVaryBeginingCoroutineQueue.AddCoroutine(ExecuteCoroutines(cutSceneData));
                     break;
                 case InvokTime.DayBeginQueue:
-                    EventManager.Instance.onDayBegin += () => CoroutineQueueManager.dayBeginCoroutineQueue.AddCoroutine(ExecuteCoroutines(cutSceneData));
+                    EventManager.Instance.OnDayBegin += invokeDay => CoroutineQueueManager.dayBeginCoroutineQueue.AddCoroutine(ExecuteCoroutines(cutSceneData, invokeDay));
                     break;
                 case InvokTime.DayBegin2Queue:
-                    EventManager.Instance.onDayBegin2 += () => CoroutineQueueManager.dayBeginCoroutineQueue2.AddCoroutine(ExecuteCoroutines(cutSceneData));
-                    break;
-                case InvokTime.onDayN_Begin:
-                    EventManager.Instance.onDayN_Begin += (dayNumber) => CoroutineQueueManager.dayBeginCoroutineQueue.AddCoroutine(ExecuteCoroutines(cutSceneData));
+                    EventManager.Instance.OnDayBegin2 += invokeDay => CoroutineQueueManager.dayBeginCoroutineQueue2.AddCoroutine(ExecuteCoroutines(cutSceneData, invokeDay));
                     break;
                 case InvokTime.HourEndQueue:
-                    EventManager.Instance.onHourEnd += () => CoroutineQueueManager.onHourEndCoroutineQueue.AddCoroutine(ExecuteCoroutines(cutSceneData));
+                    EventManager.Instance.OnHourEnd += () => CoroutineQueueManager.onHourEndCoroutineQueue.AddCoroutine(ExecuteCoroutines(cutSceneData));
                     break;
                 case InvokTime.OffWorkQueue:
-                    EventManager.Instance.onOffWork += () => CoroutineQueueManager.offWorkCoroutineQueue.AddCoroutine(ExecuteCoroutines(cutSceneData)); 
+                    EventManager.Instance.OnOffWork += () => CoroutineQueueManager.offWorkCoroutineQueue.AddCoroutine(ExecuteCoroutines(cutSceneData)); 
                     break;
                 case InvokTime.OffWork2Queue:
-                    EventManager.Instance.onOffWork2 += () => CoroutineQueueManager.offWorkCoroutineQueue2.AddCoroutine(ExecuteCoroutines(cutSceneData));
+                    EventManager.Instance.OnOffWork2 += () => CoroutineQueueManager.offWorkCoroutineQueue2.AddCoroutine(ExecuteCoroutines(cutSceneData));
                     break;
                 case InvokTime.DayEndQueue:
-                    EventManager.Instance.onDayEnd += () => CoroutineQueueManager.dayEndCoroutineQueue.AddCoroutine(ExecuteCoroutines(cutSceneData));
+                    EventManager.Instance.OnDayEnd += () => CoroutineQueueManager.dayEndCoroutineQueue.AddCoroutine(ExecuteCoroutines(cutSceneData));
                     break;
                 case InvokTime.DayEnd2Queue:
-                    EventManager.Instance.onDayEnd2 += () => CoroutineQueueManager.dayEndCoroutineQueue.AddCoroutine(ExecuteCoroutines(cutSceneData));
+                    EventManager.Instance.OnDayEnd2 += () => CoroutineQueueManager.dayEndCoroutineQueue.AddCoroutine(ExecuteCoroutines(cutSceneData));
                     break;
                 case InvokTime.FirstQuitTypingGameQueue:
-                    EventManager.Instance.onFirstQuitTypingGame += () => CoroutineQueueManager.firstQuitTypingGameCoroutineQueue.AddCoroutine(ExecuteCoroutines(cutSceneData));
+                    EventManager.Instance.OnFirstQuitTypingGame += () => CoroutineQueueManager.firstQuitTypingGameCoroutineQueue.AddCoroutine(ExecuteCoroutines(cutSceneData));
                     break;
                 // 可以添加更多触发时机的事件注册...
                 default:
@@ -65,8 +62,20 @@ public class CutSceneController : MonoBehaviour
             }
         }
     }
-    public IEnumerator ExecuteCoroutines(CutSceneData cutSceneData)
+    public IEnumerator ExecuteCoroutines(CutSceneData cutSceneData,int today = -1)
     {
+        if (cutSceneData.invokeDay != -1 && today != -1 && cutSceneData.invokeDay != today) //如果不是今天
+        {
+            Debug.Log($"CutSceneData for day {cutSceneData.invokeDay} is not applicable today ({today}). Skipping execution.");
+            yield break;
+        }
+            
+        if (cutSceneData.cutSceneList.Count == 0)
+        {
+            Debug.LogWarning("CutSceneData has no tasks to execute.");
+            yield break;
+        }
+
         List<Task> cutSceneList = cutSceneData.cutSceneList;
         Timer.Pause();
         foreach (var task in cutSceneList)

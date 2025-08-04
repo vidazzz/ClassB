@@ -106,9 +106,10 @@ public class Blackout : MonoBehaviour
     // Start is called before the first frame update
     void Awake()
     {
-        EventManager.Instance.onDayEnd += () => CoroutineQueueManager.dayEndCoroutineQueue.AddCoroutine(FadeInOrOutCoroutine());
-        EventManager.Instance.onDayEnd += () => CoroutineQueueManager.dayEndCoroutineQueue.AddCoroutine(DisplayText(narrationSentances));
-        EventManager.Instance.onDayBegin += () => CoroutineQueueManager.dayBeginCoroutineQueue.AddCoroutine(FadeInOrOutCoroutine());
+        //每日例行黑幕和文本显示
+        EventManager.Instance.OnDayEnd += () => CoroutineQueueManager.dayEndCoroutineQueue.AddCoroutine(FadeInOrOutCoroutine());
+        EventManager.Instance.OnDayEnd += () => CoroutineQueueManager.dayEndCoroutineQueue.AddCoroutine(DisplayText(narrationSentances));
+        EventManager.Instance.OnDayBegin += invokeDay => CoroutineQueueManager.dayBeginCoroutineQueue.AddCoroutine(FadeInOrOutCoroutine());
     }
     void Start()
     {
