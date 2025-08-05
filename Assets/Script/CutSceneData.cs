@@ -17,7 +17,9 @@ public class Task{
     [HideInInspector]
     public GameObject obj;
     public CoroutineType coroutineType;
-    public List<string> varList;
+    public List<string> agrs;
+    public Sprite[] blackOutSprites; // 用于黑幕的图片
+    public List<string[]> blackOutLines; // 用于NPC对话的变量列表
     public DialogueGraph dialogueGraph;
     [HideInInspector]
     public GameObject destination;

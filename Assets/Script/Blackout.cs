@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -21,6 +22,7 @@ public class Blackout : MonoBehaviour
     [SerializeField] private float fadeDuration = 1f; // 淡入持续时间
     TextMeshProUGUI textMesh;
     Image image;
+    Image CG_Image;
     public string[] narrationSentances;
     bool isFading;
 
@@ -30,14 +32,14 @@ public class Blackout : MonoBehaviour
             StartCoroutine(FadeInOrOutCoroutine());
     }
     public IEnumerator FadeInOrOutCoroutine()
-    {   
-        if(isFading)
+    {
+        if (isFading)
             yield break;
-        Color color = image.color; 
-        Debug.Log(color); 
-        if(color.a == 0)
+        Color color = image.color;
+        Debug.Log(color);
+        if (color.a == 0)
             yield return FadeInCoroutine();
-        if(color.a == 1)
+        if (color.a == 1)
             yield return FadeOutCoroutine();
     }
        // 淡入协程
@@ -90,22 +92,63 @@ public class Blackout : MonoBehaviour
     }
 
     //文本显示
-    public IEnumerator DisplayText(string[] sentances)
+    public IEnumerator DisplayText(string[] sentances , Sprite[] CGs = null)
     {
-        textMesh.gameObject.SetActive(true);
-        foreach(string s in sentances)
+        if (CGs != null && CGs.Length > 0)
         {
-            textMesh.text = s;
-            do
-                yield return null;
-            while(!Input.GetKeyDown(KeyCode.Space)); //等待按下空格键     
+            int i = 0;
+            foreach (Sprite CG in CGs)
+            {
+                CG_Image.sprite = CG;
+                CG_Image.gameObject.SetActive(true);
+                for (; i < sentances.Length; i++)
+                {
+                    if (sentances[i] == "#")
+                    {
+                        i++;
+                        break; // 如果遇到#，则跳到下一张CG的显示
+                    }
+                    // 显示文本
+                    textMesh.text = sentances[i];
+                    textMesh.gameObject.SetActive(true);
+                    // 等待按下空格键
+                    while (!Input.GetKeyDown(KeyCode.Space))
+                        yield return null;
+                    yield return null; // 等待一帧
+                }
+                // 如果已经显示完所有文本，只有图片，则等待空格键
+                if (i >= sentances.Length)
+                {
+                    while (!Input.GetKeyDown(KeyCode.Space))
+                        yield return null;
+                    yield return null; // 等待一帧 
+                }
+            }
+            CG_Image.gameObject.SetActive(false);
+            textMesh.gameObject.SetActive(false);
         }
-        textMesh.gameObject.SetActive(false);
+        else
+        {
+            CG_Image.gameObject.SetActive(false);
+            textMesh.gameObject.SetActive(true);
+            foreach (string sentance in sentances)
+            {
+                textMesh.text = sentance;
+                // 等待按下空格键
+                while (!Input.GetKeyDown(KeyCode.Space))
+                    yield return null;
+                yield return null; // 等待一帧
+            }
+            textMesh.gameObject.SetActive(false);
+        }
     }
 
     // Start is called before the first frame update
     void Awake()
     {
+        image = GetComponent<Image>();
+        CG_Image = GetComponentsInChildren<Image>(true)[1]; // 获取第二个Image组件作为CG_Image
+        textMesh = GetComponentInChildren<TextMeshProUGUI>();
         //每日例行黑幕和文本显示
         EventManager.Instance.OnDayEnd += () => CoroutineQueueManager.dayEndCoroutineQueue.AddCoroutine(FadeInOrOutCoroutine());
         EventManager.Instance.OnDayEnd += () => CoroutineQueueManager.dayEndCoroutineQueue.AddCoroutine(DisplayText(narrationSentances));
@@ -113,9 +156,6 @@ public class Blackout : MonoBehaviour
     }
     void Start()
     {
-        image = GetComponent<Image>();
-        textMesh = GetComponentInChildren<TextMeshProUGUI>();
-       
     }
 
     // Update is called once per frame

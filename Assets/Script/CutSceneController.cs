@@ -78,7 +78,7 @@ public class CutSceneController : MonoBehaviour
 
         List<Task> cutSceneList = cutSceneData.cutSceneList;
         //Timer.Pause();
-        foreach (var task in cutSceneList)
+        foreach (Task task in cutSceneList)
         {
             // 根据配置名称选择要执行的协程
             switch (task.coroutineType)
@@ -99,7 +99,7 @@ public class CutSceneController : MonoBehaviour
                     SetObjActiveFalse(task.obj);
                     break;
                 case CoroutineType.Blackout:
-                    yield return StartCoroutine(BlackOutCoroutine(task.varList.ToArray()));
+                    yield return StartCoroutine(BlackOutCoroutine(task.agrs.ToArray(),task.blackOutSprites));
                     break;
                 case CoroutineType.ResetDialuoge:
                     //ResetDialuoge(task.dialogueGraph);
@@ -142,7 +142,7 @@ public class CutSceneController : MonoBehaviour
                 SetObjActiveFalse(node.obj);
                 break;
             case CoroutineType.Blackout:
-                yield return StartCoroutine(BlackOutCoroutine(node.args.ToArray()));
+                //yield return StartCoroutine(BlackOutCoroutine(node.args.ToArray()));
                 break;
             case CoroutineType.Pusse:
                 Timer.Pause();
@@ -180,10 +180,11 @@ public class CutSceneController : MonoBehaviour
     {
         yield return StartCoroutine(interactable.Interact(Hero.Instance));
     }
-    IEnumerator  BlackOutCoroutine(string[] sentances)
+    IEnumerator  BlackOutCoroutine(string[] sentances, Sprite[] blackOut_CGs = null)
     {
+
         yield return StartCoroutine(Blackout.Instance.FadeInOrOutCoroutine());
-        yield return StartCoroutine(Blackout.Instance.DisplayText(sentances));
+        yield return StartCoroutine(Blackout.Instance.DisplayText(sentances, blackOut_CGs));
     }
     void  SetObjActiveFalse(GameObject obj)
     {

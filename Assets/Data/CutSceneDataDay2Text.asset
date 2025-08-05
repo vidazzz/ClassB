@@ -16,9 +16,9 @@ MonoBehaviour:
   - objName: NPC (1)
     destinationObjName: Hero
     obj: {fileID: 0}
-    coroutineType: 0
+    coroutineType: 1
     varList: []
     dialogueGraph: {fileID: 0}
     destination: {fileID: 0}
-  invokeTime: 3
+  invokeTime: 4
   invokeDay: 2

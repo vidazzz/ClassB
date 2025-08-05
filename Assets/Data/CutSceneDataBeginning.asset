@@ -17,25 +17,45 @@ MonoBehaviour:
     destinationObjName: 
     obj: {fileID: 0}
     coroutineType: 6
-    varList:
+    agrs:
     - "\u554A\u2026\u2026\u75DB\u75DB\u75DB\uFF0C\u53D1\u751F\u4E86\u4EC0\u4E48\uFF0C\u6211\u600E\u4E48\u7761\u5728\u5927\u8857\u4E0A"
     - "\u2026\u2026"
     - "\u2026\u2026\u2026\u2026"
-    - "\u2026\u2026\u2026\u2026\u2026\u2026"
+    - '#'
     - "\u8FC7\u4E86\u5F88\u4E45\uFF0C\u5374\u4EC0\u4E48\u90FD\u60F3\u4E0D\u8D77\u6765"
     - "\u2026\u2026"
     - "\u2026\u2026\u2026\u2026"
+    - '#'
     - "\u627E\u904D\u5168\u8EAB\uFF0C\u8EAB\u65E0\u5206\u6587\uFF0C\u4E5F\u65E0\u4ED6\u7269\uFF0C\u6709\u7684\u5374\u53EA\u662F\u4E00\u4EFD\u76B1\u5DF4\u5DF4\u7684\u5408\u540C"
     - "XX\u79D1\u6280\u6709\u9650\u516C\u53F8\uFF0C\u7279\u8058\u7528____\uFF08\u73A9\u5BB6\u547D\u540D\uFF09\u4E3A\u5458\u5DE5"
     - "\u2026\u2026"
     - "\u770B\u6765\u6CA1\u6709\u4EC0\u4E48\u9009\u62E9\u4E86\uFF0C\u5148\u53BB\u5427"
+    - '#'
+    - "\u2026\u2026"
+    - "\u5B8C\u6210\u4E86\u5165\u804C"
+    - '#'
+    - "\u4E00\u5207\u6BEB\u65E0\u6CE2\u6F9C\uFF0C\u6CA1\u4EBA\u5728\u610F\u6211\u662F\u8C01\uFF0C\u4ECE\u54EA\u6765"
+    - "\u6211\u88AB\u5B89\u6392\u5728\u4E86\u5DE5\u4F4D\u4E0A"
+    - '#'
+    - "\u201C\u4E00\u4F1A\u6839\u636E\u5C4F\u5E55\u4E0A\u7684\u8981\u6C42\uFF0C\u8981\u6C42\u4EC0\u4E48\u4F60\u8F93\u5165\u4EC0\u4E48\u5C31\u597D\u201D"
+    - "\u201C\u5E72\u591A\u5C11\u6D3B\u5C31\u6709\u591A\u5C11\u5DE5\u8D44\u201D"
+    - "\u201C\u770B\u5728\u4F60\u662F\u65B0\u624B\uFF0C\u4ECA\u5929\u7684\u7EE9\u6548\u4ECE10\u8D77\u201D"
+    - "\u4E3B\u7BA1\u8FD9\u4E48\u8BF4"
+    blackOutSprites:
+    - {fileID: 21300000, guid: aa2dedb36e8d6b442890e34b9ad072e8, type: 3}
+    - {fileID: 21300000, guid: 00cc690455e41e341aeec4af62e46946, type: 3}
+    - {fileID: 21300000, guid: f7a9c745797dade48812ecbb5e3eddd7, type: 3}
+    - {fileID: 21300000, guid: 151ebcd28b26ad84585c4f504bfc90a2, type: 3}
+    - {fileID: 21300000, guid: ce3444884cacf274581b50b7a3b953de, type: 3}
+    - {fileID: 21300000, guid: 1dacf247dd25d474091223e116c19298, type: 3}
     dialogueGraph: {fileID: 0}
     destination: {fileID: 0}
   - objName: 
     destinationObjName: 
     obj: {fileID: 0}
     coroutineType: 6
-    varList: []
+    agrs: []
+    blackOutSprites: []
     dialogueGraph: {fileID: 0}
     destination: {fileID: 0}
   invokeTime: 1
