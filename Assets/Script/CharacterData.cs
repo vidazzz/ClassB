@@ -207,7 +207,7 @@ public class Skill
 {
     public string name;
     public List<Buff> buffs;
-    private int level = 1;
+    public int level = 1;
     protected Character target; // 应用到的目标
 
     public Skill(string name,int[] buffIndexArrey,int level = 1)

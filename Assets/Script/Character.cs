@@ -51,13 +51,22 @@ public class Character : Interactable
                 break;
             }
         }
-        if(targetSkill == null)
+        if (targetSkill == null)
         {
-           targetSkill = CreateSkill(index);
-           targetSkill.Apply(this);
+            targetSkill = CreateSkill(index);
+            targetSkill.Apply(this);
+            Debug.Log($"Learned new skill: {targetSkill.name}");
+            PopUp.Instance.ShowPopUp($"Learned new skill: {targetSkill.name}");
+            // 这里可以添加技能学习的特效或音效
         }
         else
+        {
             targetSkill.LevelUp();
+            Debug.Log($"Skill {targetSkill.name} leveled up to level {targetSkill.level}");
+            PopUp.Instance.ShowPopUp($"Skill {targetSkill.name} leveled up to level {targetSkill.level}");
+            // 这里可以添加技能升级的特效或音效
+        }
+            
     }
     protected Skill CreateSkill(int index)
     {

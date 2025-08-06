@@ -147,12 +147,6 @@ public class Timer : MonoBehaviour
         pauseIcon.SetActive(false);
         hasPaused = false;
     }
-
-    void AddDayN_BeginCoroutine(int invokDay)
-    {
-        if (invokDay != dd || !hadQuitTypingGame)
-            return;
-    }
     void AddOffWorkCoroutine()
     {
         CoroutineQueueManager.offWorkCoroutineQueue.AddCoroutine(EndTheDay());        

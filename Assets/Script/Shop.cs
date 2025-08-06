@@ -8,36 +8,35 @@ using UnityEngine.UI;
 public class Shop : MonoBehaviour
 {
     public Canvas canvas;
-    public List<Goods> goodsList;
-    public List<Goods> skillBooks;
-    public List<Goods> FoodList;
-    public List<Goods> rentalList;
+    public List<GoodsData> goodsList;
+    public List<GoodsData> skillBooks;
+    public List<GoodsData> FoodList;
+    public List<GoodsData> rentalList;
 
     public ToggleGroup foodToggleGroup;
     public ToggleGroup rentalToggleGroup;
     public int essentialIndex1;
     public int essentialIndex2;
     public Toggle prfToggle;
+    public Image prfBook;
     public Transform foodPanel;
     public Transform rentalPanel;
+    public Transform goodsScrollViewContent;
     [Serializable]
-    public class Goods
+    public class GoodsData
     {
+        public Goods.GoodsType goodsType;
         public string goodsName;
+        public Sprite icon; // 添加图标属性
         public string parameterName;
         public int value;
         public int price;
-        public Button button;
+        public int skillIndex; // 如果是技能书，则对应技能的索引
     }
     
-    public void ShopModifyStats (Goods goods)
+    public void ShopModifyStats (GoodsData goods)
     {
         Hero.Instance.lifeController.AddModifier(goods.parameterName,goods.value);
-        Hero.Instance.lifeController.AddModifier("money",-goods.price);
-    }
-    public void ShopLearnSkill (Goods goods)
-    {
-        Hero.Instance.LearnSkill(goods.value); //value是skill索引
         Hero.Instance.lifeController.AddModifier("money",-goods.price);
     }
     public void StartShopping()
@@ -64,17 +63,28 @@ public class Shop : MonoBehaviour
     }
     void InitializeMenu()
     {
-        foreach(var food in FoodList)
+        foreach (var food in FoodList)
         {
-            Toggle newToggle = Instantiate(prfToggle,foodPanel);
-            newToggle.GetComponentInChildren<Text>(true).text = $"{food.parameterName} [price: {food.price}]";
+            Toggle newToggle = Instantiate(prfToggle, foodPanel);
+            newToggle.GetComponentInChildren<Text>(true).text = $"{food.goodsName} [price: {food.price}]";
             newToggle.group = foodToggleGroup;
         }
-        foreach(var rental in rentalList)
+        foreach (var rental in rentalList)
         {
-            Toggle newToggle = Instantiate(prfToggle,rentalPanel);
-            newToggle.GetComponentInChildren<Text>(true).text = $"{rental.parameterName} [price: {rental.price}]";
+            Toggle newToggle = Instantiate(prfToggle, rentalPanel);
+            newToggle.GetComponentInChildren<Text>(true).text = $"{rental.goodsName} [price: {rental.price}]";
             newToggle.group = rentalToggleGroup;
+        }
+        foreach (var book in skillBooks)
+        {
+            Image newBook = Instantiate(prfBook, goodsScrollViewContent);
+            newBook.GetComponent<Goods>().goodsType = book.goodsType;
+            newBook.GetComponent<Goods>().goodsName = book.goodsName;
+            newBook.GetComponent<Goods>().Icon = book.icon; // 设置图标
+            newBook.GetComponent<Goods>().parameterName = book.parameterName;
+            newBook.GetComponent<Goods>().value = book.value;
+            newBook.GetComponent<Goods>().price = book.price;
+            newBook.GetComponent<Goods>().skillIndex = book.skillIndex;
         }
     }
 
@@ -94,14 +104,14 @@ public class Shop : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        foreach(Goods goods in goodsList)
+        foreach(GoodsData goods in goodsList)
         {
-            goods?.button.onClick.AddListener(() => ShopModifyStats(goods));
+            
         }
 
-        foreach(Goods book in skillBooks)
+        foreach(GoodsData book in skillBooks)
         {
-            book?.button.onClick.AddListener(() => ShopLearnSkill(book));
+            
         }
 
         InitializeMenu();
