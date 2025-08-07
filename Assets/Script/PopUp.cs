@@ -20,6 +20,7 @@ public class PopUp : MonoBehaviour
     private TextMeshProUGUI popUpText;
     public void ShowPopUp(string str)
     {
+        StopAllCoroutines(); //停止之前的弹窗
         StartCoroutine(PopUpCoroutine(str));
     }
     private IEnumerator PopUpCoroutine(string str)

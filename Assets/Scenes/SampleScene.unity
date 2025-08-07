@@ -3957,7 +3957,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: CheckResult
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: f7e2d46168c3ce343a8ba60204bc2bd4, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
@@ -4021,7 +4021,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 0
+  m_hasFontAssetChanged: 1
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!222 &834778399
@@ -12536,21 +12536,21 @@ MonoBehaviour:
     icon: {fileID: 21300000, guid: 49ba3f3c9238c1c4f954f54c7c34b898, type: 3}
     parameterName: 
     value: 0
-    price: 0
+    price: 100
     skillIndex: 0
   - goodsType: 2
     goodsName: 
     icon: {fileID: 21300000, guid: 39042156ea70713468fc95eca8d5afc2, type: 3}
     parameterName: 
     value: 0
-    price: 0
+    price: 200
     skillIndex: 1
   - goodsType: 2
     goodsName: 
     icon: {fileID: 21300000, guid: c1a57cd1430c1d740b29ac2b684ec7e5, type: 3}
     parameterName: 
     value: 0
-    price: 0
+    price: 300
     skillIndex: 2
   FoodList:
   - goodsType: 0
@@ -12626,13 +12626,12 @@ MonoBehaviour:
     skillIndex: 0
   foodToggleGroup: {fileID: 1070714871}
   rentalToggleGroup: {fileID: 802481345}
-  essentialIndex1: 0
-  essentialIndex2: 0
   prfToggle: {fileID: 2929243473147645311, guid: 770d287a86df83e4695bada1efa235ac, type: 3}
   prfBook: {fileID: 682748421713837333, guid: 74fd4e5cc766b1b4787d68087fc8e6f5, type: 3}
   foodPanel: {fileID: 1070714870}
   rentalPanel: {fileID: 802481344}
   goodsScrollViewContent: {fileID: 1028204918}
+  advancePayment: 0
 --- !u!4 &1994106260
 Transform:
   m_ObjectHideFlags: 0

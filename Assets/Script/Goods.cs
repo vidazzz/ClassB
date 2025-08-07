@@ -22,10 +22,15 @@ public class Goods : MonoBehaviour
         SkillBook
     }
 
-    void ShopModifyStats ()
+    void ShopModifyStats()
     {
-        Hero.Instance.lifeController.AddModifier(parameterName,value);
-        Hero.Instance.lifeController.AddModifier("money",-price);
+        if (Hero.Instance.lifeController.AddModifier("money", -price))
+            Hero.Instance.lifeController.AddModifier(parameterName,value);
+    }
+    void ShopSkillBook()
+    {
+        if(Hero.Instance.lifeController.AddModifier("money",-price))
+            Hero.Instance.LearnSkill(skillIndex);
     }
     void Awake()
     {
@@ -40,7 +45,7 @@ public class Goods : MonoBehaviour
                 button.onClick.AddListener(() => ShopModifyStats());
                 break;
             case GoodsType.SkillBook:
-                button.onClick.AddListener(() => Hero.Instance.LearnSkill(skillIndex));
+                button.onClick.AddListener(() => ShopSkillBook());
                 break;
             default:
                 button.onClick.AddListener(() => ShopModifyStats());

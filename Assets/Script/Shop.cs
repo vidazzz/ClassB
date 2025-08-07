@@ -14,9 +14,11 @@ public class Shop : MonoBehaviour
     public List<GoodsData> rentalList;
 
     public ToggleGroup foodToggleGroup;
+    private List<Toggle> foodToggles;
     public ToggleGroup rentalToggleGroup;
-    public int essentialIndex1;
-    public int essentialIndex2;
+    private List<Toggle> rentalToggles;
+    private int essentialIndex1;
+    private int essentialIndex2;
     public Toggle prfToggle;
     public Image prfBook;
     public Transform foodPanel;
@@ -33,11 +35,12 @@ public class Shop : MonoBehaviour
         public int price;
         public int skillIndex; // 如果是技能书，则对应技能的索引
     }
-    
+    [HideInInspector]
+    public float advancePayment;
     public void ShopModifyStats (GoodsData goods)
     {
-        Hero.Instance.lifeController.AddModifier(goods.parameterName,goods.value);
-        Hero.Instance.lifeController.AddModifier("money",-goods.price);
+        if(Hero.Instance.lifeController.AddModifier("money",-goods.price))
+            Hero.Instance.lifeController.AddModifier(goods.parameterName,goods.value);    
     }
     public void StartShopping()
     {
@@ -61,19 +64,35 @@ public class Shop : MonoBehaviour
         essentialIndex1 = foodToggleGroup.ActiveToggles().First().transform.GetSiblingIndex() - 1;
         essentialIndex2 = rentalToggleGroup.ActiveToggles().First().transform.GetSiblingIndex() - 1;
     }
+    public void ResetToggleGroup(List<Toggle> toggles)
+    {
+        toggles[0].isOn = true; // 默认选中第一个
+    }
     void InitializeMenu()
     {
+        foodToggles = new();
+        rentalToggles = new();
         foreach (var food in FoodList)
         {
             Toggle newToggle = Instantiate(prfToggle, foodPanel);
+            EssentialToggle essentialToggle = newToggle.GetComponent<EssentialToggle>();
+            essentialToggle.shop = this; // 设置商店引用
+            essentialToggle.toggles = foodToggles; // 设置toggles引用
+            essentialToggle.price = food.price;
             newToggle.GetComponentInChildren<Text>(true).text = $"{food.goodsName} [price: {food.price}]";
             newToggle.group = foodToggleGroup;
+            foodToggles.Add(newToggle);
         }
         foreach (var rental in rentalList)
         {
             Toggle newToggle = Instantiate(prfToggle, rentalPanel);
+            EssentialToggle essentialToggle = newToggle.GetComponent<EssentialToggle>();
+            essentialToggle.shop = this; // 设置商店引用
+            essentialToggle.toggles = rentalToggles; // 设置toggles引用
+            essentialToggle.price = rental.price;
             newToggle.GetComponentInChildren<Text>(true).text = $"{rental.goodsName} [price: {rental.price}]";
             newToggle.group = rentalToggleGroup;
+            rentalToggles.Add(newToggle);
         }
         foreach (var book in skillBooks)
         {
@@ -104,9 +123,9 @@ public class Shop : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        foreach(GoodsData goods in goodsList)
+        foreach (GoodsData goods in goodsList)
         {
-            
+
         }
 
         foreach(GoodsData book in skillBooks)

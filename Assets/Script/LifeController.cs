@@ -41,26 +41,31 @@ public class LifeController : MonoBehaviour
     {
         
     }
-    public void AddModifier(string statsName,float value)
+    public bool AddModifier(string statsName, float value)
     {
-        if(statsName.Equals("preesure") && value > 0)
-            if(Random.Range(0,100) < statsPairs["preesureResistance"]) //概率免疫压力
-                {
-                    Debug.Log("触发压力免疫了");
-                    return;
-                }
-        if(statsName.Equals("kpi") && value > 0)
-            if(Random.Range(0,100) < statsPairs["kpiBouesPossibility"]) //概率提升kip收益
-                {
-                    Debug.Log("触发额外kpi收益了");
-                    value *= statsPairs["kpiBouesMultiplier"];
-                }
-        if(statsPairs[statsName] + value >= 0)
+        if (statsName.Equals("preesure") && value > 0)
+            if (Random.Range(0, 100) < statsPairs["preesureResistance"]) //概率免疫压力
+            {
+                PopUp.Instance.ShowPopUp("触发压力免疫了");
+                return false; //免疫压力
+            }
+        if (statsName.Equals("kpi") && value > 0)
+            if (Random.Range(0, 100) < statsPairs["kpiBouesPossibility"]) //概率提升kip收益
+            {
+                PopUp.Instance.ShowPopUp("触发额外kpi收益了");
+                value *= statsPairs["kpiBouesMultiplier"];
+            }
+        Debug.Log($"Modify{gameObject.name}.{statsName} by {value}, from {statsPairs[statsName]} to {statsPairs[statsName] + value}");
+        if (statsPairs[statsName] + value >= 0)
             statsPairs[statsName] += value;
         else
-            Debug.Log($"{statsName} is not enough!");
+        {
+            PopUp.Instance.ShowPopUp($"{statsName} is not enough!");
+            return false; //如果不足则不修改
+        }
         //deltaStatsPairs[statsName] = value;
         Hero.Instance.DisplayStatsValue();
+        return true;
     }
 
     public void MultiplyModifier(string statsName,float value)
@@ -149,7 +154,6 @@ public class LifeController : MonoBehaviour
         {      
             {"preesure",25},
             {"preesureResistance",0}, //压力抗性，概率不会产生压力
-            {"money",0},
             {"kpi",10},
             {"kpiBouesPossibility",0},//概率提升收益
             {"kpiBouesMultiplier",1},//概率提升收益
