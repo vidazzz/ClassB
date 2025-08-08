@@ -17,7 +17,11 @@ public class EssentialToggle : MonoBehaviour
     private bool lastCheckedState = false;// 用于记录上次的选中状态
     public void CheckMoney()
     {
-        bool isAffordable = Hero.Instance.lifeController.statsPairs["money"] - shop.advancePayment >= price;
+        bool isAffordable;
+        if (toggle.isOn)
+            isAffordable = Hero.Instance.lifeController.statsPairs["money"] >= shop.advancePayment;
+        else
+            isAffordable = Hero.Instance.lifeController.statsPairs["money"] >= shop.advancePayment + price;
         toggle.interactable = isAffordable;
         if (!isAffordable && toggle.isOn)
         {
