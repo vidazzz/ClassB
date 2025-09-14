@@ -15,7 +15,7 @@ public class DialogueNode : Node {
 				string[] formatArgs = new string[formatArgNames.Length];
 				for (int i = 0; i < formatArgNames.Length; i++)
 				{
-					formatArgs[i] = Hero.Instance.lifeController.statsPairs[formatArgNames[i]].ToString();
+					formatArgs[i] = Hero.Instance.lifeController.GetStatValue(formatArgNames[i]).ToString();
 				}
 				return string.Format(line, formatArgs);
 			}
@@ -40,7 +40,7 @@ public class DialogueNode : Node {
 				return nextNode;
 			if (checkingStatsName == "")
 				return GetOutputPort("succeededNode")?.Connection?.node as DialogueNode;
-			if (Hero.Instance.lifeController.Check(checkingStatsName, checkingValue))
+			if (DiceCheck.Instance.CheckStats(checkingStatsName, checkingValue, Hero.Instance))
 				return GetOutputPort("succeededNode")?.Connection?.node as DialogueNode;
 			else
 				return GetOutputPort("failedNode")?.Connection?.node as DialogueNode;

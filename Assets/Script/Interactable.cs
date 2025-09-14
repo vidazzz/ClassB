@@ -6,9 +6,20 @@ using UnityEngine;
 
 public abstract class Interactable : MonoBehaviour
 {
-    public float interactTime;
     protected Animator animator;
-    [NonSerialized] public NPC occupiedBy;
+    public List<Character> users;
+    public int userLimit;
+    public bool IsInUse { get { return userLimit > 0 && users.Count >= userLimit; } }
+    public NeedChange cost;
+    public NeedChange gain;
+    public float duration;
+    public int interactDisdence = 1; //交互距离,单位是一个Astar.node的半径
+    [Serializable]
+    public class NeedChange
+    {
+        public string needName;
+        public float value;
+    }
     public Vector3[] interactPoint;
 
     [SerializeField] protected string interactionPrompt = "互动";
@@ -29,7 +40,7 @@ public abstract class Interactable : MonoBehaviour
     
     // 互动的核心方法，由子类实现具体功能
     public abstract IEnumerator Interact(Character interactor);
-    
+
     protected void Awake()
     {
         animator = GetComponent<Animator>();

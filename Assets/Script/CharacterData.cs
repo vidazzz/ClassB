@@ -1,20 +1,15 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 [Serializable]
 public class Talent
 {
-    public string name;
+    public string TalentName;
     public int id;
     public TalentType type;
-    public int level;
-    public void LevelUp()
-    {
-        level++;
-    }
-
 }
 
 public enum TalentType
@@ -26,15 +21,31 @@ public enum TalentType
 }
 
 [Serializable]
-public class SomeThing
+public class Action
 {
-    public SomeThingType type;
-    public List<GameObject> obgList;
-    public int multiPersonDialoguesIndex;
+    public ActionType type;
+    public Interactable target;
+    public bool isWaiting;
+    public float priorityJob;
+    public float priorityHobby;
+    public float priorityStat;
+    public float priorityTask;
+    public float Priority { get { return priorityJob + priorityHobby + priorityStat + priorityTask; } }
+
+    public IEnumerator Waiting()
+    {
+        isWaiting = true;
+        Timer.Date beginTime = Timer.Time;
+        while (Timer.GetPassedMinutes(beginTime) < target.duration)
+        {
+            yield return null;
+        }
+        isWaiting = false;
+    }
 }
 
 [Serializable]
-public enum SomeThingType{
+public enum ActionType{
     none = 0,
     use,
     meeting,
@@ -177,13 +188,13 @@ public class StatModifierBuff : Buff
     protected override void OnApply()
     {
         LifeController stats = target.lifeController;
-        Debug.Log("to "+ target +": "+ statName + " <=" + (value + modifier * level) * StackCount);
+        //Debug.Log("to "+ target +": "+ statName + " <=" + (value + modifier * level) * StackCount);
         if (type == ModifierType.Add)
-            stats.AddModifier(statName, (value + modifier * level ) * StackCount);
+            stats.TryMotifyStat(statName, (value + modifier * level ) * StackCount);
         else
             stats.MultiplyModifier(statName, 1 + ((value + modifier * level ) * StackCount));
         
-        Debug.Log(stats.statsPairs[statName]);
+        //Debug.Log(stats.GetStatValue(statName));
     }
 
     protected override void OnRemove()
@@ -269,7 +280,7 @@ public class AffinityEffect : Skill
 
     public void TryUpdate()
     {
-        float affinityValue = Community.affinity.GetAfinity(owner,target);
+        float affinityValue = Community.affinity.GetAffinity(owner,target);
         if (affinityValue >= affinityThreshold && isActive == false)
             Apply(target);
         else if(affinityValue < affinityThreshold && isActive == true)
@@ -290,8 +301,227 @@ public class AffinityEffect : Skill
 }
 
 [Serializable]
-public struct AffinityEffectArgs{
+public struct AffinityEffectArgs
+{
     public string name;
     public int[] buffIndexArrey;
     public int affinityThreshold;
 }
+
+[Serializable]
+public class Hobby
+{
+    public string hobbyName;
+    public int id;
+    public List<Talent> talents;
+    public List<Device> devices;
+}
+[Serializable]
+public class Stat
+{
+    public string name;
+    public float value;
+    public float expectation = 100;
+
+    public State StatState { get { return GetStatState(); } }
+
+    public Stat(string name, float value, float expectation = 100)
+    {
+        this.name = name;
+        this.value = value;
+        this.expectation = expectation;
+    }
+
+    public State GetStatState()
+    {
+        if (value < expectation * 0.3f)
+            return State.low;
+        else if (value < expectation * 0.8f)
+            return State.middle;
+        else
+            return State.high;
+    }
+
+    [Serializable]
+    public enum State
+    {
+        none = 0,
+        low,
+        middle,
+        high,
+    }
+}
+
+[Serializable]
+public class Need
+{
+    private static WaitForSeconds _waitForSeconds1 = new(1f);
+    public string name;
+    public Character owner;
+    public float value;
+    public float decay;//每10游戏分钟自然衰减值
+    public float expectation;
+    public bool isChanging;
+
+    public List<PriorityNeed> priorityNeedList = new();// 与该属性相关的行为优先级
+    public State NeedState { get { return GetNeedState(); } }
+
+    public Need(Character character, string name, float value, float decay = 1, float expectation = 100)
+    {
+        owner = character;
+        this.name = name;
+        this.value = value;
+        this.decay = decay;
+        this.expectation = expectation;
+        if (character is NPC)
+        {
+            priorityNeedList = SetUpActionPriorities((character as NPC).actions);
+        }
+        owner.StartCoroutine(ProcessDecay());
+    }
+    
+    public State GetNeedState()
+    {
+        if (value < expectation * 0.3f)
+            return State.dangerous;
+        else if (value < expectation * 0.8f)
+            return State.warning;
+        else
+            return State.normal;
+    }
+
+    public IEnumerator ProcessDecay()
+    {
+        Timer.Date beginTime = Timer.Time;
+        while (true)
+        {
+            if (isChanging)//正在进行相关的活动，暂停衰减
+            {
+                beginTime = Timer.Time;
+                yield return _waitForSeconds1;
+                continue;
+            }
+            if (Timer.GetPassedMinutes(beginTime) >= 10)
+                {
+                    int n = Timer.GetPassedMinutes(beginTime) / 10; //有可能过去了n个10游戏分钟
+                    TryMotifyValue(-decay * n);
+                    beginTime = Timer.Time;
+                }
+            yield return _waitForSeconds1;
+        }
+    }
+
+    public List<PriorityNeed> SetUpActionPriorities(List<Action> actions)
+    {
+        List<PriorityNeed> actionPriorities = new();
+        foreach (Action action in actions)
+        {
+            //Debug.Log("stateName:" + name + " target.name:" + action.target.name + " gain:" + action.target.gain.needName + " cost:" + action.target.cost.needName);
+            if (action.target.gain.needName == name) // 只考虑与该需求相关的行为
+            {
+                PriorityNeed actionPriority = new()
+                {
+                    action = action,
+                    need = this,
+                    VFM = action.target.cost.value < 1 ? action.target.gain.value - action.target.cost.value : action.target.gain.value / action.target.cost.value,
+                    efficiency = action.target.gain.value / action.target.duration
+                };
+                actionPriorities.Add(actionPriority);
+            }
+            else if (action.target.cost.needName == name)
+            {
+                PriorityNeed actionPriority = new()
+                {
+                    action = action,
+                    need = this,
+                    VFM = action.target.gain.value < 1 ? - action.target.cost.value + action.target.gain.value : - action.target.cost.value / action.target.gain.value,
+                    efficiency = -action.target.cost.value / action.target.duration
+                };
+                actionPriorities.Add(actionPriority);
+            }
+        }
+        if (actionPriorities.Count == 0)
+            Debug.LogWarning($"{name}需求没有相关行为");
+        return actionPriorities;
+    }
+
+    public bool TryMotifyValue(float motifier, StatModifierBuff.ModifierType modifierType = StatModifierBuff.ModifierType.Add)
+    {
+        switch (modifierType)
+        {
+            case StatModifierBuff.ModifierType.Add:
+                return AddModifier(motifier);
+            case StatModifierBuff.ModifierType.Multiply:
+                MultiplyModifier(motifier);
+                return true;
+            default:
+                return AddModifier(motifier);
+        }
+    }
+    public bool AddModifier(float modifier)
+    {
+        float newValue = value + modifier;
+        State originStatState = NeedState;
+        if (newValue >= 0)
+        {
+            value = newValue;
+            if (originStatState != NeedState)
+            {
+                owner.lifeController.UpdatePriorityNeed(); //状态变化时更新行动优先级
+            }
+        }
+        else
+        {
+            //PopUp.Instance.ShowPopUp($"{name} is not enough!");
+            return false; //如果不足则不修改
+        }
+        EventManager.Instance.MutifyNeeds();
+        owner.lifeController.UpdatePriorityNeed();
+        return true;
+    }
+
+    public void MultiplyModifier(float modifier)
+    {
+        float newValue = value * modifier;
+        if (newValue >= 0)
+        {
+            value = newValue;
+        }
+        EventManager.Instance.MutifyNeeds();
+        owner.lifeController.UpdatePriorityNeed();
+    }
+
+    [Serializable]
+    public class PriorityNeed
+    {
+        public Action action;
+        public Need need;
+        public float VFM; // 性价比 gain / cost
+        public float efficiency; // 效率 gain / time
+        // 优先级计算公式
+        public float Priority
+        {
+            get
+            {
+                return need.NeedState switch
+                {
+                    State.dangerous => efficiency,
+                    State.warning => VFM,
+                    State.normal => 0,// normal状态时需求相关行为的优先级归零
+                    _ => 0,
+                };
+            }
+        }
+    }
+
+    [Serializable]
+    public enum State
+    {
+        none = 0,
+        dangerous,
+        warning,
+        normal,
+    }
+
+}
+

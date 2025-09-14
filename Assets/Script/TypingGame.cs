@@ -179,8 +179,8 @@ public class TypingGame : MonoBehaviour
                     fishingTime = 0;
                     CheckInput();
                 }
-                if ((int)Hero.Instance.lifeController.PreesureLevel > 2) //如果压力过大就会导致字符跳动
-                    HighlightCorrectCharacter(ReplaceRandomChar(currentSentence,ShuffleIndexArray,(int)Hero.Instance.lifeController.PreesureLevel-2));
+                if ((int)Hero.Instance.lifeController.GetStat("preesure").StatState >= 2) //如果压力过大就会导致字符跳动
+                    HighlightCorrectCharacter(ReplaceRandomChar(currentSentence,ShuffleIndexArray,(int)Hero.Instance.lifeController.GetStat("preesure").StatState - 1));
                 else
                     HighlightCorrectCharacter(currentSentence);
             }
@@ -323,7 +323,7 @@ public class TypingGame : MonoBehaviour
 
     public void SettleAccount()
     {
-        Hero.Instance.lifeController.AddModifier("kpi",kpi*Hero.Instance.lifeController.KpiMultiplier);
+        Hero.Instance.lifeController.AddModifier("kpi",kpi*Hero.Instance.lifeController.GetStatValue("KpiMultiplier"));
         Hero.Instance.lifeController.AddModifier("preesure",preesure);
     }
 
@@ -336,7 +336,7 @@ public class TypingGame : MonoBehaviour
         {
             fishingTime = 0;
             Hero.Instance.lifeController.AddModifier("preesure",-1); //摸鱼解压 
-            if(Hero.Instance.lifeController.KpiMultiplier>1)
+            if(Hero.Instance.lifeController.GetStatValue("KpiMultiplier")>1)
                 Hero.Instance.lifeController.AddModifier("kpi", -5); //老板查岗时公然摸鱼扣kpi
         }
     }

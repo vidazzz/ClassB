@@ -41,7 +41,7 @@ public class DialogueGraph : NodeGraph
 
     private DialogueNode DialogueDiceCheck()
     { 
-        if(DiceCheck.Instance.Check(Hero.Instance.GetTalent(checkingName), ckeckingValue))
+        if(DiceCheck.Instance.CheckTalent(checkingName, ckeckingValue,Hero.Instance))
             return succeededNode;
         else
             return failedNode;
@@ -49,7 +49,7 @@ public class DialogueGraph : NodeGraph
 
     private DialogueNode DialogueStatsCheck()
     {
-        if(Hero.Instance.lifeController.Check(checkingName,ckeckingValue))
+        if(DiceCheck.Instance.CheckStats(checkingName,ckeckingValue,Hero.Instance))
             return succeededNode;
         else
             return failedNode;

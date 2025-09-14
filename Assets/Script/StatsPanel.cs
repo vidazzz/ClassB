@@ -19,7 +19,7 @@ public class StatsPanel : MonoBehaviour
             GameObject go = Instantiate(preferbTestMesh, GetComponent<RectTransform>());
             textMeshes[i] = go.GetComponent<TextMeshProUGUI>();
             textMeshes[i].text = statsNames[i];
-            textMeshes[i].text += " : " + (int)Hero.Instance.lifeController.statsPairs[statsNames[i]];
+            textMeshes[i].text += " : " + (int)Hero.Instance.lifeController.GetStatValue(statsNames[i]);
         }
     }
 
@@ -29,7 +29,7 @@ public class StatsPanel : MonoBehaviour
         for(int i = 0; i < statsNames.Length; i++)
         {
             textMeshes[i].text = statsNames[i];
-            textMeshes[i].text += " : " + (int)Hero.Instance.lifeController.statsPairs[statsNames[i]];
+            textMeshes[i].text += " : " + (int)Hero.Instance.lifeController.GetStatValue(statsNames[i]);
         }
     }
 }

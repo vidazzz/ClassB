@@ -23,16 +23,53 @@ public class Timer : MonoBehaviour
             return instance;
         }
     }
-    private int dd;
-    private int hh;
-    private float mm;
-    private static int deltaTime; //游戏中计时器timer的每帧时间，单位时游戏中的分
+    static private int dd;
+    public int DD{get { return dd; }}
+    static private int hh;
+    public int HH{get { return hh; }}
+    static private float mm;
+    public int MM{get { return (int)mm; }}
+    public struct Date
+    {
+        public int dd;
+        public int hh;
+        public int mm;
+        public Date(int dd, int hh, int mm)
+        {
+            this.dd = dd;
+            this.hh = hh;
+            this.mm = mm;
+        }
+        // 重载+运算符
+        public static Date operator +(Date a, Date b)
+        {
+            int minute = a.mm + b.mm;
+            int hour = a.hh + b.hh + minute / 60;
+            int day = a.dd + b.dd + hour / 24;
+            minute %= 60;
+            hour %= 24;
+            return new Date(day, hour, minute);
+        }
+        public static Date operator +(Date a, int b)
+        {
+            int minute = a.mm + b;
+            int hour = a.hh + minute / 60;
+            int day = a.dd + hour / 24;
+            minute %= 60;
+            hour %= 24;
+            return new Date(day, hour, minute);
+        }
+    }
+    public static Date Time
+    {
+        get { return new Date(dd, hh, (int)mm); }
+    }
+    private static int deltaTime; //游戏中计时器timer的每帧时间，单位是游戏中的分
     public static int DeltaTime{
         get {return deltaTime;}
     }
     public bool isOffWork = false;
     private bool hasDayEnded = false;
-    [SerializeField]
     private static int oneSecondInGame = 4;
     public TextMeshProUGUI displayText;
     public static bool hasPaused;
@@ -57,7 +94,7 @@ public class Timer : MonoBehaviour
             deltaTime = 0;
             while (hasPaused)
                 yield return null;
-            mm += Time.deltaTime * oneSecondInGame * Hero.Instance.lifeController.TimeMultiplier;
+            mm += UnityEngine.Time.deltaTime * oneSecondInGame * Hero.Instance.lifeController.GetStatValue("timeMultiplier");
             EventManager.Instance.NextFrame(); //下一帧
             if (!CoroutineQueueManager.nextFrameCoroutineQueue.IsQueueEmpty)
                 yield return StartCoroutine(CoroutineQueueManager.nextFrameCoroutineQueue.ProcessQueue()); //下一帧
@@ -155,6 +192,15 @@ public class Timer : MonoBehaviour
     public static void SetOneSecondInGame(int value)
     {
         oneSecondInGame = value;
+    }
+
+    public static int GetPassedMinutes(Date fromTime)
+    {
+        int toDD = Instance.DD;
+        int toHH = Instance.HH;
+        int toMM = Instance.MM;
+        int passedMinutes = (toDD - fromTime.dd) * 24 * 60 + (toHH - fromTime.hh) * 60 + (toMM - fromTime.mm);
+        return passedMinutes;
     }
 
 

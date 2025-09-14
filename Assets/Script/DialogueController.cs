@@ -145,16 +145,16 @@ public class DialogueController : MonoBehaviour
     }
     */
 
-    public IEnumerator GraphDisplayDialogue(DialogueGraph dialogueGraph, List<GameObject> objs = null)
+    public IEnumerator GraphDisplayDialogue(DialogueGraph dialogueGraph, List<Interactable> characters = null)
     {
         Timer.Pause();
         //处理多人对话情况
         meetingTextMeshList = new() { dialogueTextMesh };
-        if (objs != null)
-            foreach (var obj in objs)
+        if (characters != null)
+            foreach (var character in characters)
             {
-                meetingTextMeshList.Add(obj.GetComponent<DialogueController>().dialogueTextMesh);
-                Debug.Assert(obj != null, "obj不能为null");
+                meetingTextMeshList.Add(character.GetComponent<DialogueController>().dialogueTextMesh);
+                Debug.Assert(character != null, "character不能为null");
                 Debug.Assert(meetingTextMeshList[^1] != null, "TextMesh不能为null");
             }
 
@@ -208,7 +208,7 @@ public class DialogueController : MonoBehaviour
                     textMesh.text += "\n" + (i + 1) + ". " + option.line;
                     if (option.checkingTalentName != "")
                         if (!option.hasChecked)
-                            textMesh.text += "\t" + DiceCheck.Instance.PredictionString(option.checkingTalentName, option.checkingTalentLevel);
+                            textMesh.text += "\t" + DiceCheck.Instance.PredictionString(option.checkingTalentName, option.checkingTalentLevel,Hero.Instance);
                         else
                             textMesh.text += "\t" + (option.checkResult ? "<color=green>已成功</color>" : "<color=red>已失败</color>");
                 }

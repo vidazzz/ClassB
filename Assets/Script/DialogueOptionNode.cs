@@ -39,9 +39,9 @@ public class DialogueOptionNode : Node
 	{
 		EffectType type;
 		List<string> args;
-		if (checkingTalentName != "" && !hasChecked) //填了checkingSkillName且没有检定过就进行检定
+		if (checkingTalentName != "" && !hasChecked) //填了checkingTalentName且没有检定过就进行检定
 		{
-			checkResult = DiceCheck.Instance.Check(Hero.Instance.GetTalent(checkingTalentName), checkingTalentLevel);
+			checkResult = DiceCheck.Instance.CheckTalent(checkingTalentName, checkingTalentLevel ,Hero.Instance);
 			hasChecked = true;
 		}
 		if (checkResult) //根据检定结果决定采用的效果和跳转索引
@@ -104,7 +104,7 @@ public class DialogueOptionNode : Node
 	}
 	public void RollbackRequiredKPI()
 	{
-		Hero.Instance.lifeController.statsPairs["requiredKPI"] = Hero.Instance.lifeController.statsPairs["lastRequiredKPI"];
+		Hero.Instance.lifeController.SetStatValue("requiredKPI", Hero.Instance.lifeController.GetStatValue("lastRequiredKPI"));
 		Hero.Instance.DisplayStatsValue();
 	}
 	public IEnumerator EffectCheckItem(List<string> strings)

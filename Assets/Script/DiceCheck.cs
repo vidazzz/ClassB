@@ -22,12 +22,12 @@ public class DiceCheck : MonoBehaviour
     }
     private TextMeshProUGUI checkResultText;
     
-    public string PredictionString(string skillName,int checkingSkillLevel)
+    public string PredictionString(string checkingName ,int checkingValue ,Character character)
     {
-        Talent skill = Hero.Instance.GetTalent(skillName);
+        Character.TalentData talentData = character.GetTalent(checkingName);
         float possibility;
         Color color;
-        possibility = (float)skill.level/(skill.level + checkingSkillLevel);
+        possibility = (float)talentData.value/(talentData.value + checkingValue);
         possibility = (float)Math.Round(possibility, 2)*100;
         if(possibility < 10)
             color = Color.gray;
@@ -39,25 +39,28 @@ public class DiceCheck : MonoBehaviour
             color = Color.cyan;
         else
             color = Color.green;
-        return "[" + skill.name + "]<color=#" + ColorUtility.ToHtmlStringRGB(color) + ">" + possibility.ToString() +"%</color>";
+        return "[" + talentData.talent.TalentName + "]<color=#" + ColorUtility.ToHtmlStringRGB(color) + ">" + possibility.ToString() +"%</color>";
     }
-    public bool Check(Talent talent,int checkingSkillLevel)
+    public bool CheckTalent(string checkingTalentName,int checkingSkillLevel,Character character)
     {
+        Character.TalentData heroTalentData = character.GetTalent(checkingTalentName);
         bool result;
-        
-        int dice = UnityEngine.Random.Range(0,talent.level + checkingSkillLevel);
-        result = dice < talent.level;   
-        
-       
-        DisplayResult(talent.name,result);
+        int dice = UnityEngine.Random.Range(0,heroTalentData.value + checkingSkillLevel);
+        result = dice < heroTalentData.value;   
+        DisplayResult(heroTalentData.talent.TalentName,result);
         return result;
-            
+    }
+    
+    public bool CheckStats(string statsName,float value,Character character)
+    {
+        bool result = character.GetComponent<LifeController>().GetStatValue(statsName) >= value;
+        return result;
     }
 
-    public void DisplayResult(string talentName,bool checkResult)
+    public void DisplayResult(string talentName, bool checkResult)
     {
         string result = $"<color=#{ColorUtility.ToHtmlStringRGB(Color.magenta)}>{talentName}</color>: ";
-        if(checkResult)
+        if (checkResult)
             result += $"<color={"green"}>success";
         else
             result += $"<color={"red"}>failure";

@@ -19,16 +19,20 @@ public class EventManager : MonoBehaviour
         }
     }
 
-    public event Action OnTheVaryBegining;
-    public event Action OnNextFrame;
+    public event System.Action OnTheVaryBegining;
+    public event System.Action OnNextFrame;
     public event Action<int> OnDayBegin;
     public event Action<int> OnDayBegin2;
-    public event Action OnHourEnd;
-    public event Action OnOffWork;
-    public event Action OnOffWork2;
-    public event Action OnDayEnd;
-    public event Action OnDayEnd2;
-    public event Action OnFirstQuitTypingGame;
+    public event System.Action OnHourEnd;
+    public event System.Action OnOffWork;
+    public event System.Action OnOffWork2;
+    public event System.Action OnDayEnd;
+    public event System.Action OnDayEnd2;
+    public event System.Action OnFirstQuitTypingGame;
+
+    public event System.Action OnMutifyStats;
+
+    public event System.Action OnMutifyNeeds;
 
     public void TheVaryBegining()
     {
@@ -80,6 +84,14 @@ public class EventManager : MonoBehaviour
     {
         OnFirstQuitTypingGame?.Invoke();
         // Additional logic for first quit typing game can be added here
+    }
+    public void MutifyStats()
+    {
+        OnMutifyStats?.Invoke();
+    }
+    public void MutifyNeeds()
+    {
+        OnMutifyNeeds?.Invoke();
     }
 
     // Start is called before the first frame update

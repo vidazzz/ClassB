@@ -19,9 +19,9 @@ public class EssentialToggle : MonoBehaviour
     {
         bool isAffordable;
         if (toggle.isOn)
-            isAffordable = Hero.Instance.lifeController.statsPairs["money"] >= shop.advancePayment;
+            isAffordable = Hero.Instance.lifeController.GetStatValue("money") >= shop.advancePayment;
         else
-            isAffordable = Hero.Instance.lifeController.statsPairs["money"] >= shop.advancePayment + price;
+            isAffordable = Hero.Instance.lifeController.GetStatValue("money") >= shop.advancePayment + price;
         toggle.interactable = isAffordable;
         if (!isAffordable && toggle.isOn)
         {

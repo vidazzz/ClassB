@@ -435,6 +435,7 @@ GameObject:
   - component: {fileID: 6138957515224026236}
   - component: {fileID: 42871176506680659}
   - component: {fileID: 6298020359651462320}
+  - component: {fileID: 7552774599953980320}
   m_Layer: 3
   m_Name: NPC
   m_TagString: Untagged
@@ -457,6 +458,7 @@ Transform:
   m_Children:
   - {fileID: 5315199179363316440}
   - {fileID: 2304704203353410732}
+  - {fileID: 2307078824808246075}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &6448968868260851068
@@ -561,25 +563,49 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5514cefb00cdbb141b37ef68f26128b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactTime: 1
+  users: []
+  cost:
+    needName: 
+    value: 0
+  gain:
+    needName: 
+    value: 0
+  duration: 0
+  interactDisdence: 1
   interactPoint: []
   interactionPrompt: "\u4E92\u52A8"
   interactionKey: 101
   fSpeed: 10
   lifeController: {fileID: 0}
+  dialogueController: {fileID: 42871176506680659}
   spawnPosition: {x: 0, y: 0, z: 0}
+  profilePic: {fileID: 21300000, guid: 4616d024e32e8814cb775ea678f0b67d, type: 3}
+  conversationAffinityThreshold: 0
+  talentDataList: []
+  action:
+    type: 0
+    target: {fileID: 0}
+    priorityJob: 0
+    priorityHobby: 0
+    priorityStat: 0
+    priorityTask: 0
+  actions: []
+  hobbyDataList:
+  - hobbyIndex: 1
+    passion: 5
   affinityEffectArgsList:
   - name: GoodJob
     buffIndexArrey: 00000000
     affinityThreshold: 2
   IsMoving: 0
+  topicHobby:
+    hobbyName: 
+    id: 0
+    talents: []
+    devices: []
+  groups: []
   astar: {fileID: 267063047941556591}
-  ThingsICanDo:
-  - type: 1
-    obgList:
-    - {fileID: 0}
-    multiPersonDialoguesIndex: 0
-  dialogueController: {fileID: 42871176506680659}
+  isMeeting: 0
 --- !u!50 &8595137357344968266
 Rigidbody2D:
   serializedVersion: 4
@@ -664,10 +690,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 644d5db7f9a830b4e803f33e04b8fc34, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dialogues:
-  - {fileID: 11400000, guid: 9a0b7a0ccf9f44a46a0e2b1562463875, type: 2}
-  multiPersonDialogues: []
-  currentLineIndex: 0
+  dialogueGraph: {fileID: 11400000, guid: 4321badb58a6f7648a23ce89fcdca78d, type: 2}
+  multiPersonDialogueGraphs: []
+  currentDialogueNode: {fileID: 0}
   character: {fileID: 0}
 --- !u!114 &6298020359651462320
 MonoBehaviour:
@@ -681,3 +706,99 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22105274e8549054d823f17dcd379708, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  stats: []
+  needs: []
+--- !u!114 &7552774599953980320
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6906196488222310973}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: af075e64eb97d7642aa5e396bd3319a6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tasks: []
+--- !u!1 &8975183213159628016
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2307078824808246075}
+  - component: {fileID: 3681808623611281540}
+  - component: {fileID: 6800309268018912000}
+  m_Layer: 2
+  m_Name: Circle
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2307078824808246075
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8975183213159628016}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 5, y: 5, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3435712186245327416}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!58 &3681808623611281540
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8975183213159628016}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  serializedVersion: 2
+  m_Radius: 0.5
+--- !u!114 &6800309268018912000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8975183213159628016}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe259a13e54ceca42a0efe50fa1d9171, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  characters: []

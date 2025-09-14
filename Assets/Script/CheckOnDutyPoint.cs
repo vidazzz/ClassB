@@ -18,10 +18,10 @@ public class CheckOnDutyPoint : Interactable
 
     IEnumerator CheckOnDuty(NPC overseer)
     {
-        StartCoroutine(overseer.ShowPopUp("Result",interactTime));
+        StartCoroutine(overseer.ShowPopUp("Result",2f));
         
         character.lifeController.AddModifier("kpiMultiplier",addToKpiMultiplier);
-        yield return new WaitForSeconds(interactTime);
+        yield return new WaitForSeconds(2f);
         character.lifeController.AddModifier("kpiMultiplier",-addToKpiMultiplier); //结束查岗 恢复原先的kpi倍率
     }
 

@@ -1,46 +1,43 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 
 public class NPC : Character
 {
     [SerializeField] private AStar astar;
-    SomeThing someThingsWorkingOn;
-    public List<SomeThing> ThingsICanDo;
-    public DialogueController dialogueController;
+    public List<List<Action>> Schedule;//
     NPC interlocutor;
     public bool isMeeting;
-    DialogueGraph currentTopic;
-
 
     public override IEnumerator Interact(Character interactor)
     {
-        if(interactor is Hero) //对象是主角
+        if (interactor is Hero) //对象是主角
         {
             Timer.Pause();
             StopAllCoroutines();
             //Hero.Instance.canActive = false;
-            if (isMeeting && dialogueController.multiPersonDialogueGraphs.Count > 0) //多人对话
+            if (isMeeting) //多人对话
             {
-                yield return StartCoroutine(dialogueController.GraphDisplayDialogue(dialogueController.multiPersonDialogueGraphs[someThingsWorkingOn.multiPersonDialoguesIndex], someThingsWorkingOn.obgList));
+                //yield return StartCoroutine(dialogueController.GraphDisplayDialogue(dialogueController.multiPersonDialogueGraphs[scheduleItem.multiPersonDialoguesIndex], scheduleItem.targetList));
             }
-            else if (dialogueController != null ? dialogueController.dialogueGraph : null != null) //单人对话
+            else if (dialogueController.dialogueGraph != null) //单人对话
             {
                 yield return StartCoroutine(dialogueController.GraphDisplayDialogue(dialogueController.dialogueGraph));
             }
             else
                 Debug.LogWarning("No dialogue has been set");
             yield return null;
-            StartCoroutine(LetsDoSomeThing(someThingsWorkingOn));
+            StartCoroutine(ProsessSchedule(action));//继续执行日程
             Timer.Resume();
         }
         else //interactor is NPC
         {
             StartCoroutine(Reaction(interactor.gameObject));
             interlocutor = interactor.GetComponent<NPC>();
-            yield return ShowPopUp("Result",interactTime);
+            yield return ShowPopUp("Result", 2f);
 
             interlocutor = null;
         }
@@ -71,7 +68,7 @@ public class NPC : Character
         if (path != null)
         {
             //Debug.Log(path.Count);
-            for (int i = 0; i < path.Count - socialDisdence; i++)
+            for (int i = 0; i < path.Count - target.interactDisdence; i++)
             {
                 AStar.Node node = path[i];
                 Debug.DrawLine(node.worldPosition, node.parent.worldPosition, Color.red, 99f);
@@ -114,21 +111,22 @@ public class NPC : Character
         StopAllCoroutines();
         AnimateStopMove();
         FaceTheTarget(interrupter);
-        yield return ShowPopUp("Result",interactTime);
-        if (interrupter == someThingsWorkingOn.obgList[0]) //the person I was supposed to find
-            StartCoroutine(LetsDoSomeThing());
+        yield return ShowPopUp("Result",2f);
+        if (interrupter == action.target) //the person I was supposed to find
+            StartCoroutine(ProsessSchedule());
         else
-            StartCoroutine(LetsDoSomeThing(someThingsWorkingOn));
+            StartCoroutine(ProsessSchedule(action));
     }
 
     public IEnumerator MoveTo(GameObject gameObj)
     {
         StopAllCoroutines();
         AnimateStopMove();
+        Interactable target = gameObj.GetComponent<Interactable>();
         List<AStar.Node> path = astar.FindPath(transform.position, gameObj.transform.position);
         if (path != null)
         {
-            for (int i = 0; i < path.Count - socialDisdence; i++)
+            for (int i = 0; i < path.Count - target.interactDisdence; i++)
             {
                 AStar.Node node = path[i];
                 Debug.DrawLine(node.worldPosition, node.parent.worldPosition, Color.red, 99f);
@@ -145,24 +143,41 @@ public class NPC : Character
         FaceTheTarget(gameObj);
     }
 
-    IEnumerator LetsDoSomeThing(SomeThing someThing = null)
+    //AI行为协程
+    IEnumerator ProsessSchedule(Action item = null)
     {
+        Debug.Log($"NPC {name} ProsessSchedule ACTION");
         yield return new WaitForSeconds(1);
-        if(ThingsICanDo.Count == 0)
+        if(actions.Count == 0)
             yield break;
-        if(someThing == null)
-            someThing = ThingsICanDo[UnityEngine.Random.Range(0,ThingsICanDo.Count)];
-        someThingsWorkingOn = someThing;
-        switch(someThing.type)
+        
+        
+        item ??= ChooseAction();
+        action = item;
+        switch (item.type)
         {
-            case SomeThingType.meeting:
-                yield return StartCoroutine(TakeMeeting(dialogueController.multiPersonDialogueGraphs[someThing.multiPersonDialoguesIndex],someThing.obgList));//参数决定了npc想聊什么，以后有需要再实现传参方式
+            case ActionType.meeting:
+                yield return StartCoroutine(TakeMeeting(item));//参数决定了npc想聊什么，以后有需要再实现传参方式
                 break;
-            case SomeThingType.use:
-                yield return StartCoroutine(UseFacility(someThing.obgList[0]));
-                break;                                  
+            case ActionType.use:
+                yield return StartCoroutine(UseDevice(item));
+                break;
+            default:
+                yield return null;
+                break;                            
         } 
-        StartCoroutine(LetsDoSomeThing());
+        StartCoroutine(ProsessSchedule());
+    }
+
+
+
+    Action ChooseAction()
+    {
+        Action maxPriorityAction = actions //.OrderByDescending(a => a.Priority).FirstOrDefault();
+                                    .Where(a => !a.isWaiting)
+                                    .OrderByDescending(a => a.Priority)
+                                    .FirstOrDefault();
+        return maxPriorityAction;
     }
 
     void NotifyTheTarget(NPC target)
@@ -170,52 +185,116 @@ public class NPC : Character
         target.StopAllCoroutines();
         target.AnimateStopMove();
     }
-    public IEnumerator UseFacility(GameObject facility)
+    public IEnumerator UseDevice(Action scheduleItem)
     {
-        Interactable interactable = facility.GetComponent<Interactable>();
-        if(interactable.occupiedBy == this || interactable.occupiedBy == null) //未被占用
-        {    
-            yield return StartCoroutine(MoveToObj(facility));
-            FaceTheTarget(facility);
-            interactable.occupiedBy = this;
-            StartCoroutine(ShowPopUp("Result",interactable.interactTime));
-            yield return StartCoroutine(interactable.Interact(this));
-            interactable.occupiedBy = null;
+        Device device = scheduleItem.target as Device;
+        CheckSocialNeedAndPostTask(device);//检查社交需求
+        //设置topicHobby
+        topicHobby = device.hobby;
+        yield return StartCoroutine(MoveToObj(device.gameObject));
+
+        
+        FaceTheTarget(device.gameObject);
+
+        if (device.IsInUse)
+        {
+            StartCoroutine(scheduleItem.Waiting());
+            yield break;
+        }
+            
+
+        if (device.hobby.hobbyName != "")//如果是爱好就聊
+            {
+                OpenRadder();
+                if (!FindConversation())
+                    CreatConversation();
+            }
+        
+        StartCoroutine(ShowPopUp("Result", device.duration));
+        yield return StartCoroutine(device.Interact(this));
+
+        QuitConversation();
+        CloseRadder();
+    }
+    public void CheckSocialNeedAndPostTask(Device device)
+    {
+        Need soialNeed = lifeController.GetNeed("SocialNeed");
+        if (soialNeed.value < 20)
+        {
+            PostGroupTask(device);
         }
     }
-    public IEnumerator TakeMeeting(DialogueGraph topic,List<GameObject> interlocutors)
+    private void PostGroupTask(Device device)
     {
-        if(interlocutors.Count == 1) //与另一个npc对话
+        foreach (Group group in groups)
         {
-            NPC npc = interlocutors[0].GetComponent<NPC>();
-            if(npc.occupiedBy == this || npc.occupiedBy == null) //npc未被占用
+            if (group.hobby.devices.Contains(device))
             {
-                NotifyTheTarget(npc); //叫住对面NPC
-                npc.occupiedBy = this;
+                YouChat.Instance.PostTask(new TaskManager.TaskData
+                {
+                    taskName = $"{group.groupName}圈 {Timer.Time.dd}/{Timer.Time.hh}/{Timer.Time.mm} 冲{device.name}活动",
+                    needName = device.gain.needName,
+                    targetValue = 50,//属性振幅目标
+                    interactables = new List<Interactable> { device },
+                    deadLine = new(Timer.Instance.DD, 23, 59) // 默认截止时间为当天23:59
+                }, group, this);
+                //taskManager.AcceptTask(group.activeTask);
+                break;
+            }
+        }  
+    }
+    
+    //检查是否有任务需要接受
+    public void CheckTask()
+    {
+        if (groups.Count == 0)
+            return;
+        foreach (Group group in groups)
+        {
+            if (group.activeTask != null)
+                if (group.activeTask.taskName != "")
+                    if (!taskManager.tasks.Exists(a => a.taskName == group.activeTask.taskName))
+                    {
+                        taskManager.AcceptTask(group.activeTask);
+                        break;
+                    }
+        }
+    }
+
+    public IEnumerator TakeMeeting(Action item)
+    {
+
+        NPC npc = item.target as NPC;
+        if (npc.users.Count == 0) //npc未被占用
+        {
+            NotifyTheTarget(npc); //叫住对面NPC
+            if (!npc.users.Contains(this))
+            {
                 yield return StartCoroutine(MoveToObj(npc.gameObject));
                 FaceTheTarget(npc.gameObject);
                 isMeeting = true;
                 StartCoroutine(npc.Interact(this));
-                yield return StartCoroutine(ShowPopUp("Result",npc.interactTime));
-                currentTopic = topic;
+                yield return StartCoroutine(ShowPopUp("Result", 1f));
                 isMeeting = false;
-                npc.occupiedBy = null;
+                npc.users = null;
             }
-        }
-        else    //与多个npc对话
-        {
-
         }
     }
 
     void OnEnable()
     {
-        StartCoroutine(LetsDoSomeThing());
+        StartCoroutine(ProsessSchedule());
     }
     // Start is called before the first frame update
     new void Awake()
     {
         base.Awake();
+    }
+
+    new void Start()
+    {
+        base.Start();
+        
     }
 
     // Update is called once per frame

@@ -91,21 +91,10 @@ public class Hero : Character
     {
         transform.position = spawnPosition;
     }
-
-    public Talent GetTalent(string skillName)
-    {
-        Debug.Assert(skillName != null,"dialogueTextMesh不能为null");
-        return talents[skillName];
-    }
-
-
+    
     public void DisplayStatsValue()
     {
-        LifeValueText.text = "";
-        foreach(var statsPair in lifeController.statsPairs)
-        {
-            LifeValueText.text += $"{statsPair.Key} : {statsPair.Value}\n";
-        }
+        lifeController.DisplayStatsValue(LifeValueText);
     }
 
     //等一下加载
