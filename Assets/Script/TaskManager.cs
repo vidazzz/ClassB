@@ -18,21 +18,21 @@ public class TaskManager : MonoBehaviour
         public string needName;
         public float targetValue;
         public List<Interactable> interactables;
-        public Timer.Date deadLine;
+        public int duration;
     }
 
     [Serializable]
     public class Task
     {
         public string taskName;
-        Character owner;
-        TaskManager taskManager;
-        Need targetNeed;
-        float originStatValue;
-        float targetValue;
-        List<Interactable> interactables = new();
-        Timer.Date deadLine;//hh,mm
-        float priorityValue = 20;
+        private Character owner;
+        private TaskManager taskManager;
+        private Need targetNeed;
+        private float originStatValue;
+        private float targetValue;
+        private List<Interactable> interactables = new();
+        private Timer.Date deadLine;
+        private float priorityValue = 20;
 
         public Task(Character character,TaskData taskData)
         {
@@ -43,7 +43,7 @@ public class TaskManager : MonoBehaviour
             originStatValue = targetNeed.value;
             targetValue = taskData.targetValue;
             interactables = taskData.interactables;
-            deadLine = taskData.deadLine;
+            deadLine = Timer.Time + taskData.duration;
             CheckAndAddPriorityTask();
             EventManager.Instance.OnMutifyNeeds += CheckIfFinished;
             EventManager.Instance.OnNextFrame += CheckIfDeadLine;
@@ -51,7 +51,7 @@ public class TaskManager : MonoBehaviour
 
         private void CheckIfDeadLine()
         {
-            if (Timer.Instance.HH >= deadLine.hh && Timer.Instance.MM >= deadLine.mm)
+            if (Timer.Time >= deadLine)
                 CloseTask();
         }
         private void CheckIfFinished()

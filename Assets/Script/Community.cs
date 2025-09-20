@@ -145,7 +145,6 @@ public class Community : MonoBehaviour
             if (characterIndexList.Count == 0)
                 return hobbyGroups;
             
-            Debug.Log("ChackHobbyToppicScore");
             for (int hobbyIndex = 0; hobbyIndex < DataSetting.Hobbies.Count; hobbyIndex++) //遍历hobby划分圈子
             {
                 int[] arr = characterIndexList.ToArray();
@@ -157,15 +156,12 @@ public class Community : MonoBehaviour
                         bool isIndexMoved = false;
                         for (int j = lastIdxIdx + 1; j < arr.Length; j++)
                         {
-                            Debug.Log($"hobbyTopicScoreValue[{arr[lastIdxIdx]}, {arr[j]}, {hobbyIndex}] = {hobbyTopicScoreValue[arr[lastIdxIdx], arr[j], hobbyIndex]}");
+                            //Debug.Log($"hobbyTopicScoreValue[{arr[lastIdxIdx]}, {arr[j]}, {hobbyIndex}] = {hobbyTopicScoreValue[arr[lastIdxIdx], arr[j], hobbyIndex]}");
                             if (hobbyTopicScoreValue[arr[lastIdxIdx], arr[j], hobbyIndex] >= 1f)
                             {
-                                Debug.Log($"characterIndexArr[{lastIdxIdx}] = {arr[lastIdxIdx]}");
+                                //Debug.Log($"characterIndexArr[{lastIdxIdx}] = {arr[lastIdxIdx]}");
 
-                                int temp = arr[lastIdxIdx + 1];
-                                arr[lastIdxIdx + 1] = arr[j];
-                                arr[j] = temp;
-
+                                (arr[j], arr[lastIdxIdx + 1]) = (arr[lastIdxIdx + 1], arr[j]);
                                 lastIdxIdx++;
                                 hobbyGroup.menberIndexList.Add(arr[lastIdxIdx]);
                                 isIndexMoved = true;
@@ -179,7 +175,7 @@ public class Community : MonoBehaviour
                         hobbyGroups.Add(hobbyGroup);
                 }
             }
-            Debug.Log("ChackHobbyToppicScore " + hobbyGroups.Count);
+            //Debug.Log("ChackHobbyToppicScore " + hobbyGroups.Count);
             if (hobbyGroups.Count > 0)
                 return hobbyGroups;
             else
@@ -196,7 +192,7 @@ public class Community : MonoBehaviour
 
     public static Coroutine StartConversation(Conversation conversation)
     {
-        Debug.Log("StartConversation " + conversation.participants);
+        //Debug.Log("StartConversation " + conversation.participants);
         return Instance.StartCoroutine(conversation.Process());
     }
 

@@ -19,15 +19,21 @@ public class TestConsole : MonoBehaviour
     }
     public void TestSetTimepass1()
     {
-        Timer.SetOneSecondInGame(4);
+        //Timer.SetOneSecondInGame(4);
+        Timer.Resume(1);
+        testPanel.SetActive(!testPanel.activeSelf);
     }
-        public void TestSetTimepass2()
+    public void TestSetTimepass2()
     {
-        Timer.SetOneSecondInGame(60);
+        //Timer.SetOneSecondInGame(60);
+        Timer.Resume(10);
+        testPanel.SetActive(!testPanel.activeSelf);
     }
-        public void TestSetTimepass3()
+    public void TestSetTimepass3()
     {
-        Timer.SetOneSecondInGame(120);
+        //Timer.SetOneSecondInGame(120);
+        Timer.Resume(20);
+        testPanel.SetActive(!testPanel.activeSelf);
     }
 
     // Start is called before the first frame update

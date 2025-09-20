@@ -67,6 +67,11 @@ public class DiceCheck : MonoBehaviour
         PopUp.Instance.ShowPopUp(result);
     }
 
+    public void Check()
+    {
+        
+    }
+
     // Start is called before the first frame update
     void Start()
     {

@@ -250,7 +250,7 @@ public class DialogueController : MonoBehaviour
             }
             yield return null; //等待一帧，避免过快跳过对话
         }
-        Debug.Log(currentDialogueNode);
+        //Debug.Log(currentDialogueNode);
         //跳出循环，下一句是空，结束对话
         EndDialogue(textMesh);
     }

@@ -146,7 +146,7 @@ public class NPC : Character
     //AI行为协程
     IEnumerator ProsessSchedule(Action item = null)
     {
-        Debug.Log($"NPC {name} ProsessSchedule ACTION");
+        //Debug.Log($"NPC {name} ProsessSchedule ACTION");
         yield return new WaitForSeconds(1);
         if(actions.Count == 0)
             yield break;
@@ -236,7 +236,7 @@ public class NPC : Character
                     needName = device.gain.needName,
                     targetValue = 50,//属性振幅目标
                     interactables = new List<Interactable> { device },
-                    deadLine = new(Timer.Instance.DD, 23, 59) // 默认截止时间为当天23:59
+                    duration = 60 // 默认60分钟
                 }, group, this);
                 //taskManager.AcceptTask(group.activeTask);
                 break;

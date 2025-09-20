@@ -36,7 +36,6 @@ public class Blackout : MonoBehaviour
         if (isFading)
             yield break;
         Color color = image.color;
-        Debug.Log(color);
         if (color.a == 0)
             yield return FadeInCoroutine();
         if (color.a == 1)

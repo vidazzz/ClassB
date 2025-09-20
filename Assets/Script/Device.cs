@@ -14,7 +14,7 @@ public class Device : Interactable
     {
         users.Add(interactor);
         Need gainNeed = null;
-        Debug.Log($"{interactor.name} handling {name} gain.needName = {gain.needName}");
+        //Debug.Log($"{interactor.name} handling {name} gain.needName = {gain.needName}");
         if (gain.needName != "")
         {
             gainNeed = interactor.lifeController.GetNeed(gain.needName);
@@ -29,12 +29,17 @@ public class Device : Interactable
         users.Remove(interactor);
     }
 
+    public void Operate()
+    {
+        
+    }
+
     protected IEnumerator PlayAnimation()
     {
         if (animator != null)
             animator.SetBool("isOccupied", true);
         Timer.Date beginTime = Timer.Time;
-        while (Timer.GetPassedMinutes(beginTime) < duration) //使用时间
+        while (Timer.Time - beginTime < duration) //使用时间
         {
             yield return null;
         }

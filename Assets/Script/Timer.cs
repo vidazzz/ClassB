@@ -6,8 +6,6 @@ using TMPro;
 using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
-public delegate void timerDelegate();
-public delegate void timerDelegateWithInt(int value);
 public class Timer : MonoBehaviour
 {
     private static Timer instance;
@@ -23,12 +21,12 @@ public class Timer : MonoBehaviour
             return instance;
         }
     }
+    private static int oneSecondInGame = 5;
+    static private float originTimeScale;
     static private int dd;
-    public int DD{get { return dd; }}
     static private int hh;
-    public int HH{get { return hh; }}
     static private float mm;
-    public int MM{get { return (int)mm; }}
+    static private float ss;
     public struct Date
     {
         public int dd;
@@ -50,6 +48,13 @@ public class Timer : MonoBehaviour
             hour %= 24;
             return new Date(day, hour, minute);
         }
+        public static int operator -(Date a, Date b)
+        {
+            int aMinute = a.dd * 24 * 60 + a.hh * 60 + a.mm;
+            int bMinute = b.dd * 24 * 60 + b.hh * 60 + b.mm;
+
+            return aMinute - bMinute;
+        }
         public static Date operator +(Date a, int b)
         {
             int minute = a.mm + b;
@@ -58,6 +63,57 @@ public class Timer : MonoBehaviour
             minute %= 60;
             hour %= 24;
             return new Date(day, hour, minute);
+        }
+        public static bool operator >(Date a, Date b)
+        {
+            int aMinute = a.dd * 24 * 60 + a.hh * 60 + a.mm;
+            int bMinute = b.dd * 24 * 60 + b.hh * 60 + b.mm;
+            return (aMinute > bMinute);
+        }
+
+        public static bool operator <(Date a, Date b)
+        {
+            int aMinute = a.dd * 24 * 60 + a.hh * 60 + a.mm;
+            int bMinute = b.dd * 24 * 60 + b.hh * 60 + b.mm;
+            return (aMinute < bMinute);
+        }
+        public static bool operator <=(Date a, Date b)
+        {
+            int aMinute = a.dd * 24 * 60 + a.hh * 60 + a.mm;
+            int bMinute = b.dd * 24 * 60 + b.hh * 60 + b.mm;
+            return (aMinute <= bMinute);
+        }
+
+        public static bool operator >=(Date a, Date b)
+        {
+            int aMinute = a.dd * 24 * 60 + a.hh * 60 + a.mm;
+            int bMinute = b.dd * 24 * 60 + b.hh * 60 + b.mm;
+            return (aMinute >= bMinute);
+        }
+
+        public static bool operator ==(Date a, Date b)
+        {
+            int aMinute = a.dd * 24 * 60 + a.hh * 60 + a.mm;
+            int bMinute = b.dd * 24 * 60 + b.hh * 60 + b.mm;
+            return (aMinute == bMinute);
+        }
+
+        public static bool operator !=(Date a, Date b)
+        {
+            return !(a == b);
+        }
+
+        public override readonly bool Equals(object obj)
+        {
+            if (!(obj is Date))
+                return false;
+            Date other = (Date)obj;
+            return this == other;
+        }
+
+        public override readonly int GetHashCode()
+        {
+            return HashCode.Combine(dd, hh, mm);
         }
     }
     public static Date Time
@@ -70,7 +126,7 @@ public class Timer : MonoBehaviour
     }
     public bool isOffWork = false;
     private bool hasDayEnded = false;
-    private static int oneSecondInGame = 4;
+
     public TextMeshProUGUI displayText;
     public static bool hasPaused;
 
@@ -94,20 +150,32 @@ public class Timer : MonoBehaviour
             deltaTime = 0;
             while (hasPaused)
                 yield return null;
-            mm += UnityEngine.Time.deltaTime * oneSecondInGame * Hero.Instance.lifeController.GetStatValue("timeMultiplier");
+            ss += UnityEngine.Time.deltaTime * oneSecondInGame * Hero.Instance.lifeController.GetStatValue("timeMultiplier");
+            
             EventManager.Instance.NextFrame(); //下一帧
             if (!CoroutineQueueManager.nextFrameCoroutineQueue.IsQueueEmpty)
                 yield return StartCoroutine(CoroutineQueueManager.nextFrameCoroutineQueue.ProcessQueue()); //下一帧
             if (!CoroutineQueueManager.firstQuitTypingGameCoroutineQueue.IsQueueEmpty)
                 yield return StartCoroutine(CoroutineQueueManager.firstQuitTypingGameCoroutineQueue.ProcessQueue()); //处理第一次退出打字游戏的协程队列
-            
-            if(hh >= 9) //上班时间
+            if (ss >= 60)
             {
-                if(hasDayEnded) //新的一天开始
+                mm++;
+                ss = 0;
+            }
+                
+            if (mm >=60)
+            {
+                hh ++;
+                mm = 0;
+                EventManager.Instance.HourEnd();
+            }
+            if (hh >= 9) //上班时间
+            {
+                if (hasDayEnded) //新的一天开始
                 {
                     EventManager.Instance.DayBegin(dd);
                     yield return StartCoroutine(CoroutineQueueManager.dayBeginCoroutineQueue.ProcessQueue());
-                    if(hadQuitTypingGame) //如果退出过打字界面
+                    if (hadQuitTypingGame) //如果退出过打字界面
                     {
                         EventManager.Instance.DayBegin2(dd);
                         yield return StartCoroutine(CoroutineQueueManager.dayBeginCoroutineQueue2.ProcessQueue());
@@ -116,12 +184,7 @@ public class Timer : MonoBehaviour
                     isOffWork = false;
                 }
             }
-            if(mm >=60)
-            {
-                hh ++;
-                mm = 0;
-                EventManager.Instance.HourEnd();
-            }
+
             if(hh == 18 && !isOffWork) //下班时间
             {
                 isOffWork = true;
@@ -164,7 +227,7 @@ public class Timer : MonoBehaviour
     void DisplayClock()
     {
         int hhr = hh >= 24 ? hh-24 : hh;//上班时钟转换成正常时钟
-        displayText.text = "DAY"+dd+"\t" + hhr + ":" + (int)mm;
+        displayText.text = $"DAY{dd}\t{string.Format("{0:00}:{1:00}:{2:00}", hhr, (int)mm, (int)ss)}";
     }
 
     public static void Pause()
@@ -172,15 +235,20 @@ public class Timer : MonoBehaviour
         if (hasPaused)
             return;
         Debug.Log("Pause");
-        deltaTime = 0;
+        //deltaTime = 0;
+        originTimeScale = UnityEngine.Time.timeScale;
+        UnityEngine.Time.timeScale = 0;
         pauseIcon.SetActive(true);
         hasPaused = true;
     }
-    public static void Resume()
+    public static void Resume(float newTimeScale = 0)
     {
         if(!hasPaused)
             return;
         Debug.Log("Resume");
+        if (newTimeScale > 0)
+            originTimeScale = newTimeScale;
+        UnityEngine.Time.timeScale = originTimeScale;
         pauseIcon.SetActive(false);
         hasPaused = false;
     }
@@ -193,16 +261,6 @@ public class Timer : MonoBehaviour
     {
         oneSecondInGame = value;
     }
-
-    public static int GetPassedMinutes(Date fromTime)
-    {
-        int toDD = Instance.DD;
-        int toHH = Instance.HH;
-        int toMM = Instance.MM;
-        int passedMinutes = (toDD - fromTime.dd) * 24 * 60 + (toHH - fromTime.hh) * 60 + (toMM - fromTime.mm);
-        return passedMinutes;
-    }
-
 
     void Awake()
     {

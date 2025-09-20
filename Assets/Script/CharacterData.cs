@@ -36,7 +36,7 @@ public class Action
     {
         isWaiting = true;
         Timer.Date beginTime = Timer.Time;
-        while (Timer.GetPassedMinutes(beginTime) < target.duration)
+        while (Timer.Time - beginTime < target.duration)
         {
             yield return null;
         }
@@ -289,7 +289,7 @@ public class AffinityEffect : Skill
 
     new public void Apply(Character target)
     {
-        Debug.Log("Apply");
+        //Debug.Log("Apply");
         isActive = true;
         base.Apply(target);
     }
@@ -401,9 +401,9 @@ public class Need
                 yield return _waitForSeconds1;
                 continue;
             }
-            if (Timer.GetPassedMinutes(beginTime) >= 10)
+            if (Timer.Time - beginTime >= 10)
                 {
-                    int n = Timer.GetPassedMinutes(beginTime) / 10; //有可能过去了n个10游戏分钟
+                    int n = (Timer.Time - beginTime) / 10; //有可能过去了n个10游戏分钟
                     TryMotifyValue(-decay * n);
                     beginTime = Timer.Time;
                 }

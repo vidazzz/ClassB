@@ -52,7 +52,7 @@ public class Group : MonoBehaviour
                 needName = device.gain.needName,
                 targetValue = 5,//属性振幅目标
                 interactables = new List<Interactable> { device },
-                deadLine = Timer.Time + 60 // 默认截止时间1小时之后
+                duration = 60 // 默认截止时间1小时
             };
             activeTasks.Add(newTask);
         }
@@ -86,14 +86,18 @@ public class Group : MonoBehaviour
 
     public bool TryPostTask(TaskManager.TaskData taskData)
     {
-        if (activeTask.taskName != "")
+        if (activeTask != null)
         {
-            Debug.Log($"Group {groupName} already has an active task: {activeTask.taskName}");
-            return false;
+            if (activeTask.taskName != "")
+            {
+                Debug.Log($"Group {groupName} already has an active task: {activeTask.taskName}");
+                return false;
+            }        
         }
         activeTask = taskData;
         NotifyMembers();
         StartCoroutine(ClearActiveTaskWhenExpire());
+        Debug.Log($"Group {groupName} posted a new task: {taskData.taskName}");
         Debug.Log($"Group {groupName} posted a new task: {activeTask.taskName}");
         return true;
     }
@@ -107,8 +111,9 @@ public class Group : MonoBehaviour
     }
     public IEnumerator ClearActiveTaskWhenExpire()
     {
-
-        while (Timer.GetPassedMinutes(Timer.Time) < activeTask.deadLine.dd * 24 * 60 + activeTask.deadLine.hh * 60 + activeTask.deadLine.mm) //截止时间未到
+        Timer.Date beginTime = Timer.Time;
+        Timer.Date deadLine = beginTime + activeTask.duration;
+        while (Timer.Time < deadLine) //截止时间未到
         {
             yield return null;
         }
