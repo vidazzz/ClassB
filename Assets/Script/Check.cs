@@ -10,20 +10,25 @@ using UnityEngine;
 public class Check
 {
     List<CheckItem> checkItems;
+    public Interactable Owner;
+    public Character challenger;
     int maxValue;
     int currentValue;
     int deltaValue;
     Timer.Date deadLine;
     int maxTime;
-    int oneCheckTime;
+    int duration;
     public class CheckItem
     {
         public int result;
         public string description;
-        public Interactable Owner;
-        public Character challenger;
-        public Type type;
+
         public object checkObj;
+
+        public CheckItem(string itemName)
+        {
+
+        }
 
         public void Process()
         {
@@ -63,7 +68,7 @@ public class Check
         UpdateDeltaValue();
         currentValue += deltaValue;
         Timer.Date beginTime = Timer.Time;
-        while (Timer.Time < beginTime + oneCheckTime)
+        while (Timer.Time < beginTime + duration)
         {
             yield return new WaitForSeconds(0.5f);
         }

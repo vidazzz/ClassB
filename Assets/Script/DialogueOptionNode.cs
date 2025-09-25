@@ -71,6 +71,9 @@ public class DialogueOptionNode : Node
 				case EffectType.CheckItem:
 					yield return EffectCheckItem(args);
 					break;
+				case EffectType.Check:
+					yield return EffectCheck(args, dialogueController.character);
+					break;
 				case EffectType.RollBack:
 					RollbackRequiredKPI();
 					break;
@@ -108,6 +111,10 @@ public class DialogueOptionNode : Node
 		Hero.Instance.DisplayStatsValue();
 	}
 	public IEnumerator EffectCheckItem(List<string> strings)
+	{
+		yield return null;
+	}
+	public IEnumerator EffectCheck(List<string> strings,Character character)
 	{
 		yield return null;
 	}
