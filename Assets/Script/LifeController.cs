@@ -14,6 +14,7 @@ public class LifeController : MonoBehaviour
     private List<Stat> stats = new();
     [SerializeField]
     private List<Need> needs = new();
+    private int expToNextLevel = 100;
     private Character character;
     private bool waitForSettleAccountsAffterWork = false;
 
@@ -48,7 +49,7 @@ public class LifeController : MonoBehaviour
         Stat stat = stats.Find(a => a.name == statsName);
         if (stat == null)
         {
-            Debug.LogError($"Stat {statsName} not found!");
+            Debug.LogError($"{character.gameObject.name} Stat {statsName} not found!");
             return null;
         }
         return stat;
@@ -129,6 +130,31 @@ public class LifeController : MonoBehaviour
         Hero.Instance.DisplayStatsValue();
         EventManager.Instance.MutifyStats();
     }
+
+    public void GainExp(float exp)
+    {
+        AddModifier("exp", exp);
+        CheckLevelUp();
+    }
+    
+    // 检查是否升级
+    private void CheckLevelUp()
+    {
+        // 若当前经验超过下一级所需，触发升级
+        if (GetStat("exp").value >= expToNextLevel)
+        {
+            AddModifier("level", 1);
+            SetStatValue("exp", 0);
+            AddModifier("point", 1);
+            EventManager.Instance.LevelUp(); // 触发升级事件
+        }
+    }
+
+    public void UsePoint(Character.TalentData talentData)
+    {
+        talentData.value++;
+        AddModifier("point", -1);
+    }
     
     public void SalarySettleAccounts()
     {
@@ -137,7 +163,7 @@ public class LifeController : MonoBehaviour
             bonus = GetStatValue("kpi") * 1f;
         float salary = GetStatValue("kpi") + bonus;
         AddModifier("money", salary);
-        SetStatValue("kpi",0); //清kpi
+        SetStatValue("kpi", 0); //清kpi
         if (character is Hero)
             PopUp.Instance.ShowPopUp($"Get Salary: {salary} (with {bonus} Bonus)");
         float newRequiredKPI = GetStatValue("kpi") + (float)Math.Ceiling(GetStatValue("requiredKPI") * Random.Range(0, 0.5f)); //计算新的KPI
@@ -229,6 +255,9 @@ public class LifeController : MonoBehaviour
     {
         stats = new()
         {
+            new("level",1),//等级
+            new("exp",0),//经验值
+            new("point",0),//技能点
             new("preesure",25), //压力值
             new("preesureResistance", 0), //压力抗性，概率不会产生压力
             new("money", 1000),

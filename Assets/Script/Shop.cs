@@ -7,7 +7,6 @@ using UnityEngine.UI;
 
 public class Shop : MonoBehaviour
 {
-    public Canvas canvas;
     public List<GoodsData> goodsList;
     public List<GoodsData> skillBooks;
     public List<GoodsData> FoodList;
@@ -44,14 +43,14 @@ public class Shop : MonoBehaviour
     }
     public void StartShopping()
     {
-        canvas.gameObject.SetActive(true);
+        gameObject.SetActive(true);
     }
 
     public void EndShopping()
     {
         SetEssentialIndex();
         EssentialCheckOut();
-        canvas.gameObject.SetActive(false);
+        gameObject.SetActive(false);
     }
 
     void EssentialCheckOut()

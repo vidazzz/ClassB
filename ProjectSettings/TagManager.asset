@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 2
   tags:
   - hero
+  - DropZone
   layers:
   - Default
   - TransparentFX

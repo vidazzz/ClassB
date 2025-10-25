@@ -4,12 +4,16 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
+[RequireComponent(typeof(WorkManager))]
+[RequireComponent(typeof(DialogueController))]
 public class Character : Interactable
 {
     [SerializeField] protected float fSpeed;
     [HideInInspector] public LifeController lifeController;
     [HideInInspector] public DialogueController dialogueController;
-    protected TaskManager taskManager;
+
+    [HideInInspector]
+    public WorkManager workManager;
     [HideInInspector] public Vector3 spawnPosition;
     public Sprite profilePic;
     public float conversationAffinityThreshold;
@@ -21,6 +25,7 @@ public class Character : Interactable
         public int talentIndex;
         public int value;
     }
+    public List<TalentSkill> talentSkills = new();
     public Action action;
     public List<Action> actions;
     public List<HobbyData> hobbyDataList;
@@ -28,6 +33,7 @@ public class Character : Interactable
     [Serializable]
     public struct HobbyData
     {
+        public Hobby hobby;
         public int hobbyIndex;
         public float passion;
     }
@@ -38,10 +44,11 @@ public class Character : Interactable
     public bool IsMoving;
     protected Animator popUpAnimator;
     public Conversation conversation;
-    private Rader rader;
+
     [SerializeField]
     protected Hobby topicHobby;
-    public List<Group> groups;
+    public List<Group> hoppyGroups;
+    public List<Company.Group> jobGroups;
 
     public override IEnumerator Interact(Character interactor)
     {
@@ -62,10 +69,19 @@ public class Character : Interactable
         animator.SetFloat("Y",Mathf.RoundToInt(direction.y));
     }
     
-    public TalentData GetTalent(string skillName)
+    public object GetTalent(string talentName)
     {
-        TalentData talentData = talentDataList.Find(a => a.talent.TalentName == skillName);
-        return talentData;
+        TalentData talentData = talentDataList.Find(a => a.talent.TalentName == talentName);
+        if (talentData.talent == null)
+        {
+            Debug.LogError($"{gameObject} Talent {talentName} not find!");
+            return null;
+        }
+        else
+        {
+            Debug.Log($"{talentData.talent.TalentName} is found");
+            return talentData;
+        }      
     }
 
     //学习技能
@@ -131,16 +147,6 @@ public class Character : Interactable
         }
     }
 
-    public void OpenRadder()
-    {
-        rader.enabled = true;
-    }
-
-    public void CloseRadder()
-    {
-        rader.enabled = false;
-    }
-
     public void CreatConversation()
     {
         if (topicHobby.hobbyName == "")
@@ -151,19 +157,6 @@ public class Character : Interactable
         conversation = new(topicHobby, this);
     }
 
-    public bool FindConversation()
-    {
-        bool result = false;
-        foreach (Character target in rader.characters)
-        {
-            if (TryJoinConversation(target))
-            {
-                result = true;
-                break;
-            }
-        }
-        return result;
-    }
 
     public bool TryJoinConversation(Character target)
     {
@@ -185,22 +178,6 @@ public class Character : Interactable
         conversation = null;
     }
 
-
-    public bool HaveBecomeHost()
-    {
-        Character winer = this;
-        int maxTalent = rader.characters[0].talentDataList[0].value;
-        foreach (Character character in rader.characters)
-        {
-            if (character.talentDataList[0].value > maxTalent)
-            {
-                maxTalent = character.talentDataList[0].value;
-                winer = character;
-            }
-        }
-        return winer == this;
-    }
-
     private void TalentDataInitialize()
     {
         for(int i = 0; i < talentDataList.Count; i++)
@@ -208,6 +185,26 @@ public class Character : Interactable
             var talentData = talentDataList[i];
             talentData.talent = DataSetting.Instance.talents[talentData.talentIndex];
             talentDataList[i] = talentData;
+        }
+    }
+    private void TalentSkillInitalize()
+    {
+        int[] cost = { 1, 1 };
+        talentSkills = new()
+        {
+            new("TalentSkill1","AddDice",talentDataList[0].talent,1,cost),
+            new("TalentSkill2","AddPoint",talentDataList[1].talent,2,cost),
+            new("TalentSkill3","ReduceTime",talentDataList[2].talent,3,cost),
+
+        };
+    }
+    private void HobbyDataInitialize()
+    {
+        for (int i = 0; i < hobbyDataList.Count; i++)
+        {
+            var hobbyData = hobbyDataList[i];
+            hobbyData.hobby = DataSetting.Hobbies[hobbyData.hobbyIndex];
+            hobbyDataList[i] = hobbyData;
         }
     }
     protected void InitializePriorityHobby()
@@ -222,9 +219,19 @@ public class Character : Interactable
                     {
                         action.priorityHobby += hobbyData.passion * 0.1f;
                     }
-                }            
+                }
             }
         }
+    }
+
+    public object GetHobbyData(string hobbyName)
+    {
+        HobbyData result;
+        result = hobbyDataList.Find(a => a.hobby.hobbyName == hobbyName);
+        if (result.hobby == null)
+            return null;
+        else
+            return result;
     }
     protected void InitializePriorityJob()
     {
@@ -263,13 +270,14 @@ public class Character : Interactable
         Debug.Assert(lifeController != null, "lifecontruller 不可为空");
         dialogueController = GetComponent<DialogueController>();
         Debug.Assert(dialogueController != null, "dialogueController 不可为空");
-        taskManager = GetComponent<TaskManager>();
-        Debug.Assert(taskManager != null, "taskManager 不可为空");
-        rader = GetComponentInChildren<Rader>(true);
-        Debug.Assert(rader != null, "rader 不可为空");
+        workManager = GetComponent<WorkManager>();
+        Debug.Assert(workManager != null, "workManager 不可为空");
         popUpAnimator = transform.Find("Character_PopUp").GetComponent<Animator>();
         Debug.Assert(popUpAnimator != null, "popUpAnimator 不可为空");
         TalentDataInitialize();
+        TalentSkillInitalize();
+        HobbyDataInitialize();
+        
         spawnPosition = transform.position;
         buffs = new();
         skills = new();

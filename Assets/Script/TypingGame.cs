@@ -64,8 +64,8 @@ public class TypingGame : MonoBehaviour
     }
     void OnDisable()
     {
-        EventManager.Instance.OnOffWork -= EndGame;//订阅广播,以后结算时自动关闭打字界面
-        EventManager.Instance.OnDayEnd -= EndGame; //订阅广播,以后结算时自动关闭打字界面
+        //EventManager.Instance.OnOffWork -= EndGame;//订阅广播,以后结算时自动关闭打字界面
+        //EventManager.Instance.OnDayEnd -= EndGame; //订阅广播,以后结算时自动关闭打字界面
         EventManager.Instance.OnOffWork2 -= Hero.Instance.lifeController.TrySalarySettleAccounts;
         EventManager.Instance.OnDayEnd -= Hero.Instance.lifeController.TrySalarySettleAccountsAffterWork;
     }

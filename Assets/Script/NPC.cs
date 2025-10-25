@@ -5,10 +5,13 @@ using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 
+[RequireComponent(typeof(TaskManager))]
 public class NPC : Character
 {
     [SerializeField] private AStar astar;
-    public List<List<Action>> Schedule;//
+    public List<List<Action>> Schedule;
+    protected TaskManager taskManager;
+    private Rader rader;
     NPC interlocutor;
     public bool isMeeting;
 
@@ -226,7 +229,7 @@ public class NPC : Character
     }
     private void PostGroupTask(Device device)
     {
-        foreach (Group group in groups)
+        foreach (Group group in hoppyGroups)
         {
             if (group.hobby.devices.Contains(device))
             {
@@ -247,9 +250,9 @@ public class NPC : Character
     //检查是否有任务需要接受
     public void CheckTask()
     {
-        if (groups.Count == 0)
+        if (hoppyGroups.Count == 0)
             return;
-        foreach (Group group in groups)
+        foreach (Group group in hoppyGroups)
         {
             if (group.activeTask != null)
                 if (group.activeTask.taskName != "")
@@ -280,6 +283,29 @@ public class NPC : Character
             }
         }
     }
+    public void OpenRadder()
+    {
+        rader.enabled = true;
+    }
+
+    public void CloseRadder()
+    {
+        rader.enabled = false;
+    }
+
+    public bool FindConversation()
+    {
+        bool result = false;
+        foreach (Character target in rader.characters)
+        {
+            if (TryJoinConversation(target))
+            {
+                result = true;
+                break;
+            }
+        }
+        return result;
+    }
 
     void OnEnable()
     {
@@ -289,6 +315,10 @@ public class NPC : Character
     new void Awake()
     {
         base.Awake();
+        rader = GetComponentInChildren<Rader>(true);
+        Debug.Assert(rader != null, "rader 不可为空");
+        taskManager = GetComponent<TaskManager>();
+        Debug.Assert(taskManager != null, "taskManager 不可为空");
     }
 
     new void Start()

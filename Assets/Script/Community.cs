@@ -139,7 +139,7 @@ public class Community : MonoBehaviour
             //剔除已经有group的角色
             for (int i = 0; i < characters.Count; i++)
             {
-                if (characters[i].groups.Count == 0)
+                if (characters[i].hoppyGroups.Count == 0)
                     characterIndexList.Add(i);
             }
             if (characterIndexList.Count == 0)
@@ -214,7 +214,7 @@ public class Community : MonoBehaviour
 
         foreach (Character menber in menbers)
         {
-            menber.groups.Add(group);
+            menber.hoppyGroups.Add(group);
         }
 
         return group;

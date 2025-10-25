@@ -34,6 +34,8 @@ public class EventManager : MonoBehaviour
 
     public event System.Action OnMutifyNeeds;
 
+    public event System.Action OnLevelUp;
+
     public void TheVaryBegining()
     {
         OnTheVaryBegining?.Invoke();
@@ -92,6 +94,10 @@ public class EventManager : MonoBehaviour
     public void MutifyNeeds()
     {
         OnMutifyNeeds?.Invoke();
+    }
+    public void LevelUp()
+    {
+        OnLevelUp?.Invoke();
     }
 
     // Start is called before the first frame update

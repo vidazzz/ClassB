@@ -119,7 +119,7 @@ GameObject:
   - component: {fileID: 9009702953087932856}
   - component: {fileID: 6356345961205728028}
   m_Layer: 5
-  m_Name: Canvas
+  m_Name: NPC_Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -564,6 +564,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   users: []
+  userLimit: 0
   cost:
     needName: 
     value: 0
@@ -575,23 +576,47 @@ MonoBehaviour:
   interactPoint: []
   interactionPrompt: "\u4E92\u52A8"
   interactionKey: 101
-  fSpeed: 10
+  fSpeed: 3
   lifeController: {fileID: 0}
   dialogueController: {fileID: 42871176506680659}
   spawnPosition: {x: 0, y: 0, z: 0}
   profilePic: {fileID: 21300000, guid: 4616d024e32e8814cb775ea678f0b67d, type: 3}
   conversationAffinityThreshold: 0
-  talentDataList: []
+  talentDataList:
+  - talent:
+      TalentName: 
+      id: 0
+      type: 0
+    talentIndex: 0
+    value: 10
+  - talent:
+      TalentName: 
+      id: 0
+      type: 0
+    talentIndex: 1
+    value: 10
+  - talent:
+      TalentName: 
+      id: 0
+      type: 0
+    talentIndex: 2
+    value: 10
   action:
     type: 0
     target: {fileID: 0}
+    isWaiting: 0
     priorityJob: 0
     priorityHobby: 0
     priorityStat: 0
     priorityTask: 0
   actions: []
   hobbyDataList:
-  - hobbyIndex: 1
+  - hobby:
+      hobbyName: 
+      id: 0
+      talents: []
+      devices: []
+    hobbyIndex: 1
     passion: 5
   affinityEffectArgsList:
   - name: GoodJob

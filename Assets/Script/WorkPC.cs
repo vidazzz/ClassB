@@ -1,22 +1,23 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Data.Common;
 using UnityEngine;
 
 [RequireComponent(typeof(TypingGame))]
 public class WorkPC : Device
 {
-    
-    TypingGame typingGame;
     public override IEnumerator Interact(Character interactor)
     {
         if (interactor is Hero)
         {
             Hero.Instance.canActive = false;
-            yield return StartCoroutine(typingGame.StartTyping());
+            //yield return StartCoroutine();
             Hero.Instance.canActive = true;
         }
-        else
+        else if(interactor is NPC)
         {
+            NPC npc = interactor as NPC;
+            yield return StartCoroutine(npc.workManager.Process(npc.workEfficiency, (int)duration));
             if (gain.needName != "")
                 interactor.lifeController.GetNeed(gain.needName).TryMotifyValue(gain.value);
             if(cost.needName != "")
@@ -29,7 +30,6 @@ public class WorkPC : Device
     // Start is called before the first frame update
     void Start()
     {
-        typingGame = GetComponent<TypingGame>();
         
     }
 

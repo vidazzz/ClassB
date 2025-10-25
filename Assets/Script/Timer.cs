@@ -22,7 +22,7 @@ public class Timer : MonoBehaviour
         }
     }
     private static int oneSecondInGame = 5;
-    static private float originTimeScale;
+    static public float originTimeScale;
     static private int dd;
     static private int hh;
     static private float mm;
@@ -32,7 +32,7 @@ public class Timer : MonoBehaviour
         public int dd;
         public int hh;
         public int mm;
-        public Date(int dd, int hh, int mm)
+        public Date(int dd, int hh = 0, int mm = 0)
         {
             this.dd = dd;
             this.hh = hh;
@@ -120,8 +120,8 @@ public class Timer : MonoBehaviour
     {
         get { return new Date(dd, hh, (int)mm); }
     }
-    private static int deltaTime; //游戏中计时器timer的每帧时间，单位是游戏中的分
-    public static int DeltaTime{
+    private static float deltaTime; //游戏中计时器timer的每帧时间，单位是游戏中的秒
+    public static float DeltaTime{
         get {return deltaTime;}
     }
     public bool isOffWork = false;
@@ -150,7 +150,8 @@ public class Timer : MonoBehaviour
             deltaTime = 0;
             while (hasPaused)
                 yield return null;
-            ss += UnityEngine.Time.deltaTime * oneSecondInGame * Hero.Instance.lifeController.GetStatValue("timeMultiplier");
+            deltaTime = UnityEngine.Time.deltaTime * oneSecondInGame;
+            ss += deltaTime;
             
             EventManager.Instance.NextFrame(); //下一帧
             if (!CoroutineQueueManager.nextFrameCoroutineQueue.IsQueueEmpty)
@@ -230,13 +231,16 @@ public class Timer : MonoBehaviour
         displayText.text = $"DAY{dd}\t{string.Format("{0:00}:{1:00}:{2:00}", hhr, (int)mm, (int)ss)}";
     }
 
-    public static void Pause()
+    public static void Pause(float newTimeScale = 0)
     {
         if (hasPaused)
             return;
         Debug.Log("Pause");
         //deltaTime = 0;
-        originTimeScale = UnityEngine.Time.timeScale;
+        if (newTimeScale > 0)
+            originTimeScale = newTimeScale;
+        else
+            originTimeScale = UnityEngine.Time.timeScale;
         UnityEngine.Time.timeScale = 0;
         pauseIcon.SetActive(true);
         hasPaused = true;

@@ -114,9 +114,15 @@ public class DialogueOptionNode : Node
 	{
 		yield return null;
 	}
-	public IEnumerator EffectCheck(List<string> strings,Character character)
+	public IEnumerator EffectCheck(List<string> args,Character owner)
 	{
-		yield return null;
+		Check check = new(args, owner,Hero.Instance);
+		CheckPanel.instance.Initialize(check);
+		CheckPanel.ToggleUI();
+		while (CheckPanel.instance.gameObject.activeSelf)
+		{
+			yield return null;
+		}
 	}
 	public IEnumerator EffectOffWork()
 	{

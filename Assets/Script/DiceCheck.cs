@@ -24,7 +24,7 @@ public class DiceCheck : MonoBehaviour
     
     public string PredictionString(string checkingName ,int checkingValue ,Character character)
     {
-        Character.TalentData talentData = character.GetTalent(checkingName);
+        Character.TalentData talentData = (Character.TalentData)character.GetTalent(checkingName);
         float possibility;
         Color color;
         possibility = (float)talentData.value/(talentData.value + checkingValue);
@@ -43,7 +43,7 @@ public class DiceCheck : MonoBehaviour
     }
     public bool CheckTalent(string checkingTalentName,int checkingSkillLevel,Character character)
     {
-        Character.TalentData heroTalentData = character.GetTalent(checkingTalentName);
+        Character.TalentData heroTalentData = (Character.TalentData)character.GetTalent(checkingTalentName);
         bool result;
         int dice = UnityEngine.Random.Range(0,heroTalentData.value + checkingSkillLevel);
         result = dice < heroTalentData.value;   
