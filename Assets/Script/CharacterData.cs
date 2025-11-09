@@ -25,12 +25,27 @@ public class Action
 {
     public ActionType type;
     public Interactable target;
+    public Character owner;
     public bool isWaiting;
-    public float priorityJob;
+    public float priorityWork;
     public float priorityHobby;
     public float priorityStat;
     public float priorityTask;
-    public float Priority { get { return priorityJob + priorityHobby + priorityStat + priorityTask; } }
+    public float Priority { get { return priorityWork + priorityHobby + priorityStat + priorityTask; } }
+
+    public Action(ActionType type, Interactable target, Character owner)
+    {
+        this.type = type;
+        this.target = target;
+        this.owner = owner;
+        isWaiting = false;
+        priorityWork = 0;
+        priorityHobby = 0;
+        priorityStat = 0;
+        priorityTask = 0;
+        UpdatePriorityWork();
+        InitializePriorityHobby();
+    }
 
     public IEnumerator Waiting()
     {
@@ -42,6 +57,52 @@ public class Action
         }
         isWaiting = false;
     }
+
+    public void UpdatePriorityWork()
+    {
+        if (target is not WorkPC)
+            return;
+        Company.Project.Task task = owner.workManager.CurrentTask;
+        if (task != null)
+        {
+            // 根据任务进度和截止时间计算优先级
+            if( Timer.Time >= task.deadLine)
+                priorityWork = 999; // 任务已过截止时间，优先级最高
+            else
+                priorityWork = (task.maxProgress - task.currentProgress) / (task.deadLine - Timer.Time);
+        }
+        else
+        {
+            priorityWork = 0;
+        }
+    }
+
+    public void InitializePriorityHobby()
+    {
+        foreach (Character.HobbyData hobbyData in owner.hobbyDataList)
+        {
+            if (target is Device)
+            {
+                if ((target as Device).hobby == DataSetting.Hobbies[hobbyData.hobbyIndex])
+                {
+                    priorityHobby += hobbyData.passion * 0.1f;
+                }
+            }
+        }
+    }
+
+    public void UpdatePriorityNeed(Need need)
+    {
+        //Debug.Log($"Updating action priority for {target} based on stat {need.name}");
+        Need.PriorityNeed PN = need.priorityNeedList.Find(a => a.action == this);
+        if (PN != null)
+            priorityStat = PN.Priority;
+    }
+    public void UpdatePriorityNeed(Need.PriorityNeed priorityNeed)
+    {
+        priorityStat = priorityNeed.Priority;
+    }
+
 }
 
 [Serializable]
@@ -342,6 +403,25 @@ public class Stat
             return State.high;
     }
 
+    public static Stat operator +(Stat a, float b)
+    {
+        a.value += b;
+        return a;
+    }
+
+    public static Stat operator -(Stat a, float b)
+    {
+        a.value -= b;
+        return a;
+    }
+
+    public static Stat operator *(Stat a, float b)
+    {
+        a.value *= b;
+        return a;
+    }
+
+
     [Serializable]
     public enum State
     {
@@ -375,11 +455,16 @@ public class Need
         this.expectation = expectation;
         if (character is NPC)
         {
-            priorityNeedList = SetUpActionPriorities((character as NPC).actions);
+            foreach (Action action in character.actions)
+            {
+                PriorityNeed priorityNeed = new(action, this);
+                priorityNeedList.Add(priorityNeed);
+                action.UpdatePriorityNeed(priorityNeed); //初始化需求优先级
+            }
         }
         owner.StartCoroutine(ProcessDecay());
     }
-    
+
     public State GetNeedState()
     {
         if (value < expectation * 0.3f)
@@ -402,84 +487,53 @@ public class Need
                 continue;
             }
             if (Timer.Time - beginTime >= 10)
-                {
-                    int n = (Timer.Time - beginTime) / 10; //有可能过去了n个10游戏分钟
-                    TryMotifyValue(-decay * n);
-                    beginTime = Timer.Time;
-                }
+            {
+                int n = (Timer.Time - beginTime) / 10; //有可能过去了n个10游戏分钟
+                MotifyValue(-decay * n);
+                beginTime = Timer.Time;
+            }
             yield return _waitForSeconds1;
         }
     }
 
-    public List<PriorityNeed> SetUpActionPriorities(List<Action> actions)
+    public void MotifyValue(float motifier, StatModifierBuff.ModifierType modifierType = StatModifierBuff.ModifierType.Add)
     {
-        List<PriorityNeed> actionPriorities = new();
-        foreach (Action action in actions)
-        {
-            //Debug.Log("stateName:" + name + " target.name:" + action.target.name + " gain:" + action.target.gain.needName + " cost:" + action.target.cost.needName);
-            if (action.target.gain.needName == name) // 只考虑与该需求相关的行为
-            {
-                PriorityNeed actionPriority = new()
-                {
-                    action = action,
-                    need = this,
-                    VFM = action.target.cost.value < 1 ? action.target.gain.value - action.target.cost.value : action.target.gain.value / action.target.cost.value,
-                    efficiency = action.target.gain.value / action.target.duration
-                };
-                actionPriorities.Add(actionPriority);
-            }
-            else if (action.target.cost.needName == name)
-            {
-                PriorityNeed actionPriority = new()
-                {
-                    action = action,
-                    need = this,
-                    VFM = action.target.gain.value < 1 ? - action.target.cost.value + action.target.gain.value : - action.target.cost.value / action.target.gain.value,
-                    efficiency = -action.target.cost.value / action.target.duration
-                };
-                actionPriorities.Add(actionPriority);
-            }
-        }
-        if (actionPriorities.Count == 0)
-            Debug.LogWarning($"{name}需求没有相关行为");
-        return actionPriorities;
-    }
-
-    public bool TryMotifyValue(float motifier, StatModifierBuff.ModifierType modifierType = StatModifierBuff.ModifierType.Add)
-    {
+        State originStatState = NeedState;
         switch (modifierType)
         {
             case StatModifierBuff.ModifierType.Add:
-                return AddModifier(motifier);
+                AddModifier(motifier);
+                break;
             case StatModifierBuff.ModifierType.Multiply:
                 MultiplyModifier(motifier);
-                return true;
+                break;
             default:
-                return AddModifier(motifier);
+                AddModifier(motifier);
+                break;
         }
-    }
-    public bool AddModifier(float modifier)
-    {
-        float newValue = value + modifier;
-        State originStatState = NeedState;
-        if (newValue >= 0)
+        //状态变化时更新行动优先级
+        if (originStatState != NeedState)
         {
-            value = newValue;
-            if (originStatState != NeedState)
+            foreach (Action action in owner.actions)
             {
-                owner.lifeController.UpdatePriorityNeed(); //状态变化时更新行动优先级
-            }
-        }
-        else
-        {
-            //PopUp.Instance.ShowPopUp($"{name} is not enough!");
-            return false; //如果不足则不修改
+                action.UpdatePriorityNeed(this);
+            }   
         }
         EventManager.Instance.MutifyNeeds();
-        owner.lifeController.UpdatePriorityNeed();
-        return true;
     }
-
+    public void AddModifier(float modifier)
+    {
+        float newValue = value + modifier;
+        if (newValue >= 0)
+            value = newValue;
+        else
+            value = 0;
+    }
+    public static Need operator +(Need a, float b)
+    {
+        a.MotifyValue(b);
+        return a;
+    }
     public void MultiplyModifier(float modifier)
     {
         float newValue = value * modifier;
@@ -487,8 +541,6 @@ public class Need
         {
             value = newValue;
         }
-        EventManager.Instance.MutifyNeeds();
-        owner.lifeController.UpdatePriorityNeed();
     }
 
     [Serializable]
@@ -512,6 +564,25 @@ public class Need
                 };
             }
         }
+
+        public PriorityNeed(Action action, Need need)
+        {
+            this.action = action;
+            this.need = need;
+            //Debug.Log("stateName:" + name + " target.name:" + action.target.name + " gain:" + action.target.gain.needName + " cost:" + action.target.cost.needName);
+            if (action.target.gain.needName == need.name) // 只考虑与该需求相关的行为
+            {
+                
+                VFM = action.target.cost.value < 1 ? action.target.gain.value - action.target.cost.value : action.target.gain.value / action.target.cost.value;
+                efficiency = action.target.gain.value / action.target.duration;
+            }
+            else if (action.target.cost.needName == need.name)
+            {
+                VFM = action.target.gain.value < 1 ? -action.target.cost.value + action.target.gain.value : -action.target.cost.value / action.target.gain.value;
+                efficiency = -action.target.cost.value / action.target.duration;
+                
+            }
+        }
     }
 
     [Serializable]
@@ -522,6 +593,90 @@ public class Need
         warning,
         normal,
     }
-
 }
 
+public class Operation
+{
+    public Character owner;
+    public List<string> checkItems = new();
+    public List<Character.Value> outputs = new(); 
+    public bool isCompleted;
+    public float maxProgress;
+    public float currentProgress;
+    public float Progress { get { return currentProgress / maxProgress; } }
+    public float efficiency;
+    public Operation(Character owner, List<string> checkItems, List<Character.Value> outputs, float maxProgress)
+    {
+        this.owner = owner;
+        this.checkItems = checkItems;
+        this.outputs = outputs;
+        this.maxProgress = maxProgress;
+        currentProgress = 0;
+    }
+    public Operation()
+    {
+    }
+    public void CaculateEfficiency()
+    {
+        efficiency = 0;
+        foreach (string input in checkItems)
+        {
+            efficiency += owner.TryFindValue(input);
+        }
+    }
+    public IEnumerator ProcessHero()
+    {
+        CaculateEfficiency();
+        float originTimeScale = Time.timeScale;
+        Time.timeScale *= 20;//加速
+
+        Timer.Date beginTime = Timer.Time;
+        while (Input.GetKey(KeyCode.E)) //持续操作
+        {
+            yield return null;
+            if (Timer.Time - beginTime >= 1)
+            {           
+                currentProgress += efficiency;
+                beginTime = Timer.Time;
+                if (currentProgress >= maxProgress)
+                {
+                    currentProgress = maxProgress;
+                    yield return null;
+                    Completed();
+                    break;
+                }
+            }
+        }
+        Time.timeScale = originTimeScale;//恢复时间流逝速度
+    }
+    public IEnumerator ProcessNPC()
+    {
+        CaculateEfficiency();
+        Timer.Date beginTime = Timer.Time;
+        while (Timer.Time - beginTime <= 10) //持续操作10游戏分钟
+        {
+            yield return null;
+            if (Timer.Time - beginTime >= 1)
+            {
+                Debug.Log(efficiency);
+                currentProgress += efficiency;
+                beginTime = Timer.Time;
+                if (currentProgress >= maxProgress)
+                {
+                    currentProgress = maxProgress;
+                    yield return null;
+                    Completed();
+                    break;
+                }
+            }
+        }
+    }
+    protected void Completed()
+    {
+        isCompleted = true;
+        foreach (Character.Value output in outputs)
+        {
+            owner.MotifyValue(output);
+        }
+    }
+}

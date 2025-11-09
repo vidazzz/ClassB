@@ -176,6 +176,11 @@ public class NPC : Character
 
     Action ChooseAction()
     {
+        foreach(Action action in actions)
+        {
+            Debug.Log($"{name}'s action:{action.target.name} : {action.Priority}");
+        };
+        
         Action maxPriorityAction = actions //.OrderByDescending(a => a.Priority).FirstOrDefault();
                                     .Where(a => !a.isWaiting)
                                     .OrderByDescending(a => a.Priority)
@@ -237,7 +242,7 @@ public class NPC : Character
                 {
                     taskName = $"{group.groupName}圈 {Timer.Time.dd}/{Timer.Time.hh}/{Timer.Time.mm} 冲{device.name}活动",
                     needName = device.gain.needName,
-                    targetValue = 50,//属性振幅目标
+                    targetValue = 50,//属性数值目标
                     interactables = new List<Interactable> { device },
                     duration = 60 // 默认60分钟
                 }, group, this);

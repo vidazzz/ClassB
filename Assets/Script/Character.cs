@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 
 [RequireComponent(typeof(WorkManager))]
@@ -49,6 +50,14 @@ public class Character : Interactable
     protected Hobby topicHobby;
     public List<Group> hoppyGroups;
     public List<Company.Group> jobGroups;
+    //数值
+    [Serializable]
+    public struct Value
+    {
+        public string valueName;
+        public float value;
+ 
+    }
 
     public override IEnumerator Interact(Character interactor)
     {
@@ -68,20 +77,46 @@ public class Character : Interactable
         animator.SetFloat("X",Mathf.RoundToInt(direction.x));
         animator.SetFloat("Y",Mathf.RoundToInt(direction.y));
     }
-    
+
     public object GetTalent(string talentName)
     {
         TalentData talentData = talentDataList.Find(a => a.talent.TalentName == talentName);
         if (talentData.talent == null)
         {
-            Debug.LogError($"{gameObject} Talent {talentName} not find!");
+            Debug.LogWarning($"{gameObject} Talent {talentName} not find!");
             return null;
         }
         else
         {
-            Debug.Log($"{talentData.talent.TalentName} is found");
             return talentData;
-        }      
+        }
+    }
+    
+    //修改数值
+    public void MotifyValue(Value value)
+    {
+        object obj = TryGetValueObj(value.valueName);
+        switch (obj)
+        {
+            case Stat stat:
+                stat += value.value;
+                break;
+            case TalentData talentData:
+                talentData.value += (int)value.value;
+                break;
+            case HobbyData hobbyData:
+                hobbyData.passion += value.value;
+                break;
+            case Need need:
+                need.MotifyValue(value.value);
+                break;
+            case Company.Project.Task task:
+                task.currentProgress += value.value;
+                break;
+            default:
+                Debug.LogError("invalid checkObj type!");
+                break;
+        }
     }
 
     //学习技能
@@ -178,6 +213,57 @@ public class Character : Interactable
         conversation = null;
     }
 
+    //尝试根据给出的数值名从属性、天赋、爱好和好感度中查找数值
+    public int TryFindValue(string objName, Character other = null)
+    {
+        object obj = TryGetValueObj(objName);
+        float result = 0;
+        switch (obj)
+        {
+            case Stat stat:
+                result = stat.value;
+                break;
+            case TalentData talentData:
+                result = talentData.value;
+                break;
+            case HobbyData hobbyData:
+                result = hobbyData.passion;
+                break;
+            case Community.Affinity affinity:
+                result = affinity.GetAffinity(this, other);
+                break;
+            case Need need:
+                result = need.value;
+                break;
+            default:
+                Debug.LogError("invalid checkObj type!");
+                break;
+        }
+        return (int)result;
+    }
+    public object TryGetValueObj(string objName)
+    {
+        object obj;
+        obj = lifeController.GetStat(objName);
+        obj ??= GetTalent(objName);
+        obj ??= GetHobbyData(objName);
+        obj ??= lifeController.GetNeed(objName);
+        if(obj == null)
+        {
+            if(objName == "task")
+                obj = workManager.CurrentTask;
+        }
+        if (obj == null)
+        {
+            if (objName == "affinity")
+                obj = Community.affinity;
+        }
+        if (obj == null)
+            Debug.LogError("can't find checkObj!");
+        return obj;
+    }
+
+
     private void TalentDataInitialize()
     {
         for(int i = 0; i < talentDataList.Count; i++)
@@ -207,22 +293,6 @@ public class Character : Interactable
             hobbyDataList[i] = hobbyData;
         }
     }
-    protected void InitializePriorityHobby()
-    {
-        foreach (Action action in actions)
-        {
-            foreach (HobbyData hobbyData in hobbyDataList)
-            {
-                if (action.target is Device)
-                {
-                    if ((action.target as Device).hobby == DataSetting.Hobbies[hobbyData.hobbyIndex])
-                    {
-                        action.priorityHobby += hobbyData.passion * 0.1f;
-                    }
-                }
-            }
-        }
-    }
 
     public object GetHobbyData(string hobbyName)
     {
@@ -233,16 +303,7 @@ public class Character : Interactable
         else
             return result;
     }
-    protected void InitializePriorityJob()
-    {
-        foreach (Action action in actions)
-        {
-            if ((action.target as Device).isJob)
-            {
-                action.priorityJob += 3f;
-            }
-        }
-    }
+
     protected void InitializeActions()
     {
         foreach (Device device in DataSetting.Instance.devices)
@@ -250,15 +311,9 @@ public class Character : Interactable
             if (device.owner != null)
                 if (device.owner != this)
                     continue;
-            Action useAction = new()
-            {
-                type = ActionType.use,
-                target = device,
-            };
+            Action useAction = new(ActionType.use, device, this);
             actions.Add(useAction);
         }
-        InitializePriorityHobby();
-        InitializePriorityJob();
         lifeController.InitializeStats();
     }
 
@@ -278,15 +333,16 @@ public class Character : Interactable
         TalentSkillInitalize();
         HobbyDataInitialize();
         
+
+    }
+
+    protected void Start()
+    {
         spawnPosition = transform.position;
         buffs = new();
         skills = new();
         affinityEffects = new();
         InitializeActions();
-    }
-
-    protected void Start()
-    {
     }
 
 }

@@ -27,7 +27,7 @@ public class Timer : MonoBehaviour
     static private int hh;
     static private float mm;
     static private float ss;
-    public struct Date
+    public struct Date : IComparable<Date>
     {
         public int dd;
         public int hh;
@@ -114,6 +114,21 @@ public class Timer : MonoBehaviour
         public override readonly int GetHashCode()
         {
             return HashCode.Combine(dd, hh, mm);
+        }
+
+        public readonly int CompareTo(Date other)
+        {
+            int total = dd * 24 * 60 + hh * 60 + mm;
+            int otherTotal = other.dd * 24 * 60 + other.hh * 60 + other.mm;
+            if (total < otherTotal) return -1;
+            if (total > otherTotal) return 1;
+            return 0;
+        }
+
+        public readonly int ToMinutes()
+        {
+            //Debug.Log($"{dd} days, {hh} hours, {mm} minutes to total minutes");
+            return (int)Mathf.Ceil(dd * 24 * 60 + hh * 60 + mm);     
         }
     }
     public static Date Time

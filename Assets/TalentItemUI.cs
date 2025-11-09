@@ -13,13 +13,13 @@ public class TalentItemUI : MonoBehaviour
     {
         Hero.Instance.lifeController.UsePoint(talentData);
         DisplayTalent();
-        CheckRemainintPoint();
+        CheckRemainPoint();
     }
     public void DisplayTalent()
     {
         textMesh.text = $"{talentData.talent.TalentName} {talentData.value}";
     }
-    private void CheckRemainintPoint()
+    private void CheckRemainPoint()
     {
         if (Hero.Instance.lifeController.GetStat("point").value <= 0)
         {
@@ -34,6 +34,6 @@ public class TalentItemUI : MonoBehaviour
     {
         textMesh = GetComponentInChildren<TextMeshProUGUI>();
         button = GetComponentInChildren<Button>();
-        CheckRemainintPoint();
+        CheckRemainPoint();
     }
 }

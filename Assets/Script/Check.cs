@@ -5,7 +5,7 @@ using UnityEngine;
 public class Check
 {
     public List<CheckItem> checkItems = new();
-    public Interactable owner;
+    public Character owner;
     public Character challenger;
     public State state;
     public enum State
@@ -28,62 +28,20 @@ public class Check
         public string name;
         public int checkResult;
         public string description;
-        public Interactable owner;
+        public Character owner;
         public Character challenger;
         public object checkObj;
 
-        public CheckItem(string objName,Interactable owner, Character challenger)
+        public CheckItem(string objName,Character owner, Character challenger)
         {
             name = objName;
             this.owner = owner;
             this.challenger = challenger;
-            checkObj = FindCheckObj(objName);
-            Debug.Log($"FindCheckObj {checkObj}");
-            Process();
-        }
-
-        private object FindCheckObj(string objName)
-        {
-            object result;
-            result = challenger.lifeController.GetStat(objName);
-            result ??= challenger.GetTalent(objName);
-            result ??= challenger.GetHobbyData(objName);
-            if (result == null)
-            {
-                if (objName == "affinity")
-                    result = Community.affinity;
-            }
-            if (result == null)
-                Debug.LogError("can't find checkObj!");
-            return result;
-        }
-
-        public void Process()
-        {
-            float result = 0;
-            switch (checkObj)
-            {
-                case Stat stat:
-                    result = stat.value;
-                    break;
-                case Character.TalentData talentData:
-                    result = talentData.value;
-                    break;
-                case Character.HobbyData hobbyData:
-                    result = hobbyData.passion;
-                    break;
-                case Community.Affinity affinity:
-                    result = affinity.GetAffinity(owner as Character,challenger);
-                    break;
-                default:
-                    UnityEngine.Debug.LogError("invalid checkObj type!");
-                    break;
-            }
-            checkResult = (int)result;
+            checkResult = owner.TryFindValue(objName, challenger);
         }
     }
 
-    public Check(List<string> objNames, Interactable owner, Character challenger, int maxValue = 100, int maxTime = 0)
+    public Check(List<string> objNames, Character owner, Character challenger, int maxValue = 100, int maxTime = 0)
     {
         this.owner = owner;
         this.challenger = challenger;

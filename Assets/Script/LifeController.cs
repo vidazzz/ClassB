@@ -13,7 +13,7 @@ public class LifeController : MonoBehaviour
     [SerializeField]
     private List<Stat> stats = new();
     [SerializeField]
-    private List<Need> needs = new();
+    public List<Need> needs = new();
     private int expToNextLevel = 100;
     private Character character;
     private bool waitForSettleAccountsAffterWork = false;
@@ -26,7 +26,7 @@ public class LifeController : MonoBehaviour
         Stat stat = stats.Find(a => a.name == statsName);
         if (stat == null)
         {
-            Debug.LogError($"Character {character.name}'s Stat {statsName} not found!");
+            Debug.LogWarning($"Character {character.name}'s Stat {statsName} not found!");
             return 0;
         }
         return stat.value;
@@ -36,7 +36,7 @@ public class LifeController : MonoBehaviour
         Stat stat = stats.Find(a => a.name == statsName);
         if (stat == null)
         {
-            Debug.LogError($"Stat {statsName} not found!");
+            Debug.LogWarning($"Stat {statsName} not found!");
             return;
         }
         stat.value = value;
@@ -49,7 +49,7 @@ public class LifeController : MonoBehaviour
         Stat stat = stats.Find(a => a.name == statsName);
         if (stat == null)
         {
-            Debug.LogError($"{character.gameObject.name} Stat {statsName} not found!");
+            Debug.LogWarning($"{character.gameObject.name} Stat {statsName} not found!");
             return null;
         }
         return stat;
@@ -59,23 +59,23 @@ public class LifeController : MonoBehaviour
         Need need = needs.Find(a => a.name == needName);
         if (need == null)
         {
-            Debug.LogError($"Need {needName} not found!");
+            Debug.LogWarning($"Need {needName} not found!");
             return null;
         }
         return need;
     }
     
-    public bool TryMotifyStat(string statsName, float value, StatModifierBuff.ModifierType modifierType = StatModifierBuff.ModifierType.Add)
+    public bool TryMotifyStat(string statName, float value, StatModifierBuff.ModifierType modifierType = StatModifierBuff.ModifierType.Add)
     {
         switch (modifierType)
         {
             case StatModifierBuff.ModifierType.Add:
-                return AddModifier(statsName, value);
+                return AddModifier(statName, value);
             case StatModifierBuff.ModifierType.Multiply:
-                MultiplyModifier(statsName, value);
+                MultiplyModifier(statName, value);
                 return true;
             default:
-                return AddModifier(statsName, value);
+                return AddModifier(statName, value);
         }
     }
     public bool AddModifier(string statsName, float value)
@@ -230,27 +230,6 @@ public class LifeController : MonoBehaviour
         }
     }
 
-    public void UpdatePriorityNeed()
-    {
-        if (character is not NPC)
-            return;
-        NPC npc = character as NPC;
-        foreach (Action action in npc.actions)
-        {
-            action.priorityStat = 0;
-        }
-        foreach (Action action in npc.actions)
-        {
-            foreach (Need need in needs)
-            {
-                //Debug.Log($"Updating action priority for {action.target} based on stat {need.name}");
-                Need.PriorityNeed pn = need.priorityNeedList.Find(a => a.action == action);
-                if (pn != null)
-                    action.priorityStat += pn.Priority;
-            }
-        }
-    }
-
     public void InitializeStats()
     {
         stats = new()
@@ -278,7 +257,6 @@ public class LifeController : MonoBehaviour
             new(character, "Happiness", 100),//幸福感
             new(character, "Toilet", 100,2),
         };
-        UpdatePriorityNeed();//初始化priorityStat
     }
     
     void Awake()

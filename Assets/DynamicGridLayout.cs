@@ -65,7 +65,6 @@ public class DynamicGridLayout : MonoBehaviour
             panel.anchoredPosition = new Vector2(currentX, -currentY); // Y为负（UGUI特性）
             // 更新Y坐标为下一Panel位置
             currentY += panelHeight + spacing;
-            Debug.Log($"currentY: {currentY} panelHeight: {panelHeight}");
         }
 
         // 调整容器高度以包裹所有内容

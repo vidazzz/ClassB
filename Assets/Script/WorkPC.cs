@@ -2,40 +2,34 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data.Common;
 using UnityEngine;
+using UnityEngine.InputSystem.DualShock;
 
 [RequireComponent(typeof(TypingGame))]
 public class WorkPC : Device
 {
     public override IEnumerator Interact(Character interactor)
     {
+        operation = interactor.workManager.CurrentTask;
+        if(operation == null)
+        {
+            Debug.LogError("No task assigned!");
+            yield break;
+        }
+        users.Add(interactor);
+        StartCoroutine(PlayAnimation());
         if (interactor is Hero)
         {
             Hero.Instance.canActive = false;
-            //yield return StartCoroutine();
+            progressBar.gameObject.SetActive(true);
+            yield return interactor.StartCoroutine(operation.ProcessHero());
+            progressBar.gameObject.SetActive(false);
             Hero.Instance.canActive = true;
         }
-        else if(interactor is NPC)
+        else if (interactor is NPC)
         {
-            NPC npc = interactor as NPC;
-            yield return StartCoroutine(npc.workManager.Process(npc.workEfficiency, (int)duration));
-            if (gain.needName != "")
-                interactor.lifeController.GetNeed(gain.needName).TryMotifyValue(gain.value);
-            if(cost.needName != "")
-                interactor.lifeController.GetNeed(cost.needName).TryMotifyValue(-cost.value);
-            yield return StartCoroutine(PlayAnimation());
+            yield return StartCoroutine(operation.ProcessNPC());
+            owner.action.UpdatePriorityWork();
         }
-             
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        users.Remove(interactor);
     }
 }

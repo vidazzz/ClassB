@@ -47,10 +47,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab05901cba3d2ef4ba8d30ac796debc3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactTime: 0
-  interactPoint: []
+  users: []
+  userLimit: 0
+  cost:
+    needName: energy
+    value: 5
+  gain:
+    needName: 
+    value: 0
+  duration: 30
+  interactDisdence: 0
+  interactPoint:
+  - {x: 0, y: 1, z: 0}
   interactionPrompt: "\u4E92\u52A8"
   interactionKey: 101
+  hobby:
+    hobbyName: 
+    id: 0
+    talents: []
+    devices: []
+  isJob: 1
+  owner: {fileID: 0}
+  inputs: []
+  maxProgress: 0
+  screenSpaceCanvas: {fileID: 0}
+  ProgressBarPrefab: {fileID: 7250647943176387576, guid: 610489b3f8015574bbbe5534b820df41, type: 3}
+  progressBar: {fileID: 0}
 --- !u!114 &4023138116355126006
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -63,21 +85,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7aee7faeaccd004da3aa4a649222693, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sentences:
-  - aaaaaaaaaa
-  - bbbbbbbbbbbb
-  - cccccccccc
-  - ddddddddddd
   correctColor: {r: 0, g: 1, b: 0, a: 1}
   normalColor: {r: 0, g: 0, b: 0, a: 1}
   textMesh: {fileID: 0}
   textMeshForQuit: {fileID: 0}
-  kpi: 0
-  preesure: 0
-  fishTimeThreshold: 0
-  fish: 0
-  fishThreshold: 0
-  hero: {fileID: 0}
+  timeLimitSlider: {fileID: 0}
+  sentenceCount: 0
+  kpi: 1
+  preesure: 1
+  timeLimit: 3
+  quitTimerThreshold: 6
+  fishingTimeThreshold: 5
+  fishThreshold: 2
 --- !u!212 &2955440953456471031
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -127,7 +146,7 @@ SpriteRenderer:
   m_Size: {x: 0.16, y: 0.16}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!61 &6198113828358709249

@@ -12,7 +12,9 @@ public class TalentManagerUI : MonoBehaviour
     {
         foreach (Character.TalentData talentData in talentDatas)
         {
-            TalentItemUI newTalentItemUI = Instantiate(prefTalentItemUI, transform).GetComponent<TalentItemUI>();
+            GameObject talentItemUIObj = Instantiate(prefTalentItemUI, transform);
+            
+            TalentItemUI newTalentItemUI  = talentItemUIObj.GetComponent<TalentItemUI>();
             newTalentItemUI.talentData = talentData;
             newTalentItemUI.DisplayTalent();
         }

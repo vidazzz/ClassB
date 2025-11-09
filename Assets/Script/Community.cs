@@ -265,6 +265,13 @@ public class Community : MonoBehaviour
         characters = DataSetting.Characters;
         affinity = new Affinity(characters);
         hobbyTopicScore = new HobbyTopicScore(characters);
+
+    }
+    void Start()
+    {
+        EventManager.Instance.OnHourEnd += () => hobbyGroups = HobbyTopicScore.ChackHobbyToppicScore();
+        EventManager.Instance.OnDayBegin += invokeDay => CreatAllGroup();
+
         //加载社交关系效果
         foreach (Character character in characters)
         {
@@ -279,13 +286,10 @@ public class Community : MonoBehaviour
                 }
             }
         }
-    }
-    void Start()
-    {
-        EventManager.Instance.OnHourEnd += () => hobbyGroups = HobbyTopicScore.ChackHobbyToppicScore();
-        EventManager.Instance.OnDayBegin += invokeDay => CreatAllGroup();
         InitializeCommunityPannel();
         PrintAffinity();
+
+        
     }
 
     // Update is called once per frame

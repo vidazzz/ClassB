@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using Unity.VisualScripting;
+using UnityEditor.U2D.Aseprite;
 using UnityEngine;
 
 public class Company : MonoBehaviour
@@ -49,39 +50,32 @@ public class Company : MonoBehaviour
             public List<Task> tasks;
         }
         [System.Serializable]
-        public class Task
+        //任务单
+        public class Task: Operation
         {
             public string taskName;
             public Module module;
             public bool isAssigned;
-            public bool isCompleted;
-            public float workload;
-            public float completedWorkload;
-            public float progress { get { return completedWorkload / workload; } }
             public Timer.Date startTime;
-            public Timer.Date endTime;
+            public Timer.Date deadLine;
             public Timer.Date actualStartTime;
             public Timer.Date actualEndTime;
-            public void Process(float workDone)
-            {
-                if(isCompleted)
-                {
-                    Debug.LogWarning($"{taskName} is already completed!");
-                    return;
-                }
-                completedWorkload += workDone;
-                if (completedWorkload >= workload)
-                {
-                    Complete();
-                }
-            }
-            public void Complete()
+            protected void Complete()
             {
                 isCompleted = true;
                 actualEndTime = Timer.Time;
                 Debug.Log($"{taskName} completed");
             }
-
+            public Task(string taskName, Module module)
+            {
+                this.taskName = taskName;
+                this.module = module;
+                checkItems = new List<string>
+                {
+                    "Act"
+                };
+                isAssigned = false;
+            }
         }
         public void BreakDown(List<Group> groups)
         {
@@ -114,19 +108,15 @@ public class Company : MonoBehaviour
                 float remainingModuleWorkload = module.workload;
                 for (int j = 0; j < taskCount; j++)
                 {
-                    Task task = new()
-                    {
-                        taskName = $"{module.moduleName}-Task {j + 1}",
-                        module = module
-                    };
+                    Task task = new($"{module.moduleName}-Task {j + 1}", module);
                     if (j == taskCount - 1)
                     {
-                        task.workload = remainingModuleWorkload;
+                        task.maxProgress = remainingModuleWorkload;
                     }
                     else
                     {
-                        task.workload = Random.Range(remainingModuleWorkload * 0.2f, remainingModuleWorkload * 0.5f);
-                        remainingModuleWorkload -= task.workload;
+                        task.maxProgress = Random.Range(remainingModuleWorkload * 0.2f, remainingModuleWorkload * 0.5f);
+                        remainingModuleWorkload -= task.maxProgress;
                     }
                     module.tasks.Add(task);
                 }
@@ -143,7 +133,7 @@ public class Company : MonoBehaviour
                     member.workManager.workTime = 0;
                 }
                 //任务工作量降序排列
-                module.tasks.Sort((a, b) => b.workload.CompareTo(a.workload));
+                module.tasks.Sort((a, b) => b.maxProgress.CompareTo(a.maxProgress));
                 foreach(Task task in module.tasks)
                 {
                     //成员工时升序排列
@@ -151,8 +141,12 @@ public class Company : MonoBehaviour
                     //将工作量最高的任务分配给当前工时最短的成员
                     Character member = module.group.members[0];
                     member.workManager.tasks.Add(task);
-                    task.startTime = startTime + (int)member.workManager.workTime;
-                    member.workManager.workTime += task.workload / member.workManager.workEfficiency;
+                    task.owner = member;
+                    Debug.Log(member.name + " take " + task.taskName);
+                    float duration = task.maxProgress / member.workManager.workEfficiency;
+                    task.startTime = startTime + (int)Mathf.Ceil(member.workManager.workTime);
+                    task.deadLine = task.startTime + (int)Mathf.Ceil(duration);
+                    member.workManager.workTime = task.deadLine.ToMinutes();
                     task.isAssigned = true;
                 }
             }
@@ -174,12 +168,12 @@ public class Company : MonoBehaviour
 
     void Awake()
     {
-        project = new Project("Project A", 1000, 30, 1, departments[0].groups);
+        
     }
     // Start is called before the first frame update
     void Start()
     {
-        
+        project = new Project("Project A", 1000, 0, 7, departments[0].groups);
     }
 
     // Update is called once per frame

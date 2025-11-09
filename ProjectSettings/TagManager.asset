@@ -46,3 +46,6 @@ TagManager:
   - name: Roof
     uniqueID: 2984832555
     locked: 0
+  - name: UI
+    uniqueID: 936969377
+    locked: 0

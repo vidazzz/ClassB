@@ -14,7 +14,7 @@ public class MemberPanelUI : MonoBehaviour
         {
             GameObject taskPanel = Instantiate(taksPanelPrefab, transform);
             taskPanel.GetComponentInChildren<TextMeshProUGUI>().text = task.taskName;
-            taskPanel.GetComponentInChildren<Slider>().value = task.progress;
+            taskPanel.GetComponentInChildren<Slider>().value = task.Progress;
         }
     }
 
