@@ -93,12 +93,12 @@ public class Community : MonoBehaviour
         public HobbyTopicScore(List<Character> npcs)
         {
             characters = npcs;
-            hobbyTopicScoreValue = new float[npcs.Count, npcs.Count,DataSetting.Hobbies.Count];
+            hobbyTopicScoreValue = new float[npcs.Count, npcs.Count,DataSetting.Instance.hobbySettings.Count];
             for (int i = 0; i < npcs.Count; i++)
             {
                 for (int j = 0; j < npcs.Count; j++)
                 {
-                    for(int k = 0; k < DataSetting.Hobbies.Count; k++)
+                    for(int k = 0; k < DataSetting.Instance.hobbySettings.Count; k++)
                     {
                         hobbyTopicScoreValue[i, j, k] = 0;
                     }
@@ -106,11 +106,11 @@ public class Community : MonoBehaviour
             }
         }
 
-        public void ModifyHobbyTopicScore(Character a, Character b, Hobby hobby, float value)
+        public void ModifyHobbyTopicScore(Character a, Character b, AttributeID id, float value)
         {
             int rows = characters.IndexOf(a);
             int columns = characters.IndexOf(b);
-            int hobbyIndex = DataSetting.Hobbies.IndexOf(hobby);
+            int hobbyIndex = (int)id;
             hobbyTopicScoreValue[rows, columns, hobbyIndex] += value;
             Symmetry(rows, columns);
         }
@@ -145,12 +145,12 @@ public class Community : MonoBehaviour
             if (characterIndexList.Count == 0)
                 return hobbyGroups;
             
-            for (int hobbyIndex = 0; hobbyIndex < DataSetting.Hobbies.Count; hobbyIndex++) //遍历hobby划分圈子
+            for (int hobbyIndex = 0; hobbyIndex < DataSetting.Instance.hobbySettings.Count; hobbyIndex++) //遍历hobby划分圈子
             {
                 int[] arr = characterIndexList.ToArray();
                 for (int lastIdxIdx = 0; lastIdxIdx < arr.Length; lastIdxIdx++) //根据对应hobby将characterIndexArr划分成圈子
                 {
-                    HobbyGroup hobbyGroup = new() { menberIndexList = new() { arr[lastIdxIdx] }, hobbyIndex = hobbyIndex };
+                    HobbyGroup hobbyGroup = new() { menberIndexList = new() { arr[lastIdxIdx] }, hobbyID = DataSetting.Instance.hobbySettings[hobbyIndex].id };
                     for (; lastIdxIdx < arr.Length;)//将有关联的元素全部换到前面
                     {
                         bool isIndexMoved = false;
@@ -187,7 +187,7 @@ public class Community : MonoBehaviour
     public struct HobbyGroup
     {
         public List<int> menberIndexList;
-        public int hobbyIndex;
+        public AttributeID hobbyID;
     }
 
     public static Coroutine StartConversation(Conversation conversation)
@@ -203,14 +203,14 @@ public class Community : MonoBehaviour
 
     public Group CreatGroup(HobbyGroup hobbyGroup)
     {
-        Hobby hobby = DataSetting.Hobbies[hobbyGroup.hobbyIndex];
+        AttributeID hobbyID = hobbyGroup.hobbyID;
         List<Character> menbers = new();
         foreach (int index in hobbyGroup.menberIndexList)
         {
             menbers.Add(characters[index]);
         }
 
-        Group group = YouChat.Instance.SetupChatTagAndBandGroup(hobby, menbers);
+        Group group = YouChat.Instance.SetupChatTagAndBandGroup(hobbyID, menbers);
 
         foreach (Character menber in menbers)
         {

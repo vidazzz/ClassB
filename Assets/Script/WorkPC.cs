@@ -7,6 +7,7 @@ using UnityEngine.InputSystem.DualShock;
 [RequireComponent(typeof(TypingGame))]
 public class WorkPC : Device
 {
+    /*
     public override IEnumerator Interact(Character interactor)
     {
         operation = interactor.workManager.CurrentTask;
@@ -32,4 +33,5 @@ public class WorkPC : Device
         }
         users.Remove(interactor);
     }
+    */
 }

@@ -10,12 +10,12 @@ public class DialogueOptionNode : Node
 	[Input] public int nodeIndex; //输入端口，连接上一段的输出端口
 	[Output] public int succeededNode;
 	[Output] public int failedNode;
-	public string checkingTalentName;
+	public AttributeID checkingTalentID;
 	public int checkingTalentLevel;
 	public EffectType succedEffectType;
-	public List<string> succedArgs;
+	public List<AttributeID> succedIds;
 	public EffectType failedEffectType;
-	public List<string> failedArgs;
+	public List<AttributeID> failedIds;
 
 
 	public DialogueNode BelongedNode
@@ -38,22 +38,22 @@ public class DialogueOptionNode : Node
 	public IEnumerator OptionEffect(DialogueController dialogueController)
 	{
 		EffectType type;
-		List<string> args;
-		if (checkingTalentName != "" && !hasChecked) //填了checkingTalentName且没有检定过就进行检定
+		List<AttributeID> ids;
+		if (checkingTalentID != 0 && !hasChecked) //填了checkingTalentName且没有检定过就进行检定
 		{
-			checkResult = DiceCheck.Instance.CheckTalent(checkingTalentName, checkingTalentLevel ,Hero.Instance);
+			checkResult = DiceCheck.Instance.CheckTalent(checkingTalentID, checkingTalentLevel ,Hero.Instance);
 			hasChecked = true;
 		}
 		if (checkResult) //根据检定结果决定采用的效果和跳转索引
 		{
 			type = succedEffectType;
-			args = succedArgs;
+			ids = succedIds;
 			nextNode = GetOutputPort("succeededNode").Connection?.node as DialogueNode;
 		}
 		else
 		{
 			type = failedEffectType;
-			args = failedArgs;
+			ids = failedIds;
 			nextNode = GetOutputPort("failedNode").Connection?.node as DialogueNode;
 		}
 
@@ -63,16 +63,16 @@ public class DialogueOptionNode : Node
 			switch (type)
 			{
 				case EffectType.ModifyStats:
-					yield return EffectModifyParameter(args);
+					yield return EffectModifyParameter(ids);
 					break;
 				case EffectType.ModifyAfinity:
-					yield return EffectModifyAffinity(args, dialogueController.character);
+					yield return EffectModifyAffinity(ids, dialogueController.character);
 					break;
 				case EffectType.CheckItem:
-					yield return EffectCheckItem(args);
+					yield return EffectCheckItem(ids);
 					break;
 				case EffectType.Check:
-					yield return EffectCheck(args, dialogueController.character);
+					yield return EffectCheck(ids, dialogueController.character);
 					break;
 				case EffectType.RollBack:
 					RollbackRequiredKPI();
@@ -92,31 +92,31 @@ public class DialogueOptionNode : Node
 	}
 
 	//调整属性
-	public IEnumerator EffectModifyParameter(List<string> strings)
+	public IEnumerator EffectModifyParameter(List<AttributeID> ids)
 	{
-		Hero.Instance.lifeController.AddModifier(strings[0], Convert.ToInt32(strings[1]));
+		Hero.Instance.lifeController.statListManager.AddByEnum(ids[0], Convert.ToInt32(ids[1]));
 		yield return null;
 	}
 
 	//调整好感度
-	public IEnumerator EffectModifyAffinity(List<string> strings, Character target)
+	public IEnumerator EffectModifyAffinity(List<AttributeID> ids, Character target)
 	{
-		Community.affinity.ModifyAffinity(Hero.Instance, target, Convert.ToInt32(strings[0]));
+		Community.affinity.ModifyAffinity(Hero.Instance, target, Convert.ToInt32(ids[0]));
 		Community.PrintAffinity();
 		yield return null;
 	}
 	public void RollbackRequiredKPI()
 	{
-		Hero.Instance.lifeController.SetStatValue("requiredKPI", Hero.Instance.lifeController.GetStatValue("lastRequiredKPI"));
+		Hero.Instance.lifeController.statListManager.SetAttributeByEnum(AttributeID.requiredKPI, Hero.Instance.lifeController.statListManager.GetAttributeByEnum(AttributeID.lastRequiredKPI).value);
 		Hero.Instance.DisplayStatsValue();
 	}
-	public IEnumerator EffectCheckItem(List<string> strings)
+	public IEnumerator EffectCheckItem(List<AttributeID> ids)
 	{
 		yield return null;
 	}
-	public IEnumerator EffectCheck(List<string> args,Character owner)
+	public IEnumerator EffectCheck(List<AttributeID> ids,Character owner)
 	{
-		Check check = new(args, owner,Hero.Instance);
+		Check check = new(ids, owner,Hero.Instance);
 		CheckPanel.instance.Initialize(check);
 		CheckPanel.ToggleUI();
 		while (CheckPanel.instance.gameObject.activeSelf)

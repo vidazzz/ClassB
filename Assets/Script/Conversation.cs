@@ -5,15 +5,15 @@ using UnityEngine;
 
 public class Conversation
 {
-    public Hobby hobby;
+    public AttributeID id;
     public List<Character> participants = new();
     public float duration = 1f;           // 对话持续时间（秒）
     public Coroutine process;
 
     #region 核心逻辑
-    public Conversation(Hobby hobby,Character owner)
+    public Conversation(AttributeID id,Character owner)
     {
-        this.hobby = hobby;
+        this.id = id;
         participants = new() { owner };
     }
 
@@ -34,17 +34,17 @@ public class Conversation
         {
             for (int j = i + 1; j < participants.Count; j++)
             {
-                Community.hobbyTopicScore.ModifyHobbyTopicScore(participants[i], participants[j], hobby, 1f);
+                Community.hobbyTopicScore.ModifyHobbyTopicScore(participants[i], participants[j], id, 1f);
                 Community.affinity.ModifyAffinity(participants[i], participants[j], 1f);
             }
         }
     }
 
     // 获取当前话题（根据配置生成）
-    private Hobby GetCurrentHobby(NPC npc)
+    private string GetCurrentHobby(NPC npc)
     {
-        Device device = npc.action.target as Device;
-        return device.hobby;
+        Device device = npc.actionManager.CurrentAction.target as Device;
+        return device.hobbyName;
     }
 
     public void Add(Character participant)
@@ -74,8 +74,6 @@ public class Conversation
     {
         
     }
-     
-
     #endregion
 
 }

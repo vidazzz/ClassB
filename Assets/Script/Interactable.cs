@@ -1,30 +1,42 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 
 public abstract class Interactable : MonoBehaviour
 {
-    protected Animator animator;
-    public List<Character> users;
+    [HideInInspector] public Animator animator;
+    protected List<Character> users = new();
     public int userLimit;
-    public bool IsInUse { get { return userLimit > 0 && users.Count >= userLimit; } }
-    public NeedChange cost;
-    public NeedChange gain;
-    public float duration;
+    public bool IsFull { get { return userLimit > 0 && users.Count >= userLimit; } }
+
     public int interactDisdence = 1; //交互距离,单位是一个Astar.node的半径
-    [Serializable]
-    public class NeedChange
-    {
-        public string needName;
-        public float value;
-    }
-    public Vector3[] interactPoint;
+    public Vector3[] interactPoints;
 
     [SerializeField] protected string interactionPrompt = "互动";
     [SerializeField] protected KeyCode interactionKey = KeyCode.E;
     
+    public bool TryClaimedBy(Character character)
+    {
+        if(!IsFull && !CheckIfClaimedBy(character))
+        {
+            users.Add(character);
+            return true;
+        }
+        else
+            return false;
+    }
+
+    public bool CheckIfClaimedBy(Character character)
+    {
+        return users.Contains(character);
+    }
+    public void DeclaimedBy(Character character)
+    {
+        users.Remove(character);
+    }
     // 显示互动提示
     public virtual void ShowPrompt()
     {

@@ -1,232 +1,49 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
 
 [RequireComponent(typeof(TaskManager))]
+[RequireComponent(typeof(BehaviorManager))]
 public class NPC : Character
 {
     [SerializeField] private AStar astar;
+
     public List<List<Action>> Schedule;
     protected TaskManager taskManager;
-    private Rader rader;
-    NPC interlocutor;
-    public bool isMeeting;
+    public BehaviorManager behaviorManager;
+    [HideInInspector] public Rader rader;
 
     public override IEnumerator Interact(Character interactor)
     {
-        if (interactor is Hero) //对象是主角
+        if (interactor is Hero) //来的是hero
         {
             Timer.Pause();
             StopAllCoroutines();
             //Hero.Instance.canActive = false;
-            if (isMeeting) //多人对话
+            //if (isMeeting) //多人对话
             {
                 //yield return StartCoroutine(dialogueController.GraphDisplayDialogue(dialogueController.multiPersonDialogueGraphs[scheduleItem.multiPersonDialoguesIndex], scheduleItem.targetList));
             }
-            else if (dialogueController.dialogueGraph != null) //单人对话
+            if (dialogueController.dialogueGraph != null) //单人对话
             {
                 yield return StartCoroutine(dialogueController.GraphDisplayDialogue(dialogueController.dialogueGraph));
             }
             else
                 Debug.LogWarning("No dialogue has been set");
             yield return null;
-            StartCoroutine(ProsessSchedule(action));//继续执行日程
+            StartCoroutine(behaviorManager.ProsessSchedule(actionManager.CurrentAction));//继续执行日程
             Timer.Resume();
         }
         else //interactor is NPC
         {
-            StartCoroutine(Reaction(interactor.gameObject));
-            interlocutor = interactor.GetComponent<NPC>();
-            yield return ShowPopUp("Result", 2f);
 
-            interlocutor = null;
-        }
-    }
- 
-    IEnumerator MoveToObj(GameObject targetObj)
-    {
-        Interactable target = targetObj.GetComponent<Interactable>();
-        //Debug.Log("MoveToObj: "+target);
-        List<List<AStar.Node>> listPath = new();
-        if(target.interactPoint.Length == 0)
-            target.interactPoint = new Vector3[]{Vector3.zero};
-        foreach (Vector3 point in target.interactPoint)
-        {
-            listPath.Add(astar.FindPath(transform.position, target.transform.position + point));           
-        }
-        List<AStar.Node> path = new();
-        int lestestCount = 999999;
-        foreach (List<AStar.Node> pathForChoose in listPath)
-        {
-            if(pathForChoose!=null)
-                if(pathForChoose.Count<=lestestCount)
-                {
-                    lestestCount = pathForChoose.Count;
-                    path = pathForChoose;
-                }
-        }
-        if (path != null)
-        {
-            //Debug.Log(path.Count);
-            for (int i = 0; i < path.Count - target.interactDisdence; i++)
-            {
-                AStar.Node node = path[i];
-                Debug.DrawLine(node.worldPosition, node.parent.worldPosition, Color.red, 99f);
-                Vector3 direction = (node.worldPosition - transform.position).normalized;
-                while (transform.position != node.worldPosition)
-                {
-                    transform.position = Vector3.MoveTowards(transform.position, node.worldPosition, Time.deltaTime * fSpeed);
-                    AnimateMove(direction);
-                    do
-                        yield return null;
-                    while (Timer.hasPaused); //timer暂停时禁止移动 
-                }
-            }
-            AnimateStopMove();
-        }
-        else
-            Debug.Log("no path!"); 
-    }
-
-    void AnimateMove(Vector3 direction)
-    {
-        if(animator != null)
-        {
-            animator.SetBool("IsMoving",true);
-            animator.SetFloat("X",direction.x);
-            animator.SetFloat("Y",direction.y);
-        }
-    }
-    void AnimateStopMove()
-    {
-        if(animator != null)
-        {
-            animator.SetBool("IsMoving",false);
-            popUpAnimator.SetInteger("Result",0); //关掉表情气泡
         }
     }
 
-    public IEnumerator Reaction(GameObject interrupter)
+      public void CheckSocialNeedAndPostTask(Device device)
     {
-        StopAllCoroutines();
-        AnimateStopMove();
-        FaceTheTarget(interrupter);
-        yield return ShowPopUp("Result",2f);
-        if (interrupter == action.target) //the person I was supposed to find
-            StartCoroutine(ProsessSchedule());
-        else
-            StartCoroutine(ProsessSchedule(action));
-    }
-
-    public IEnumerator MoveTo(GameObject gameObj)
-    {
-        StopAllCoroutines();
-        AnimateStopMove();
-        Interactable target = gameObj.GetComponent<Interactable>();
-        List<AStar.Node> path = astar.FindPath(transform.position, gameObj.transform.position);
-        if (path != null)
-        {
-            for (int i = 0; i < path.Count - target.interactDisdence; i++)
-            {
-                AStar.Node node = path[i];
-                Debug.DrawLine(node.worldPosition, node.parent.worldPosition, Color.red, 99f);
-                Vector3 direction = (node.worldPosition - transform.position).normalized;
-                while( transform.position != node.worldPosition)
-                {
-                    transform.position = Vector3.MoveTowards(transform.position,node.worldPosition,Time.deltaTime*fSpeed);
-                    AnimateMove(direction);
-                    yield return null;
-                }    
-            }
-            AnimateStopMove();
-        }
-        FaceTheTarget(gameObj);
-    }
-
-    //AI行为协程
-    IEnumerator ProsessSchedule(Action item = null)
-    {
-        //Debug.Log($"NPC {name} ProsessSchedule ACTION");
-        yield return new WaitForSeconds(1);
-        if(actions.Count == 0)
-            yield break;
-        
-        
-        item ??= ChooseAction();
-        action = item;
-        switch (item.type)
-        {
-            case ActionType.meeting:
-                yield return StartCoroutine(TakeMeeting(item));//参数决定了npc想聊什么，以后有需要再实现传参方式
-                break;
-            case ActionType.use:
-                yield return StartCoroutine(UseDevice(item));
-                break;
-            default:
-                yield return null;
-                break;                            
-        } 
-        StartCoroutine(ProsessSchedule());
-    }
-
-
-
-    Action ChooseAction()
-    {
-        foreach(Action action in actions)
-        {
-            Debug.Log($"{name}'s action:{action.target.name} : {action.Priority}");
-        };
-        
-        Action maxPriorityAction = actions //.OrderByDescending(a => a.Priority).FirstOrDefault();
-                                    .Where(a => !a.isWaiting)
-                                    .OrderByDescending(a => a.Priority)
-                                    .FirstOrDefault();
-        return maxPriorityAction;
-    }
-
-    void NotifyTheTarget(NPC target)
-    {
-        target.StopAllCoroutines();
-        target.AnimateStopMove();
-    }
-    public IEnumerator UseDevice(Action scheduleItem)
-    {
-        Device device = scheduleItem.target as Device;
-        CheckSocialNeedAndPostTask(device);//检查社交需求
-        //设置topicHobby
-        topicHobby = device.hobby;
-        yield return StartCoroutine(MoveToObj(device.gameObject));
-
-        
-        FaceTheTarget(device.gameObject);
-
-        if (device.IsInUse)
-        {
-            StartCoroutine(scheduleItem.Waiting());
-            yield break;
-        }
-            
-
-        if (device.hobby.hobbyName != "")//如果是爱好就聊
-            {
-                OpenRadder();
-                if (!FindConversation())
-                    CreatConversation();
-            }
-        
-        StartCoroutine(ShowPopUp("Result", device.duration));
-        yield return StartCoroutine(device.Interact(this));
-
-        QuitConversation();
-        CloseRadder();
-    }
-    public void CheckSocialNeedAndPostTask(Device device)
-    {
-        Need soialNeed = lifeController.GetNeed("SocialNeed");
+        Need soialNeed = (Need)lifeController.needListManager.GetAttributeByEnum(AttributeID.social);
         if (soialNeed.value < 20)
         {
             PostGroupTask(device);
@@ -236,14 +53,13 @@ public class NPC : Character
     {
         foreach (Group group in hoppyGroups)
         {
-            if (group.hobby.devices.Contains(device))
+            List<Device> devices = DataSetting.Instance.actionList.Find(a => a.theme == group.hobbyId).interactables.Cast<Device>().ToList();
+            if (devices.Contains(device))
             {
                 YouChat.Instance.PostTask(new TaskManager.TaskData
                 {
                     taskName = $"{group.groupName}圈 {Timer.Time.dd}/{Timer.Time.hh}/{Timer.Time.mm} 冲{device.name}活动",
-                    needName = device.gain.needName,
-                    targetValue = 50,//属性数值目标
-                    interactables = new List<Interactable> { device },
+                    interactable =  device,
                     duration = 60 // 默认60分钟
                 }, group, this);
                 //taskManager.AcceptTask(group.activeTask);
@@ -269,61 +85,16 @@ public class NPC : Character
         }
     }
 
-    public IEnumerator TakeMeeting(Action item)
-    {
 
-        NPC npc = item.target as NPC;
-        if (npc.users.Count == 0) //npc未被占用
-        {
-            NotifyTheTarget(npc); //叫住对面NPC
-            if (!npc.users.Contains(this))
-            {
-                yield return StartCoroutine(MoveToObj(npc.gameObject));
-                FaceTheTarget(npc.gameObject);
-                isMeeting = true;
-                StartCoroutine(npc.Interact(this));
-                yield return StartCoroutine(ShowPopUp("Result", 1f));
-                isMeeting = false;
-                npc.users = null;
-            }
-        }
-    }
-    public void OpenRadder()
-    {
-        rader.enabled = true;
-    }
-
-    public void CloseRadder()
-    {
-        rader.enabled = false;
-    }
-
-    public bool FindConversation()
-    {
-        bool result = false;
-        foreach (Character target in rader.characters)
-        {
-            if (TryJoinConversation(target))
-            {
-                result = true;
-                break;
-            }
-        }
-        return result;
-    }
-
-    void OnEnable()
-    {
-        StartCoroutine(ProsessSchedule());
-    }
     // Start is called before the first frame update
     new void Awake()
     {
         base.Awake();
+
         rader = GetComponentInChildren<Rader>(true);
-        Debug.Assert(rader != null, "rader 不可为空");
+        Debug.Assert(rader != null, $"{name}  缺失 rader 组件");
         taskManager = GetComponent<TaskManager>();
-        Debug.Assert(taskManager != null, "taskManager 不可为空");
+        behaviorManager = GetComponent<BehaviorManager>();
     }
 
     new void Start()

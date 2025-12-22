@@ -29,7 +29,7 @@ public class Shop : MonoBehaviour
         public Goods.GoodsType goodsType;
         public string goodsName;
         public Sprite icon; // 添加图标属性
-        public string parameterName;
+        public AttributeID parameterID;
         public int value;
         public int price;
         public int skillIndex; // 如果是技能书，则对应技能的索引
@@ -38,8 +38,12 @@ public class Shop : MonoBehaviour
     public float advancePayment;
     public void ShopModifyStats (GoodsData goods)
     {
-        if(Hero.Instance.lifeController.AddModifier("money",-goods.price))
-            Hero.Instance.lifeController.AddModifier(goods.parameterName,goods.value);    
+        Attribute v = Hero.Instance.lifeController.statListManager.GetAttributeByEnum(AttributeID.money);
+        if(v.value - goods.price >= 0)
+        {
+            v.AddModifier(-goods.price);
+            Hero.Instance.lifeController.statListManager.AddByEnum(goods.parameterID,goods.value);
+        }       
     }
     public void StartShopping()
     {
@@ -99,7 +103,7 @@ public class Shop : MonoBehaviour
             newBook.GetComponent<Goods>().goodsType = book.goodsType;
             newBook.GetComponent<Goods>().goodsName = book.goodsName;
             newBook.GetComponent<Goods>().Icon = book.icon; // 设置图标
-            newBook.GetComponent<Goods>().parameterName = book.parameterName;
+            newBook.GetComponent<Goods>().parameterID = book.parameterID;
             newBook.GetComponent<Goods>().value = book.value;
             newBook.GetComponent<Goods>().price = book.price;
             newBook.GetComponent<Goods>().skillIndex = book.skillIndex;

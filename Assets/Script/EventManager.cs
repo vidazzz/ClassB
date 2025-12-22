@@ -34,6 +34,8 @@ public class EventManager : MonoBehaviour
 
     public event System.Action OnMutifyNeeds;
 
+    public event Action<Need> OnNeedStateChange;
+
     public event System.Action OnLevelUp;
 
     public void TheVaryBegining()
@@ -94,6 +96,10 @@ public class EventManager : MonoBehaviour
     public void MutifyNeeds()
     {
         OnMutifyNeeds?.Invoke();
+    }
+    public void NeedStateChange(Need need)
+    {
+        OnNeedStateChange?.Invoke(need);
     }
     public void LevelUp()
     {

@@ -6,30 +6,30 @@ using UnityEngine.UI;
 
 public class StatsPanel : MonoBehaviour
 {
-    public string[] statsNames;
+    public AttributeID[] statIDs;
     public GameObject preferbTestMesh;
     private TextMeshProUGUI[] textMeshes; 
 
     // Start is called before the first frame update
     void Start()
     {
-        textMeshes = new TextMeshProUGUI[statsNames.Length];
-        for(int i = 0; i < statsNames.Length; i++)
+        textMeshes = new TextMeshProUGUI[statIDs.Length];
+        for(int i = 0; i < statIDs.Length; i++)
         {
             GameObject go = Instantiate(preferbTestMesh, GetComponent<RectTransform>());
             textMeshes[i] = go.GetComponent<TextMeshProUGUI>();
-            textMeshes[i].text = statsNames[i];
-            textMeshes[i].text += " : " + (int)Hero.Instance.lifeController.GetStatValue(statsNames[i]);
+            textMeshes[i].text = statIDs[i].ToString();
+            textMeshes[i].text += " : " + (int)Hero.Instance.lifeController.statListManager.GetAttributeByEnum(statIDs[i]).value;
         }
     }
 
     // Update is called once per frame
     void Update()
     {
-        for(int i = 0; i < statsNames.Length; i++)
+        for(int i = 0; i < statIDs.Length; i++)
         {
-            textMeshes[i].text = statsNames[i];
-            textMeshes[i].text += " : " + (int)Hero.Instance.lifeController.GetStatValue(statsNames[i]);
+            textMeshes[i].text = statIDs[i].ToString();
+            textMeshes[i].text += " : " + (int)Hero.Instance.lifeController.statListManager.GetAttributeByEnum(statIDs[i]).value;
         }
     }
 }

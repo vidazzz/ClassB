@@ -7,7 +7,7 @@ using XNode;
 public class DialogueGraph : NodeGraph
 {
     public LineCheckingType lineCheckingType;
-    public string checkingName;//talent name or stats name
+    public AttributeID checkingID;//talent name or stats name
     public int ckeckingValue;//talent level or stats value
     public DialogueNode succeededNode;
     public DialogueNode failedNode;
@@ -15,7 +15,7 @@ public class DialogueGraph : NodeGraph
     private DialogueNode startNode;
     public DialogueNode StartNode{
         get{
-            if(checkingName == "") //不填则采用成功节点
+            if(checkingID == 0) //不填则采用成功节点
                 return succeededNode;
             else if(!hasChecked) //只做一次检定
             {
@@ -41,7 +41,7 @@ public class DialogueGraph : NodeGraph
 
     private DialogueNode DialogueDiceCheck()
     { 
-        if(DiceCheck.Instance.CheckTalent(checkingName, ckeckingValue,Hero.Instance))
+        if(DiceCheck.Instance.CheckTalent(checkingID, ckeckingValue,Hero.Instance))
             return succeededNode;
         else
             return failedNode;
@@ -49,7 +49,7 @@ public class DialogueGraph : NodeGraph
 
     private DialogueNode DialogueStatsCheck()
     {
-        if(DiceCheck.Instance.CheckStats(checkingName,ckeckingValue,Hero.Instance))
+        if(DiceCheck.Instance.CheckStats(checkingID,ckeckingValue,Hero.Instance))
             return succeededNode;
         else
             return failedNode;

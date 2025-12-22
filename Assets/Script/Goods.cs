@@ -10,7 +10,7 @@ public class Goods : MonoBehaviour
     public string goodsName;
     public Sprite Icon // 添加图标属性
     { set => GetComponent<Image>().sprite = value; }
-    public string parameterName;
+    public AttributeID parameterID;
     public int value;
     public int price;
     public int skillIndex; // 如果是技能书，则对应技能的索引
@@ -24,13 +24,21 @@ public class Goods : MonoBehaviour
 
     void ShopModifyStats()
     {
-        if (Hero.Instance.lifeController.AddModifier("money", -price))
-            Hero.Instance.lifeController.AddModifier(parameterName,value);
+        Attribute v = Hero.Instance.lifeController.statListManager.GetAttributeByEnum(AttributeID.money);
+        if (v.value - price >= 0)
+        {
+            v.AddModifier(-price);
+            Hero.Instance.lifeController.statListManager.AddByEnum(parameterID,value);
+        }
     }
     void ShopSkillBook()
     {
-        if(Hero.Instance.lifeController.AddModifier("money",-price))
+        Attribute v = Hero.Instance.lifeController.statListManager.GetAttributeByEnum(AttributeID.money);
+        if( v.value - price >= 0)
+        {
+            v.AddModifier(-price);
             Hero.Instance.LearnSkill(skillIndex);
+        }    
     }
     void Awake()
     {

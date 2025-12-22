@@ -25,23 +25,24 @@ public class Check
     //检查项
     public class CheckItem
     {
-        public string name;
+        public string Name{get {return id.ToString();}}
+        public AttributeID  id;
         public int checkResult;
         public string description;
         public Character owner;
         public Character challenger;
         public object checkObj;
 
-        public CheckItem(string objName,Character owner, Character challenger)
+        public CheckItem(AttributeID id,Character owner, Character challenger)
         {
-            name = objName;
+            this.id = id;
             this.owner = owner;
             this.challenger = challenger;
-            checkResult = owner.TryFindValue(objName, challenger);
+            checkResult = owner.lifeController.TryFindValueByEnum(id, challenger);
         }
     }
 
-    public Check(List<string> objNames, Character owner, Character challenger, int maxValue = 100, int maxTime = 0)
+    public Check(List<AttributeID> ids, Character owner, Character challenger, int maxValue = 100, int maxTime = 0)
     {
         this.owner = owner;
         this.challenger = challenger;
@@ -49,9 +50,9 @@ public class Check
         originTimeScale = Timer.originTimeScale;
         deadLine = Timer.Time + maxTime;
         checkItems = new();
-        foreach (string name in objNames)
+        foreach (AttributeID id in ids)
         {
-            CheckItem newCheckItem = new(name, this.owner, this.challenger);
+            CheckItem newCheckItem = new(id, this.owner, this.challenger);
             checkItems.Add(newCheckItem);
         }
     }

@@ -57,7 +57,7 @@ public class CheckPanel : MonoBehaviour
     {
         for (int i = 0; i < texts.Count; i++)
         {
-            texts[i].text = $"check {check.checkItems[i].name}:+{check.checkItems[i].checkResult}";
+            texts[i].text = $"check {check.checkItems[i].Name}:+{check.checkItems[i].checkResult}";
         }
 
         slider.value = (float)check.currentValue / check.maxValue;

@@ -4,34 +4,34 @@ using UnityEngine;
 
 public class Rader : MonoBehaviour
 {
-    private Character owner;
-    public List<Character> characters;
+    private NPC owner;
+    public List<Interactable> interactables; //视野中的可交互物体列表
     public void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject == owner.gameObject)
             return;
-        Character targetCharacter = collision.GetComponent<Character>();
-        if (targetCharacter is NPC)
+        Interactable targetInteractable = collision.GetComponent<Interactable>();
+        if (!interactables.Contains(targetInteractable))
         {
-            if (!characters.Contains(targetCharacter))
-                characters.Add(targetCharacter);
-        }
+            interactables.Add(targetInteractable);
+        }      
     }
 
     public void OnTriggerExit2D(Collider2D collision)
     {
         Character targetCharacter = collision.GetComponent<Character>();
-        if (targetCharacter is NPC)
-        {
-            if (characters.Contains(targetCharacter))
-                characters.Remove(targetCharacter);
-        }
+            if (interactables.Contains(targetCharacter))
+                interactables.Remove(targetCharacter);
+    }
+    public bool IsInRader(Interactable target)
+    {
+        return interactables.Contains(target);
     }
 
 
     void Awake()
     {
-        owner = GetComponentInParent<Character>();
+        owner = GetComponentInParent<NPC>();
     }
 
     void OnEnable()
@@ -41,7 +41,7 @@ public class Rader : MonoBehaviour
 
     void OnDisable() 
     {
-        characters.Clear();
+        interactables.Clear();
     }
 
     // Start is called before the first frame update

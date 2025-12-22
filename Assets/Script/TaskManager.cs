@@ -15,9 +15,7 @@ public class TaskManager : MonoBehaviour
     {
         //public Character owner;
         public string taskName;
-        public string needName;
-        public float targetValue;
-        public List<Interactable> interactables;
+        public Interactable interactable;
         public int duration;
     }
 
@@ -27,10 +25,8 @@ public class TaskManager : MonoBehaviour
         public string taskName;
         private Character owner;
         private TaskManager taskManager;
-        private Need targetNeed;
-        private float originStatValue;
-        private float targetValue;
-        private List<Interactable> interactables = new();
+        private Interactable interactable;
+        private Action.InteractableData devicePriority;
         private Timer.Date deadLine;
         private float priorityValue = 20;
 
@@ -38,14 +34,11 @@ public class TaskManager : MonoBehaviour
         {
             owner = character;
             taskName = taskData.taskName;
+            SetupDevicePriority();
             taskManager = owner.GetComponent<TaskManager>();
-            targetNeed = owner.lifeController.GetNeed(taskData.needName);
-            originStatValue = targetNeed.value;
-            targetValue = taskData.targetValue;
-            interactables = taskData.interactables;
+            interactable = taskData.interactable;
             deadLine = Timer.Time + taskData.duration;
             CheckAndAddPriorityTask();
-            EventManager.Instance.OnMutifyNeeds += CheckIfFinished;
             EventManager.Instance.OnNextFrame += CheckIfDeadLine;
         }
 
@@ -54,42 +47,34 @@ public class TaskManager : MonoBehaviour
             if (Timer.Time >= deadLine)
                 CloseTask();
         }
-        private void CheckIfFinished()
-        {
-            if (targetNeed.value >= targetValue + originStatValue)
-                CloseTask();
-        }
 
         private void CloseTask()
         {
             RemovePriorityTask();
-            EventManager.Instance.OnMutifyNeeds -= CheckIfFinished;
             EventManager.Instance.OnNextFrame -= CheckIfDeadLine;
             taskManager.tasks.Remove(this);
             Debug.Log($"{owner}'s 任务 {taskName} 完成");
         }
 
-        private void CheckAndAddPriorityTask()
+        private void SetupDevicePriority()
         {
-            if (owner is NPC npc)
-                foreach (Action action in npc.actions)
+            Action action = owner.actionManager.actions.Find(a => a.interactables.Contains(interactable as Device));
+            if (action != null)
+            {
+                Action.InteractableData devicePriority = action.InteractableDataList.Find(dp => dp.interactable == (interactable as Device));
+                if (devicePriority != null)
                 {
-                    if (interactables.Contains(action.target))
-                    {
-                        action.priorityTask += priorityValue;
-                    }
+                    this.devicePriority = devicePriority;
                 }
+            }
+        }
+        private void CheckAndAddPriorityTask()
+        { 
+            devicePriority.priorityTask += priorityValue;
         }
         private void RemovePriorityTask()
         {
-            if (owner is NPC npc)
-                foreach (Action action in npc.actions)
-                {
-                    if (interactables.Contains(action.target))
-                    {
-                        action.priorityTask -= priorityValue;
-                    }
-                }
+            devicePriority.priorityTask -= priorityValue;
         }
     }
 

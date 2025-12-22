@@ -10,12 +10,12 @@ public class DialogueNode : Node {
 	{
 		get
 		{
-			if (formatArgNames.Length > 0)
+			if (formatIds.Length > 0)
 			{
-				string[] formatArgs = new string[formatArgNames.Length];
-				for (int i = 0; i < formatArgNames.Length; i++)
+				string[] formatArgs = new string[formatIds.Length];
+				for (int i = 0; i < formatIds.Length; i++)
 				{
-					formatArgs[i] = Hero.Instance.lifeController.GetStatValue(formatArgNames[i]).ToString();
+					formatArgs[i] = Hero.Instance.lifeController.statListManager.GetAttributeByEnum(formatIds[i]).ToString();
 				}
 				return string.Format(line, formatArgs);
 			}
@@ -28,7 +28,7 @@ public class DialogueNode : Node {
 	[Output] public int failedNode; 
 	[Output(dynamicPortList = true)] public string[] optionNodes; //选项端口，连接选项节点的输出端口
 
-    public string checkingStatsName;
+    public AttributeID checkingStatID;
     public int checkingValue;
 	public DialogueGraph nextGraph; //对话图
 	private DialogueNode nextNode; 
@@ -38,9 +38,9 @@ public class DialogueNode : Node {
 		{
 			if (nextNode != null)
 				return nextNode;
-			if (checkingStatsName == "")
+			if (checkingStatID == 0)
 				return GetOutputPort("succeededNode")?.Connection?.node as DialogueNode;
-			if (DiceCheck.Instance.CheckStats(checkingStatsName, checkingValue, Hero.Instance))
+			if (DiceCheck.Instance.CheckStats(checkingStatID, checkingValue, Hero.Instance))
 				return GetOutputPort("succeededNode")?.Connection?.node as DialogueNode;
 			else
 				return GetOutputPort("failedNode")?.Connection?.node as DialogueNode;
@@ -52,7 +52,7 @@ public class DialogueNode : Node {
 	}
 
 
-    public string[] formatArgNames;
+    public AttributeID[] formatIds;
     public int speekerIndex = 0; //0是本人
 
 	// Use this for initialization

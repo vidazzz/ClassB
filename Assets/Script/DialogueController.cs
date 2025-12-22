@@ -206,9 +206,9 @@ public class DialogueController : MonoBehaviour
                     options.Add(option);//存储选项节点
                     //option.hasChecked = false;
                     textMesh.text += "\n" + (i + 1) + ". " + option.line;
-                    if (option.checkingTalentName != "")
+                    if (option.checkingTalentID != 0)
                         if (!option.hasChecked)
-                            textMesh.text += "\t" + DiceCheck.Instance.PredictionString(option.checkingTalentName, option.checkingTalentLevel,Hero.Instance);
+                            textMesh.text += "\t" + DiceCheck.Instance.PredictionString(option.checkingTalentID, option.checkingTalentLevel,Hero.Instance);
                         else
                             textMesh.text += "\t" + (option.checkResult ? "<color=green>已成功</color>" : "<color=red>已失败</color>");
                 }

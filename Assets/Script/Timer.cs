@@ -177,6 +177,7 @@ public class Timer : MonoBehaviour
             {
                 mm++;
                 ss = 0;
+                //Debug.Log($"time:{Time.ToMinutes()}");
             }
                 
             if (mm >=60)
@@ -290,14 +291,16 @@ public class Timer : MonoBehaviour
         CoroutineQueueManager.nextFrameCoroutineQueue = new();
         pauseIcon = GameObject.Find("PauseIcon");
         pauseIcon.SetActive(false);
+
+        mm = DateTime.Now.Minute;
+        hh = DateTime.Now.Hour < 9 ? DateTime.Now.Hour + 24 : DateTime.Now.Hour;
+        StartCoroutine(ClockCoroutine());
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        mm = DateTime.Now.Minute;
-        hh = DateTime.Now.Hour < 9 ? DateTime.Now.Hour + 24 : DateTime.Now.Hour;
-        StartCoroutine(ClockCoroutine());
+
     }
 
     // Update is called once per frame

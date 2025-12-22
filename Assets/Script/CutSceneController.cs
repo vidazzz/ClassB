@@ -159,7 +159,7 @@ public class CutSceneController : MonoBehaviour
     }
     IEnumerator NPCMoves(NPC actor,GameObject destination)
     {
-        yield return StartCoroutine(actor.MoveTo(destination));
+        yield return StartCoroutine(actor.behaviorManager.MoveTo(destination));
     }
 
     //已被Graph_NPC_Dialogue替代

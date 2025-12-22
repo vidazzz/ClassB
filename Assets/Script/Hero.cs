@@ -21,7 +21,7 @@ public class Hero : Character
     public bool canActive = true;
     Vector2 currentDirection = -Vector2.up;
     [HideInInspector]
-
+    public Action currenAction;
 
     private void Move()
     {

@@ -22,12 +22,12 @@ public class DiceCheck : MonoBehaviour
     }
     private TextMeshProUGUI checkResultText;
     
-    public string PredictionString(string checkingName ,int checkingValue ,Character character)
+    public string PredictionString(AttributeID checkingID ,int checkingValue ,Character character)
     {
-        Character.TalentData talentData = (Character.TalentData)character.GetTalent(checkingName);
+        Talent talent = (Talent)character.lifeController.talentListManager.GetAttributeByEnum(checkingID);
         float possibility;
         Color color;
-        possibility = (float)talentData.value/(talentData.value + checkingValue);
+        possibility = (float)talent.value/(talent.value + checkingValue);
         possibility = (float)Math.Round(possibility, 2)*100;
         if(possibility < 10)
             color = Color.gray;
@@ -39,21 +39,21 @@ public class DiceCheck : MonoBehaviour
             color = Color.cyan;
         else
             color = Color.green;
-        return "[" + talentData.talent.TalentName + "]<color=#" + ColorUtility.ToHtmlStringRGB(color) + ">" + possibility.ToString() +"%</color>";
+        return "[" + talent.Name + "]<color=#" + ColorUtility.ToHtmlStringRGB(color) + ">" + possibility.ToString() +"%</color>";
     }
-    public bool CheckTalent(string checkingTalentName,int checkingSkillLevel,Character character)
+    public bool CheckTalent(AttributeID checkingTalentID,int checkingSkillLevel,Character character)
     {
-        Character.TalentData heroTalentData = (Character.TalentData)character.GetTalent(checkingTalentName);
+        Talent heroTalent = (Talent)character.lifeController.talentListManager.GetAttributeByEnum(checkingTalentID);
         bool result;
-        int dice = UnityEngine.Random.Range(0,heroTalentData.value + checkingSkillLevel);
-        result = dice < heroTalentData.value;   
-        DisplayResult(heroTalentData.talent.TalentName,result);
+        int dice = (int)UnityEngine.Random.Range(0,heroTalent.value + checkingSkillLevel);
+        result = dice < heroTalent.value;   
+        DisplayResult(heroTalent.Name,result);
         return result;
     }
     
-    public bool CheckStats(string statsName,float value,Character character)
+    public bool CheckStats(AttributeID statsID,float value,Character character)
     {
-        bool result = character.GetComponent<LifeController>().GetStatValue(statsName) >= value;
+        bool result = character.GetComponent<LifeController>().statListManager.GetAttributeByEnum(statsID).value >= value;
         return result;
     }
 

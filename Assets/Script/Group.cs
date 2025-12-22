@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,7 +8,7 @@ public class Group : MonoBehaviour
     [HideInInspector]
     public string groupName; // 群组名称
     public Sprite profilePic; // 群组头像
-    public Hobby hobby; // 主题（如“冒险”“美食”，决定活动属性）
+    public AttributeID hobbyId; // 主题（如“冒险”“美食”，决定活动属性）
     public int level; // 等级（初始1级）
     public float currentActive; // 当前活跃度
     public float decayValue; // 每日衰减值（= level * 0.5，随等级提高）
@@ -19,10 +20,10 @@ public class Group : MonoBehaviour
 
     public YouChat.Chat chat; // 关联的聊天群
 
-    public void InitializeGroup(Hobby groupTheme, List<Character> initialMembers, Sprite profilePic = null)
+    public void InitializeGroup(AttributeID hobbyId, List<Character> initialMembers, Sprite profilePic = null)
     {
-        groupName = groupTheme.hobbyName + "群";
-        hobby = groupTheme;
+        groupName = hobbyId.ToString() + "群";
+        this.hobbyId = hobbyId;
         this.profilePic = profilePic;
         level = 1;
         currentActive = 0f;
@@ -44,14 +45,12 @@ public class Group : MonoBehaviour
     public void InitializeActiveTasks()
     {
         activeTasks = new List<TaskManager.TaskData>();
-        foreach (Device device in hobby.devices)
+        foreach (Interactable interactable in DataSetting.Instance.actionList.Find(a => a.theme == hobbyId).interactables)
         {
             TaskManager.TaskData newTask = new()
             {
-                taskName = $"{hobby.hobbyName}圈 {Timer.Time.dd}/{Timer.Time.hh}/{Timer.Time.mm} 冲{device.name}活动",
-                needName = device.gain.needName,
-                targetValue = 5,//属性振幅目标
-                interactables = new List<Interactable> { device },
+                taskName = $"{hobbyId}圈 {Timer.Time.dd}/{Timer.Time.hh}/{Timer.Time.mm} 冲{interactable.name}活动",
+                interactable = interactable,
                 duration = 60 // 默认截止时间1小时
             };
             activeTasks.Add(newTask);

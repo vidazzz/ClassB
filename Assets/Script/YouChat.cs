@@ -85,11 +85,11 @@ public class YouChat : MonoBehaviour
         }
     }
 
-    public Group SetupChatTagAndBandGroup(Hobby hobby, List<Character> groupMembers, Sprite profilePic = null)
+    public Group SetupChatTagAndBandGroup(AttributeID hobbyID, List<Character> groupMembers, Sprite profilePic = null)
     {
         GameObject chatTag = Instantiate(chatPrefab, chatPanel);
         Group group = chatTag.GetComponent<Group>();
-        group.InitializeGroup(hobby, groupMembers, profilePic);
+        group.InitializeGroup(hobbyID, groupMembers, profilePic);
         chatTag.GetComponentInChildren<TextMeshProUGUI>().text = group.groupName;
         chatTag.GetComponentsInChildren<Image>()[1].sprite = profilePic;
         chatTag.GetComponent<Button>().onClick.AddListener(() =>
@@ -221,9 +221,9 @@ public class YouChat : MonoBehaviour
                     options.Add(option);//存储选项节点
                     //option.hasChecked = false;
                     typpeinTextMesh.text += "\n" + (i + 1) + ". " + option.line;
-                    if (option.checkingTalentName != "")
+                    if (option.checkingTalentID != 0)
                         if (!option.hasChecked)
-                            typpeinTextMesh.text += "\t" + DiceCheck.Instance.PredictionString(option.checkingTalentName, option.checkingTalentLevel, Hero.Instance);
+                            typpeinTextMesh.text += "\t" + DiceCheck.Instance.PredictionString(option.checkingTalentID, option.checkingTalentLevel, Hero.Instance);
                         else
                             typpeinTextMesh.text += "\t" + (option.checkResult ? "<color=green>已成功</color>" : "<color=red>已失败</color>");
                 }

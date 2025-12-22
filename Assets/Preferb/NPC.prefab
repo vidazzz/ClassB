@@ -436,6 +436,8 @@ GameObject:
   - component: {fileID: 42871176506680659}
   - component: {fileID: 6298020359651462320}
   - component: {fileID: 7552774599953980320}
+  - component: {fileID: 4729803415312527319}
+  - component: {fileID: 1057554052748622637}
   m_Layer: 3
   m_Name: NPC
   m_TagString: Untagged
@@ -565,12 +567,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   users: []
   userLimit: 0
-  cost:
-    needName: 
-    value: 0
-  gain:
-    needName: 
-    value: 0
   duration: 0
   interactDisdence: 1
   interactPoint: []
@@ -579,56 +575,20 @@ MonoBehaviour:
   fSpeed: 3
   lifeController: {fileID: 0}
   dialogueController: {fileID: 42871176506680659}
+  workManager: {fileID: 0}
+  actionManager: {fileID: 0}
   spawnPosition: {x: 0, y: 0, z: 0}
   profilePic: {fileID: 21300000, guid: 4616d024e32e8814cb775ea678f0b67d, type: 3}
   conversationAffinityThreshold: 0
-  talentDataList:
-  - talent:
-      TalentName: 
-      id: 0
-      type: 0
-    talentIndex: 0
-    value: 10
-  - talent:
-      TalentName: 
-      id: 0
-      type: 0
-    talentIndex: 1
-    value: 10
-  - talent:
-      TalentName: 
-      id: 0
-      type: 0
-    talentIndex: 2
-    value: 10
-  action:
-    type: 0
-    target: {fileID: 0}
-    isWaiting: 0
-    priorityJob: 0
-    priorityHobby: 0
-    priorityStat: 0
-    priorityTask: 0
   actions: []
-  hobbyDataList:
-  - hobby:
-      hobbyName: 
-      id: 0
-      talents: []
-      devices: []
-    hobbyIndex: 1
-    passion: 5
   affinityEffectArgsList:
   - name: GoodJob
     buffIndexArrey: 00000000
     affinityThreshold: 2
   IsMoving: 0
-  topicHobby:
-    hobbyName: 
-    id: 0
-    talents: []
-    devices: []
-  groups: []
+  topicHobbyName: 
+  hoppyGroups: []
+  jobGroups: []
   astar: {fileID: 267063047941556591}
   isMeeting: 0
 --- !u!50 &8595137357344968266
@@ -731,8 +691,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22105274e8549054d823f17dcd379708, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stats: []
-  needs: []
+  statList: []
+  needList: []
+  talentList: []
+  hobbyList:
+  - id: 403
+    value: 20
+    owner: {fileID: 0}
+    talents: []
+    devices: []
 --- !u!114 &7552774599953980320
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -746,6 +713,62 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tasks: []
+--- !u!114 &4729803415312527319
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6906196488222310973}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b03469abc1bd402fa31cfc60f06b735, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  kpi: 0
+  requiredKPI: 0
+  lastRequiredKPI: 0
+  kpiMultiplier: 0
+  salary: 0
+  haveFinishWork: 0
+  tasks: []
+  workEfficiency: 1
+  workTime: 0
+--- !u!114 &1057554052748622637
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6906196488222310973}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14b1532db4aefb14abb3af4ee10eaae1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  actions: []
+  currentAction:
+    type: 0
+    checkItemNames: []
+    output: 0
+    target: {fileID: 0}
+    devices: []
+    owner: {fileID: 0}
+    need:
+      id: 0
+      value: 0
+      owner: {fileID: 0}
+      decay: 0
+      isChanging: 0
+    efficiency: 0
+    isWaiting: 0
+    priorityWork: 0
+    priorityHobby: 0
+    priority: 0
+  npc: {fileID: 0}
+  screenSpaceCanvas: {fileID: 0}
+  progressBarPrefab: {fileID: 7250647943176387576, guid: 610489b3f8015574bbbe5534b820df41, type: 3}
+  progressBar: {fileID: 0}
 --- !u!1 &8975183213159628016
 GameObject:
   m_ObjectHideFlags: 0

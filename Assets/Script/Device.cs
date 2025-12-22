@@ -7,81 +7,48 @@ using UnityEngine.UI;
 
 public class Device : Interactable
 {
-    public Hobby hobby;
+    public string hobbyName;
     public Character owner;
-    public List<string> checkItems;
-    public List<Character.Value> outputs;
-    public float maxProgress = 100;
-    public Canvas screenSpaceCanvas;
-    public GameObject progressBarPrefab;
-    private GameObject progressBarObj;
-    public ProgressBar progressBar;
-    public Operation operation;
+    public float efficiencyMultiplier = 1f;
+    public float outputMultiplier = 1f;
     
-
-
-    public override IEnumerator Interact(Character interactor)
+    public override IEnumerator Interact(Character starter)
     {
-        users.Add(interactor);
-        if (interactor is Hero)
+        ActionManager actionManager = starter.actionManager;
+        if (starter is Hero)
         {
             Debug.Log("Hero using Device");
-            progressBar.gameObject.SetActive(true);
-            operation = new(interactor, checkItems, outputs, maxProgress);
-            yield return interactor.StartCoroutine(operation.ProcessHero());
-            progressBar.gameObject.SetActive(false);
+            yield return actionManager.StartCoroutine(actionManager.CurrentAction.ProcessHero());
             Debug.Log("Used by Hero");
         }
-        Need gainNeed = null;
-        //处理收益和消耗
-        if (gain.needName != "")
+        else if(starter is NPC)
         {
-            gainNeed = interactor.lifeController.GetNeed(gain.needName);
-            gainNeed.isChanging = true; //将需求标记为正在操作
-            gainNeed.MotifyValue(gain.value);
+            Debug.Log("actionManager.CurrentAction.target: " + actionManager.CurrentAction.target);
+            yield return actionManager.StartCoroutine(actionManager.CurrentAction.ProcessNPC());
         }
-        if (cost.needName != "")
-            interactor.lifeController.GetNeed(cost.needName).MotifyValue(-cost.value);
-        yield return StartCoroutine(PlayAnimation());
-        if (gainNeed != null)
-            gainNeed.isChanging = false;
-        users.Remove(interactor);
+        DeclaimedBy(starter);
     }
 
-    protected IEnumerator PlayAnimation()
+    protected void TogglePlayAnimation()
     {
         if (animator != null)
-            animator.SetBool("isOccupied", true);
-        Timer.Date beginTime = Timer.Time;
-        while (Timer.Time - beginTime < duration) //使用时间
         {
-            yield return null;
+            bool start = animator.GetBool("isOccupied");
+            animator.SetBool("isOccupied", !start);
         }
-        if (animator != null)
-            animator.SetBool("isOccupied", false);
     }
 
     new void Awake()
     {
         base.Awake();
-        screenSpaceCanvas = GameObject.Find("ScreenSpaceCanvas")?.GetComponent<Canvas>();
-        Debug.Assert(screenSpaceCanvas != null, "Cannot find ScreenSpaceCanvas in scene");
+
     }
 
     private void Start()
     {
-        progressBarObj = Instantiate(progressBarPrefab, screenSpaceCanvas.transform);
-        progressBarObj.SetActive(false);
-        progressBar = progressBarObj.GetComponent<ProgressBar>();
-        Debug.Log(progressBar);
-        progressBar.owner = gameObject;
     }
 
     private void Update()
     {
-        if(progressBarObj.activeSelf)
-        {
-            progressBar.progress = operation.Progress;
-        }
     }
 }

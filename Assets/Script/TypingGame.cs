@@ -66,13 +66,13 @@ public class TypingGame : MonoBehaviour
     {
         //EventManager.Instance.OnOffWork -= EndGame;//订阅广播,以后结算时自动关闭打字界面
         //EventManager.Instance.OnDayEnd -= EndGame; //订阅广播,以后结算时自动关闭打字界面
-        EventManager.Instance.OnOffWork2 -= Hero.Instance.lifeController.TrySalarySettleAccounts;
-        EventManager.Instance.OnDayEnd -= Hero.Instance.lifeController.TrySalarySettleAccountsAffterWork;
+        //EventManager.Instance.OnOffWork2 -= Hero.Instance.lifeController.TrySalarySettleAccounts;
+        //EventManager.Instance.OnDayEnd -= Hero.Instance.lifeController.TrySalarySettleAccountsAffterWork;
     }
 
     void Update()
     {
-        fishingTimer();       
+        FishingTimer();       
     }
     
 
@@ -179,8 +179,8 @@ public class TypingGame : MonoBehaviour
                     fishingTime = 0;
                     CheckInput();
                 }
-                if ((int)Hero.Instance.lifeController.GetStat("preesure").StatState >= 2) //如果压力过大就会导致字符跳动
-                    HighlightCorrectCharacter(ReplaceRandomChar(currentSentence,ShuffleIndexArray,(int)Hero.Instance.lifeController.GetStat("preesure").StatState - 1));
+                if ((int)Hero.Instance.lifeController.statListManager.GetAttributeByEnum(AttributeID.preesure).State >= 2) //如果压力过大就会导致字符跳动
+                    HighlightCorrectCharacter(ReplaceRandomChar(currentSentence,ShuffleIndexArray,(int)Hero.Instance.lifeController.statListManager.GetAttributeByEnum(AttributeID.preesure).State - 1));
                 else
                     HighlightCorrectCharacter(currentSentence);
             }
@@ -323,11 +323,11 @@ public class TypingGame : MonoBehaviour
 
     public void SettleAccount()
     {
-        Hero.Instance.lifeController.AddModifier("kpi",kpi*Hero.Instance.lifeController.GetStatValue("KpiMultiplier"));
-        Hero.Instance.lifeController.AddModifier("preesure",preesure);
+        Hero.Instance.lifeController.statListManager.AddByEnum(AttributeID.kpi,kpi*Hero.Instance.lifeController.statListManager.GetAttributeByEnum(AttributeID.kpiMultiplier).value);
+        Hero.Instance.lifeController.statListManager.AddByEnum(AttributeID.preesure,preesure);
     }
 
-    void fishingTimer()
+    void FishingTimer()
     {
         if(!isTyping || Timer.hasPaused)
             return;
@@ -335,9 +335,9 @@ public class TypingGame : MonoBehaviour
         if(fishingTime>=fishingTimeThreshold)
         {
             fishingTime = 0;
-            Hero.Instance.lifeController.AddModifier("preesure",-1); //摸鱼解压 
-            if(Hero.Instance.lifeController.GetStatValue("KpiMultiplier")>1)
-                Hero.Instance.lifeController.AddModifier("kpi", -5); //老板查岗时公然摸鱼扣kpi
+            Hero.Instance.lifeController.statListManager.AddByEnum(AttributeID.preesure,-1); //摸鱼解压 
+            if(Hero.Instance.lifeController.statListManager.GetAttributeByEnum(AttributeID.kpiMultiplier).value > 1)
+                Hero.Instance.lifeController.statListManager.AddByEnum(AttributeID.kpi, -5); //老板查岗时公然摸鱼扣kpi
         }
     }
 }
