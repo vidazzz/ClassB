@@ -105,11 +105,6 @@ public class Character : Interactable
         }
     }
 
-
-
-
-
-
     private void TalentSkillInitalize()
     {
         int[] cost = { 1, 1 };
@@ -121,19 +116,11 @@ public class Character : Interactable
         };
     }
 
-    /*
-    protected void InitializeActions()
+    //随机生成一个价值观坐标；
+    protected void SetUpPersonalValues()
     {
-        foreach (Device device in DataSetting.Instance.devices)
-        {
-            if (device.owner != null)
-                if (device.owner != this)
-                    continue;
-            Action useAction = new(ActionType.use, device, this);
-            actions.Add(useAction);
-        }
+        personalValues = new(UnityEngine.Random.Range(-50,50),UnityEngine.Random.Range(-50,50));
     }
-    */
 
     // Start is called before the first frame update
     protected new void Awake()
@@ -141,15 +128,12 @@ public class Character : Interactable
         base.Awake();
         socialManager = GetComponent<SocialManager>();
         lifeController = GetComponent<LifeController>();
-        Debug.Assert(lifeController != null, "lifecontruller 不可为空");
         dialogueController = GetComponent<DialogueController>();
-        Debug.Assert(dialogueController != null, "dialogueController 不可为空");
         workManager = GetComponent<WorkManager>();
-        Debug.Assert(workManager != null, "workManager 不可为空");
         actionManager = GetComponent<ActionManager>();
         popUpAnimator = transform.Find("Character_PopUp").GetComponent<Animator>();
         Debug.Assert(popUpAnimator != null, "popUpAnimator 不可为空");
-
+        SetUpPersonalValues();
         //TalentSkillInitalize();
     }
 

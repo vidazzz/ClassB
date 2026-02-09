@@ -34,7 +34,7 @@ public class PopUp : MonoBehaviour
 
     void Awake()
     {
-        //gameObject.SetActive(false);
+        gameObject.SetActive(false);
     }
     // Start is called before the first frame update
     void Start()

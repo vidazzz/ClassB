@@ -132,9 +132,15 @@ public class LifeController : MonoBehaviour
     }
 
     //尝试根据给出的数值名从属性、天赋、爱好和好感度中查找数值
-    public int TryFindValueByEnum(AttributeID id, Character other = null)
+    public int TryGetValueByEnum(AttributeID id, out Type type,Character other = null)
     {
         object obj = TryGetValueObj(id);
+        if(obj == null)
+        {
+            type = null;
+            return 0;
+        }
+        type = obj.GetType();
         float result = 0;
         switch (obj)
         {

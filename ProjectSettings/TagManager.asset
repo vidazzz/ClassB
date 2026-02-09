@@ -10,10 +10,10 @@ TagManager:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - Character
+  - Interactable
   - Water
   - UI
-  - Device
+  - Hero
   - 
   - 
   - 

@@ -109,39 +109,10 @@ public class BehaviorManager : MonoBehaviour
 
     public IEnumerator StartConv(Character target)
     {
-        Conv conv;
         AnimateStopMove();
         FaceTheTarget(target.gameObject);
-        conv = new(owner,target);
+        yield return _waitForSeconds1;
 
-        Topic newTopic = conv.DiscoverNewTopic();
-        if(newTopic != null)        
-            socialManager.topics.Add(newTopic);
-        Debug.Log("conv.speakTimes: " + conv.speakTimes);
-        while(conv.speakTimes > 0)
-        {
-            Topic selectedTopic = conv.SelectTopicNPC();
-            yield return _waitForSeconds1;
-            float topicScore;
-            if (selectedTopic == null)
-                break;
-            else
-                topicScore = conv.CaculateTopicScore(selectedTopic);
-            if(topicScore >= 60 && topicScore < 80)
-            {
-                conv.IncreaseSpeakTimes();
-            }
-            else if(topicScore >= 80 && topicScore < 100)
-            {
-                Topic completedTopic = conv.CompleteTopic(selectedTopic);
-                socialManager.topics.Add(completedTopic);
-                conv.IncreaseSpeakTimes();
-            }
-            //选择的话题消耗掉了
-            socialManager.topics.Remove(selectedTopic);
-            conv.DecreaseSpeakTimes();
-        }
-        conv.CloseConv();
     }
     public IEnumerator Greeting()
     {

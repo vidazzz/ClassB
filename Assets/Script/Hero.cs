@@ -1,9 +1,20 @@
 using System.Collections;
+using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class Hero : Character
 {
+    private static readonly WaitForSeconds _waitForSeconds = new(1);
+    public InputActionAsset inputAction;
+    public InputActionReference interactAction;
+    public InputActionReference useAction;
+    public InputActionReference menuNavigateAction;
+    public InputActionReference menuSelectAction;
+    public InputActionReference menuBackAction;
     private static Hero _instance; //单例
     public static Hero Instance
     {
@@ -21,7 +32,9 @@ public class Hero : Character
     public bool canActive = true;
     Vector2 currentDirection = -Vector2.up;
     [HideInInspector]
-    public Action currenAction;
+    public Action currentAction;
+    private Interactable currentInteractable;
+    public int lagerMask;
 
     private void Move()
     {
@@ -42,17 +55,14 @@ public class Hero : Character
         
     }
     
-    private Interactable currentInteractable;
-    
     void CheckForInteractables()
     {
         // 射线检测前方可互动物品
-        Collider2D collider = Physics2D.OverlapPoint(transform.position+(Vector3)currentDirection);
+        RaycastHit2D  hit = Physics2D.Raycast(transform.position,(Vector3)currentDirection,1,lagerMask);
 
-         Debug.DrawLine(transform.position,transform.position + (Vector3)currentDirection, Color.yellow, 0.1f);
-        if (collider != null)
+        if (hit)
         {
-            Interactable interactable = collider.GetComponent<Interactable>();
+            Interactable interactable = hit.collider.GetComponent<Interactable>();
             if (interactable != null)
             {
                 // 如果检测到新的可互动物品
@@ -80,11 +90,70 @@ public class Hero : Character
     
     void HandleInteractionInput()
     {
-        // 当按下互动键且有可互动物品时，执行互动
-        if (Input.GetKeyDown(KeyCode.E) && currentInteractable != null)
+        if(currentInteractable == null)
+            return;
+        //如按下交互键，显示选项
+
+        if (interactAction.action.WasPerformedThisFrame())
         {
-            StartCoroutine(currentInteractable.Interact(this));
+            StartCoroutine(ConvController.Instance.ShowOptions(currentInteractable));
+            Debug.Log("Interact button");
         }
+        
+        //如果按住使用键且当前可互动物品是设备，使用设备
+        if (useAction.action.WasPerformedThisFrame() && currentInteractable is Device device)
+        {
+            Debug.Log("Use button");
+            UseDevice(device);
+        }
+            
+    }
+
+    //使用设备
+    public void UseDevice(Device device)
+    {
+        Action action = actionManager.ChooseActionHero(device);
+        if(action == null)
+        {
+            Debug.LogWarning("No valid action found for device interaction.");
+            return; 
+        } 
+        StartCoroutine(action.ProcessHero());
+    }
+    //简单交互
+    public void SampleInteractWith(Item item)
+    {
+        StartCoroutine(item.Interact(this));
+    }
+
+    // 调查
+    public void Investigate(Interactable target, Topic topic)
+    {
+        
+    }
+    // 交涉
+    public void Negotiate(Character target, Topic topic)
+    {
+        StartCoroutine(NegotiationCoroutine(target, topic));
+    }
+    public IEnumerator NegotiationCoroutine(Character target, Topic topic)
+    {
+        Negotiation Negotiation = new(topic, target, Timer.Time, Timer.Time + 1);
+
+        yield return _waitForSeconds;
+
+    }
+
+    public void EnableInputActionMapPlayer()
+    {
+        inputAction.FindActionMap("Menu").Disable();
+        inputAction.FindActionMap("Player").Enable();
+    }
+
+    public void EnableInputActionMapMenu()
+    {
+        inputAction.FindActionMap("Player").Disable();
+        inputAction.FindActionMap("Menu").Enable();
     }
 
     void Respawn(int invokeDay = -1)
@@ -106,6 +175,7 @@ public class Hero : Character
     new void Awake()
     {
         base.Awake();
+        lagerMask = LayerMask.GetMask("Interactable");
         EventManager.Instance.OnDayBegin += Respawn;
     }
     // Start is called before the first frame update
@@ -113,7 +183,7 @@ public class Hero : Character
     {
         base.Start();
         DisplayStatsValue(); 
-        
+        socialManager.SetUpTopics();
     }
 
     void OnDestroy()
@@ -132,6 +202,5 @@ public class Hero : Character
         CheckForInteractables();
         // 处理互动输入
         HandleInteractionInput();
-        //显示日常属性
     }
 }

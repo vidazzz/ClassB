@@ -56,5 +56,7 @@ public abstract class Interactable : MonoBehaviour
     protected void Awake()
     {
         animator = GetComponent<Animator>();
+        //将可交互物的Z轴位置初始化为0
+        transform.position = new(transform.position.x,transform.position.y,0);
     }
 }

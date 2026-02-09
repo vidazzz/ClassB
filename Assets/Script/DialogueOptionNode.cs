@@ -41,20 +41,20 @@ public class DialogueOptionNode : Node
 		List<AttributeID> ids;
 		if (checkingTalentID != 0 && !hasChecked) //填了checkingTalentName且没有检定过就进行检定
 		{
-			checkResult = DiceCheck.Instance.CheckTalent(checkingTalentID, checkingTalentLevel ,Hero.Instance);
+			checkResult = DiceCheck.Instance.CheckAttribute(checkingTalentID, checkingTalentLevel ,Hero.Instance);
 			hasChecked = true;
 		}
 		if (checkResult) //根据检定结果决定采用的效果和跳转索引
 		{
 			type = succedEffectType;
 			ids = succedIds;
-			nextNode = GetOutputPort("succeededNode").Connection?.node as DialogueNode;
+			nextNode = GetOutputPort("trueNode").Connection?.node as DialogueNode;
 		}
 		else
 		{
 			type = failedEffectType;
 			ids = failedIds;
-			nextNode = GetOutputPort("failedNode").Connection?.node as DialogueNode;
+			nextNode = GetOutputPort("falseNode").Connection?.node as DialogueNode;
 		}
 
 		// 根据配置名称选择要执行的协程

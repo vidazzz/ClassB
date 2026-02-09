@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class WhitBoard : Interactable
+public class WhitBoard : Item
 {
     public GameObject PMUI;
     public override IEnumerator Interact(Character interactor)
@@ -35,17 +35,5 @@ public class WhitBoard : Interactable
             PM_Layout.ArrangePanelsInGrid();    
         }   
         yield return null;
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

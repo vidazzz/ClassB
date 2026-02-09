@@ -41,21 +41,24 @@ public class DiceCheck : MonoBehaviour
             color = Color.green;
         return "[" + talent.Name + "]<color=#" + ColorUtility.ToHtmlStringRGB(color) + ">" + possibility.ToString() +"%</color>";
     }
-    public bool CheckTalent(AttributeID checkingTalentID,int checkingSkillLevel,Character character)
+    public bool CheckAttribute(AttributeID checkingID,int checkingValue,Character character)
     {
-        Talent heroTalent = (Talent)character.lifeController.talentListManager.GetAttributeByEnum(checkingTalentID);
         bool result;
-        int dice = (int)UnityEngine.Random.Range(0,heroTalent.value + checkingSkillLevel);
-        result = dice < heroTalent.value;   
-        DisplayResult(heroTalent.Name,result);
+        int value = character.lifeController.TryGetValueByEnum(checkingID, out Type type);
+        if (type == typeof(Talent))
+        {
+            int dice = UnityEngine.Random.Range(0, value + checkingValue);
+            result = dice < value;
+        }
+        else
+        {
+            // Unknown attribute type: treat as failure by default
+            result = value >= checkingValue;
+        }
+        DisplayResult(checkingID.ToString(),result);
         return result;
     }
     
-    public bool CheckStats(AttributeID statsID,float value,Character character)
-    {
-        bool result = character.GetComponent<LifeController>().statListManager.GetAttributeByEnum(statsID).value >= value;
-        return result;
-    }
 
     public void DisplayResult(string talentName, bool checkResult)
     {

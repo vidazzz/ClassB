@@ -35,6 +35,12 @@ public class ActionManager : MonoBehaviour
         return maxPriorityAction;
     }
 
+    public Action ChooseActionHero(Interactable interactable)
+    {
+        Action action = actions.Find(a => a.interactables.Contains(interactable));
+        return action;
+    }
+
     void Awake()
     {
         character = GetComponent<Character>();

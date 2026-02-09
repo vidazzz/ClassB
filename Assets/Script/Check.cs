@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -38,7 +39,7 @@ public class Check
             this.id = id;
             this.owner = owner;
             this.challenger = challenger;
-            checkResult = owner.lifeController.TryFindValueByEnum(id, challenger);
+            checkResult = owner.lifeController.TryGetValueByEnum(id, out Type type, challenger);
         }
     }
 

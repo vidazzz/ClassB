@@ -6,31 +6,19 @@ using XNode;
 [CreateAssetMenu]
 public class DialogueGraph : NodeGraph
 {
-    public LineCheckingType lineCheckingType;
     public AttributeID checkingID;//talent name or stats name
     public int ckeckingValue;//talent level or stats value
-    public DialogueNode succeededNode;
-    public DialogueNode failedNode;
+    public DialogueNode trueNode;
+    public DialogueNode falseNode;
     public bool hasChecked;
     private DialogueNode startNode;
     public DialogueNode StartNode{
         get{
             if(checkingID == 0) //不填则采用成功节点
-                return succeededNode;
+                return trueNode;
             else if(!hasChecked) //只做一次检定
             {
-                switch(lineCheckingType)
-                {
-                    case LineCheckingType.Stats:
-                        startNode = DialogueStatsCheck(); //保存检定结果
-                        break;
-                    case LineCheckingType.Skill:
-                        startNode = DialogueDiceCheck();
-                        break;
-                    default:
-                        startNode = DialogueDiceCheck();
-                        break;
-                }
+                startNode = DialogueDiceCheck();
                 hasChecked = true;
                 return startNode;
             }
@@ -41,18 +29,10 @@ public class DialogueGraph : NodeGraph
 
     private DialogueNode DialogueDiceCheck()
     { 
-        if(DiceCheck.Instance.CheckTalent(checkingID, ckeckingValue,Hero.Instance))
-            return succeededNode;
+        if(DiceCheck.Instance.CheckAttribute(checkingID, ckeckingValue,Hero.Instance))
+            return trueNode;
         else
-            return failedNode;
-    }
-
-    private DialogueNode DialogueStatsCheck()
-    {
-        if(DiceCheck.Instance.CheckStats(checkingID,ckeckingValue,Hero.Instance))
-            return succeededNode;
-        else
-            return failedNode;
+            return falseNode;
     }
 
     public void Reset()

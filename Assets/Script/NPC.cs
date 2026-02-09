@@ -20,11 +20,6 @@ public class NPC : Character
         {
             Timer.Pause();
             StopAllCoroutines();
-            //Hero.Instance.canActive = false;
-            //if (isMeeting) //多人对话
-            {
-                //yield return StartCoroutine(dialogueController.GraphDisplayDialogue(dialogueController.multiPersonDialogueGraphs[scheduleItem.multiPersonDialoguesIndex], scheduleItem.targetList));
-            }
             if (dialogueController.dialogueGraph != null) //单人对话
             {
                 yield return StartCoroutine(dialogueController.GraphDisplayDialogue(dialogueController.dialogueGraph));

@@ -15,7 +15,7 @@ public class DialogueNode : Node {
 				string[] formatArgs = new string[formatIds.Length];
 				for (int i = 0; i < formatIds.Length; i++)
 				{
-					formatArgs[i] = Hero.Instance.lifeController.statListManager.GetAttributeByEnum(formatIds[i]).ToString();
+					formatArgs[i] = formatIds[i].ToString();
 				}
 				return string.Format(line, formatArgs);
 			}
@@ -40,7 +40,7 @@ public class DialogueNode : Node {
 				return nextNode;
 			if (checkingStatID == 0)
 				return GetOutputPort("succeededNode")?.Connection?.node as DialogueNode;
-			if (DiceCheck.Instance.CheckStats(checkingStatID, checkingValue, Hero.Instance))
+			if (DiceCheck.Instance.CheckAttribute(checkingStatID, checkingValue, Hero.Instance))
 				return GetOutputPort("succeededNode")?.Connection?.node as DialogueNode;
 			else
 				return GetOutputPort("failedNode")?.Connection?.node as DialogueNode;

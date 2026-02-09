@@ -104,7 +104,7 @@ public class Action
 
         public void UpdatePriorityNeed(Need need)
         {
-            Debug.Log($"UpdatePriorityNeed, charactor:{need.owner}, need:{need.owner}'s {need.id}, action.need:{action.need.owner}'s {action.need.id} AttributeState:{need.State}");
+            //Debug.Log($"UpdatePriorityNeed, charactor:{need.owner}, need:{need.owner}'s {need.id}, action.need:{action.need.owner}'s {action.need.id} AttributeState:{need.State}");
             if(need != action.need)
                 return;
             if(need.id == AttributeID.social && interactable is Character character)
@@ -130,18 +130,6 @@ public class Action
             Debug.Log($"UpdatePriorityNeed changed, charactor:{need.owner}, priorityNeed:{priorityNeed}");
         }
 
-        /*
-        public void PriorityNeed(Need need)
-        {
-            VFM = action.target.cost.value < 1 ? action.target.gain.value - action.target.cost.value : action.target.gain.value / action.target.cost.value;
-            efficiency = action.target.gain.value / action.target.duration;
-            {
-                VFM = action.target.gain.value < 1 ? -action.target.cost.value + action.target.gain.value : -action.target.cost.value / action.target.gain.value;
-                efficiency = -action.target.cost.value / action.target.duration;
-                
-            }
-        }
-        */
     }
 
     public Action(Action action,Character owner)
@@ -164,7 +152,7 @@ public class Action
         {
             if(interactable is Device device)
             {
-                if(device.owner != null && device.owner != owner) //设备被占用且不是自己的，跳过
+                if(device.owner != null && device.owner != owner) //设备被分配且不是自己的，跳过
                     continue;     
             }
             if(interactable is Character character)
@@ -187,7 +175,7 @@ public class Action
     {
         foreach(AttributeID AttributeID in checkAttributeList)
         {
-           efficiency += owner.lifeController.TryFindValueByEnum(AttributeID);
+           efficiency += owner.lifeController.TryGetValueByEnum(AttributeID,out Type type);
            Debug.Log($"AttributeID:{AttributeID} efficiency:{efficiency}");
         }
     }
@@ -234,7 +222,7 @@ public class Action
             if (Timer.Time >= task.deadLine)
                 result = 999; // 任务已过截止时间，优先级最高
             else
-                result = (task.maxProgress - task.currentProgress) * 10 / (task.deadLine - Timer.Time);
+                result = (task.maxProgress - task.currentProgress) * 1000 / (task.deadLine - Timer.Time);
             Debug.Log($"(maxProgress:{task.maxProgress} - currentProgress:{task.currentProgress}) * 10 / (deadLine:{task.deadLine.ToMinutes()} - Time:{Timer.Time.ToMinutes()})");
         }
         else
@@ -262,11 +250,9 @@ public class Action
     {
         if (need != null)
             need.isChanging = true; //将需求标记为正在操作
-
         if(progress == null || progress.isCompleted)
-            progress = new(this);             
+            progress = new(this);          
         yield return progress.ProcessHero(interactableData.ProgressEfficiency);
-
         if (need != null)
             need.isChanging = false; //进程结束，将正在操作标记恢复
     }
@@ -663,25 +649,27 @@ public class Progress
     {
         //CaculateEfficiency();
         float originTimeScale = Time.timeScale;
-        Time.timeScale *= 20;//加速
-
-        Timer.Date beginTime = Timer.Time;
-        while (Input.GetKey(KeyCode.E)) //持续操作
+        Time.timeScale *= 5;//加速
+        progressBar.percentage = 0; 
+        progressBar.gameObject.SetActive(true);
+        while (Hero.Instance.useAction.action.WasPressedThisFrame()) //持续操作
         {
             yield return null;
-            if (Timer.Time - beginTime >= 1)
+            value += progressEfficiency * Timer.DeltaTime;//每帧加进度;
+            progressBar.percentage = Percentage;
+            Debug.Log("ProcessHero: " + value);
+            if (value >= max)
             {
-                value += progressEfficiency;
-                beginTime = Timer.Time;
-                if (value >= max)
-                {
-                    value = max;
-                    yield return null;
-                    Completed();
-                    break;
-                }
-            }
+                value = max;
+                yield return null;
+                Completed();
+                progressBar.percentage = 1;   
+                yield return null;
+                //按住的话直接开始下一轮
+                value = 0;
+            }            
         }
+        progressBar.gameObject.SetActive(false);
         Time.timeScale = originTimeScale;//恢复时间流逝速度
     }
     public IEnumerator ProcessNPC(float progressEfficiency)
@@ -997,49 +985,6 @@ public class Attitude
     }
 }
 
-public class Topic
-{
-    public AttributeID theme = 0;
-    public TopicType Type => GetTopicType();
-    public float completeness;
-    public string description;
-    public float attitudeValue;
-    public float Output => attitudeValue * completeness;
-    
-    public Topic(Character discoverer,Character target)
-    {
-        if(target is NPC npc)
-        {
-            theme = npc.actionManager.CurrentAction.theme;
-        }
-        else if(target is Hero hero)
-        {
-            theme = hero.currenAction.theme;
-        }
-        else
-        Debug.LogWarning($"{discoverer} {target} Topic has no theme");
-        //在该主题上的数值越大，完整性就高，与目标相等时最大，最大值为1
-        completeness = math.min(1,discoverer.lifeController.statListManager.GetAttributeByEnum(theme).value/target.lifeController.statListManager.GetAttributeByEnum(theme).value);
-    }
-    public enum TopicType
-    {
-        none = 0,
-        life,
-        work,
-        political,
-    }
-    public TopicType GetTopicType()
-    {
-        return theme switch
-        {
-            AttributeID.coffee or AttributeID.sports or AttributeID.art or AttributeID.gaming or AttributeID.music => TopicType.life,
-            AttributeID.work => TopicType.work,
-            AttributeID.political => TopicType.political,
-            _ => TopicType.none,
-        };
-    }
-}
-
 //对话情况
 public class Situation
 {
@@ -1054,108 +999,4 @@ public class Situation
 public class Occasion
 {
     
-}
-
-public class Conv
-{
-    public Character starter;
-    public Character responder;
-    public Situation situation;
-    public int speakTimes;
-    public Vector3 output;
-    public Conv(Character starter,Character responder)
-    {
-        this.starter = starter;
-        this.responder = responder;
-        Action action = null;
-        if(responder.IsBusy)
-        {
-            if(responder is NPC npc)
-                action = npc.actionManager.CurrentAction;
-            else if(responder is Hero hero)
-                action = hero.currenAction;
-        }
-        situation = new(action);
-        speakTimes = 1;
-    }
-    public float CaculateTopicScore(Topic topic)
-    {
-        return UnityEngine.Random.Range(0,100) ;
-    }
-    //发掘话题
-    public Topic DiscoverNewTopic()
-    {
-        AttributeID theme;
-        if(responder is NPC npc)
-        {
-            if(npc.IsBusy)
-            {
-                theme = responder.actionManager.CurrentAction.theme;
-            }
-            else
-                return null;
-        }
-        else if(responder is Hero hero)
-        {
-            theme = hero.currenAction.theme;
-        }
-        else
-            theme = 0;
-        if(theme == 0)
-                return null;
-        else
-            return new Topic(starter,responder); 
-    }
-    public Topic SelectTopicNPC()
-    {
-        AttributeID theme;
-        if(situation.action != null)
-            theme = situation.action.theme;
-        else
-            return null;
-        Topic topic = starter.socialManager.topics.Find(a => a.theme == theme);
-        CaculateTopicOutput(topic);
-        return topic; 
-    }
-    public Topic CompleteTopic(Topic topic)
-    {
-        topic.completeness += 0.2f;
-        if(topic.completeness >1)
-            topic.completeness = 1;
-        return topic;
-    }
-    public void IncreaseSpeakTimes()
-    {
-        speakTimes ++;
-    }
-    public void DecreaseSpeakTimes()
-    {
-        speakTimes ++;
-        if(speakTimes <= 0)
-            CloseConv();
-    }
-    public void CaculateTopicOutput(Topic topic)
-    {
-        if(topic == null)
-            return;
-        switch (topic.Type)
-        {
-            case Topic.TopicType.life:
-                output.y += topic.Output;
-                break;
-            case Topic.TopicType.work:
-                output.x += topic.Output;
-                break;
-            case Topic.TopicType.political:
-                output.x += topic.Output;
-                break;
-            default:
-                break;
-        }
-    }
-    public void CloseConv()
-    {
-        Attitude attitude = starter.socialManager.attitudes.Find(a => a.to == responder);
-        attitude.AddValue(output);
-    }
 }

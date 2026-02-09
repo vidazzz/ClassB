@@ -86,9 +86,15 @@ public class SocialManager : MonoBehaviour
         return attitudes.Find(a => a.to == other);
     }
 
-    public void StartConv(Character target)
+    public void SetUpTopics()
     {
-        
+        topics = new()
+        {
+            new Topic(DataSetting.Characters[Random.Range(0, DataSetting.Characters.Count)],"Talk about the weather"), 
+            new Topic(DataSetting.Characters[Random.Range(0, DataSetting.Characters.Count)],"Discuss the latest news"),
+            new Topic(DataSetting.Characters[Random.Range(0, DataSetting.Characters.Count)],"Share your favorite hobbies")
+        };
+
     }
     public void Awake()
     {

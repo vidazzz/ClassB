@@ -2,7 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Door : Interactable
+[RequireComponent(typeof(DialogueController))]
+public class Door : Item
 {
     [HideInInspector]
     public DialogueController dialogueController;
@@ -24,11 +25,5 @@ public class Door : Interactable
     void Start()
     {
         dialogueController = GetComponent<DialogueController>();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }
